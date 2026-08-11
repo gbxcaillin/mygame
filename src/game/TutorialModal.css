@@ -1,0 +1,117 @@
+.tt-tutorial-veil {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 10, 14, 0.72);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 60;
+  padding: 20px;
+  box-sizing: border-box;
+  animation: tt-tutorial-in 0.15s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tt-tutorial-veil {
+    animation: none;
+  }
+}
+
+@keyframes tt-tutorial-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.tt-tutorial-panel {
+  position: relative;
+  width: min(92vw, 480px);
+  max-height: 85dvh;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.tt-tutorial-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px 12px;
+  border-bottom: 1px solid var(--border);
+  flex: none;
+}
+
+.tt-tutorial-head h2 {
+  margin: 0;
+  font-size: 18px;
+  color: var(--text-h);
+}
+
+.tt-tutorial-close {
+  width: 28px;
+  height: 28px;
+  flex: none;
+  border-radius: 999px;
+  background: var(--code-bg);
+  border: none;
+  color: var(--text-h);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.tt-tutorial-body {
+  overflow-y: auto;
+  padding: 16px 18px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.tt-tutorial-body h3 {
+  margin: 0 0 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.tt-tutorial-body p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text);
+}
+
+.tt-tutorial-body p + p {
+  margin-top: 8px;
+}
+
+.tt-tutorial-body ul {
+  margin: 6px 0 0;
+  padding-left: 18px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text);
+}
+
+.tt-tutorial-body li {
+  margin-bottom: 6px;
+}
+
+.tt-tutorial-body li:last-child {
+  margin-bottom: 0;
+}
+
+.tt-tutorial-body strong {
+  color: var(--text-h);
+}

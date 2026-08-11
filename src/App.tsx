@@ -3,6 +3,7 @@ import type { CSSProperties } from "react";
 import { Board } from "./game/Board";
 import { Hand } from "./game/Hand";
 import { CardLightbox } from "./game/CardLightbox";
+import { TutorialModal } from "./game/TutorialModal";
 import { createInitialState, placeCard } from "./game/engine";
 import { dealHands } from "./game/cards";
 import { chooseAiMove, DIFFICULTY_LABELS } from "./game/ai";
@@ -35,6 +36,7 @@ function App() {
   const [difficulty, setDifficulty] = useState<Difficulty>(3);
   const [aiThinking, setAiThinking] = useState(false);
   const [inspecting, setInspecting] = useState<{ card: Card; owner?: PlayerId } | null>(null);
+  const [tutorialOpen, setTutorialOpen] = useState(false);
 
   const appRef = useRef<HTMLDivElement>(null);
   const handRowRef = useRef<HTMLDivElement>(null);
@@ -144,6 +146,14 @@ function App() {
       <div className="tt-app" ref={appRef} style={{ "--card-size": `${cardSize}px` } as CSSProperties}>
         <header className="tt-header">
           <h1>Triple Triad</h1>
+          <button
+            type="button"
+            className="tt-help-btn"
+            onClick={() => setTutorialOpen(true)}
+            aria-label="How to play"
+          >
+            ?
+          </button>
           <button type="button" className="tt-new-game" onClick={() => handleNewGame()}>
             New Game
           </button>
@@ -254,6 +264,7 @@ function App() {
       {inspecting && (
         <CardLightbox card={inspecting.card} owner={inspecting.owner} onClose={() => setInspecting(null)} />
       )}
+      {tutorialOpen && <TutorialModal onClose={() => setTutorialOpen(false)} />}
     </div>
   );
 }

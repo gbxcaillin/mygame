@@ -58,6 +58,26 @@
   border-color: var(--accent);
 }
 
+.tt-help-btn {
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 700;
+  width: 24px;
+  height: 24px;
+  flex: none;
+  border-radius: 999px;
+  border: 2px solid var(--border);
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.tt-help-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
 .tt-status-row {
   display: flex;
   align-items: center;
@@ -111,8 +131,11 @@
 .tt-opponent-row {
   display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px 12px;
   flex: none;
+  max-width: 100%;
   font-size: 12px;
 }
 
