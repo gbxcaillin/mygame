@@ -1,5 +1,15 @@
 import type { Card, Rarity } from "./types";
 
+const cardImages = import.meta.glob("../assets/cards/*.jpg", {
+  eager: true,
+  import: "default",
+}) as Record<string, string>;
+
+function imageFor(slug: string): string | undefined {
+  const entry = Object.entries(cardImages).find(([path]) => path.endsWith(`/${slug}.jpg`));
+  return entry?.[1];
+}
+
 interface CreatureData {
   name: string;
   rarity: Rarity;
@@ -77,13 +87,17 @@ function slugify(name: string): string {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 }
 
-export const CARD_POOL: Card[] = CREATURES.map((c) => ({
-  id: slugify(c.name),
-  name: c.name,
-  rarity: c.rarity,
-  tier: c.tier,
-  ranks: { top: c.top, bottom: c.bottom, left: c.left, right: c.right },
-}));
+export const CARD_POOL: Card[] = CREATURES.map((c) => {
+  const id = slugify(c.name);
+  return {
+    id,
+    name: c.name,
+    rarity: c.rarity,
+    tier: c.tier,
+    ranks: { top: c.top, bottom: c.bottom, left: c.left, right: c.right },
+    image: imageFor(id),
+  };
+});
 
 function shuffle<T>(items: T[]): T[] {
   const copy = [...items];

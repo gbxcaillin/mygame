@@ -3,6 +3,7 @@
   width: var(--card-size, 64px);
   height: var(--card-size, 64px);
   flex: none;
+  overflow: hidden;
   border-radius: calc(var(--card-size, 64px) * 0.12);
   border: 2px solid var(--card-border);
   background: var(--card-bg);
@@ -11,6 +12,14 @@
   padding: 0;
   font-family: var(--sans);
   transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.card-art {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  pointer-events: none;
 }
 
 .tt-card:hover:not(:disabled) {

@@ -23,6 +23,7 @@ export interface Card {
   ranks: Ranks;
   rarity: Rarity;
   tier: number;
+  image?: string;
 }
 
 export interface PlacedCard {
