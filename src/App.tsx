@@ -220,7 +220,7 @@ function App() {
           cardsRowRef={handRowRef}
         />
 
-        <p className="tt-hint">Hold a card to see it full size &mdash; tap a board card to peek.</p>
+        <p className="tt-hint">Double-tap any card to see it full size.</p>
 
         <details
           className="tt-rules"

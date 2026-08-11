@@ -11,7 +11,7 @@ interface CardProps {
   onInspect: () => void;
 }
 
-const LONG_PRESS_MS = 420;
+const DOUBLE_TAP_MS = 320;
 
 export function CardView({ card, owner, selected, disabled, onClick, onInspect }: CardProps) {
   const ownerClass = owner === "A" ? "owner-a" : owner === "B" ? "owner-b" : "";
@@ -19,36 +19,21 @@ export function CardView({ card, owner, selected, disabled, onClick, onInspect }
     .filter(Boolean)
     .join(" ");
 
-  const timerRef = useRef<number | null>(null);
-  const longPressFiredRef = useRef(false);
-
-  function startPress() {
-    longPressFiredRef.current = false;
-    timerRef.current = window.setTimeout(() => {
-      longPressFiredRef.current = true;
-      onInspect();
-    }, LONG_PRESS_MS);
-  }
-
-  function cancelPress() {
-    if (timerRef.current !== null) {
-      clearTimeout(timerRef.current);
-      timerRef.current = null;
-    }
-  }
+  const lastTapRef = useRef(0);
 
   function handleClick() {
-    if (longPressFiredRef.current) {
-      longPressFiredRef.current = false;
+    const now = Date.now();
+    const isDoubleTap = now - lastTapRef.current < DOUBLE_TAP_MS;
+    // Reset after a double-tap so a rapid third click starts a fresh pair instead of chaining.
+    lastTapRef.current = isDoubleTap ? 0 : now;
+
+    if (isDoubleTap) {
+      onInspect();
       return;
     }
-    // Hand cards (onClick present) select on tap and inspect on long-press.
-    // Board cards (no onClick) have nothing else to do on tap, so tap inspects directly.
-    if (onClick) {
-      if (!disabled) onClick();
-    } else {
-      onInspect();
-    }
+    // Hand cards (onClick present) select on a single tap. Board cards (no onClick)
+    // have nothing else to do on a single tap, so it's a no-op until the second tap.
+    if (onClick && !disabled) onClick();
   }
 
   return (
@@ -56,10 +41,6 @@ export function CardView({ card, owner, selected, disabled, onClick, onInspect }
       type="button"
       className={classes}
       onClick={handleClick}
-      onPointerDown={startPress}
-      onPointerUp={cancelPress}
-      onPointerLeave={cancelPress}
-      onPointerCancel={cancelPress}
       onContextMenu={(e) => e.preventDefault()}
       aria-disabled={disabled || undefined}
       aria-label={`${card.name}, top ${card.ranks.top}, bottom ${card.ranks.bottom}, left ${card.ranks.left}, right ${card.ranks.right}`}
