@@ -1,0 +1,33 @@
+.tt-hand {
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  opacity: 0.65;
+  transition: opacity 0.2s ease, border-color 0.2s ease;
+}
+
+.tt-hand.active {
+  opacity: 1;
+  border-color: var(--accent-border);
+}
+
+.tt-hand-label {
+  margin: 0 0 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-h);
+}
+
+.tt-hand-cards {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-height: 84px;
+  align-items: center;
+}
+
+.tt-hand-empty {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text);
+}

@@ -1,0 +1,102 @@
+.tt-app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  padding: 32px 20px 48px;
+  flex-grow: 1;
+}
+
+.tt-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.tt-header h1 {
+  margin: 0;
+  font-size: 36px;
+  letter-spacing: -0.5px;
+}
+
+.tt-new-game {
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 2px solid var(--accent-border);
+  background: var(--accent-bg);
+  color: var(--accent);
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.tt-new-game:hover {
+  border-color: var(--accent);
+}
+
+.tt-status-row {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.tt-turn-indicator {
+  font-size: 16px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 2px solid var(--border);
+}
+
+.tt-turn-indicator.turn-A {
+  border-color: var(--player-a);
+  color: var(--player-a);
+}
+
+.tt-turn-indicator.turn-B {
+  border-color: var(--player-b);
+  color: var(--player-b);
+}
+
+.tt-score {
+  display: flex;
+  gap: 14px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.score-a {
+  color: var(--player-a);
+}
+
+.score-b {
+  color: var(--player-b);
+}
+
+.tt-rules {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 18px;
+  margin-top: 10px;
+}
+
+.tt-rules-note {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text);
+  flex-basis: 100%;
+}
+
+.tt-rules label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  cursor: pointer;
+}

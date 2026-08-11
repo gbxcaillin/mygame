@@ -1,0 +1,47 @@
+.tt-board {
+  display: grid;
+  grid-template-columns: repeat(3, 84px);
+  grid-template-rows: repeat(3, 84px);
+  gap: 10px;
+  padding: 14px;
+  background: var(--board-bg);
+  border-radius: 14px;
+  border: 1px solid var(--border);
+}
+
+.tt-cell {
+  width: 84px;
+  height: 84px;
+  border-radius: 10px;
+}
+
+.tt-cell.flash {
+  animation: capture-flash 0.6s ease;
+}
+
+@keyframes capture-flash {
+  0% {
+    box-shadow: 0 0 0 4px var(--accent);
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
+.tt-empty-cell {
+  width: 100%;
+  height: 100%;
+  border-radius: 10px;
+  border: 2px dashed var(--border);
+  background: transparent;
+  cursor: pointer;
+}
+
+.tt-empty-cell:hover:not(:disabled) {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+}
+
+.tt-empty-cell:disabled {
+  cursor: default;
+}
