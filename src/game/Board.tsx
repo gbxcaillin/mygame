@@ -1,4 +1,4 @@
-import type { Cell } from "./types";
+import type { Cell, PlacedCard } from "./types";
 import { CardView } from "./Card";
 import "./Board.css";
 
@@ -7,15 +7,16 @@ interface BoardProps {
   onCellClick: (index: number) => void;
   canPlace: boolean;
   justCaptured: number[];
+  onInspect: (cell: PlacedCard) => void;
 }
 
-export function Board({ board, onCellClick, canPlace, justCaptured }: BoardProps) {
+export function Board({ board, onCellClick, canPlace, justCaptured, onInspect }: BoardProps) {
   return (
     <div className="tt-board">
       {board.map((cell, i) => (
         <div key={i} className={`tt-cell ${justCaptured.includes(i) ? "flash" : ""}`}>
           {cell ? (
-            <CardView card={cell.card} owner={cell.owner} disabled />
+            <CardView card={cell.card} owner={cell.owner} onInspect={() => onInspect(cell)} />
           ) : (
             <button
               type="button"

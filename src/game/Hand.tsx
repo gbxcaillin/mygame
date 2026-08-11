@@ -9,11 +9,12 @@ interface HandProps {
   isActive: boolean;
   selectedCardId: string | null;
   onSelect: (card: Card) => void;
+  onInspect: (card: Card) => void;
   label: string;
   cardsRowRef?: Ref<HTMLDivElement>;
 }
 
-export function Hand({ player, cards, isActive, selectedCardId, onSelect, label, cardsRowRef }: HandProps) {
+export function Hand({ player, cards, isActive, selectedCardId, onSelect, onInspect, label, cardsRowRef }: HandProps) {
   return (
     <div className={`tt-hand ${isActive ? "active" : ""}`}>
       <h3 className="tt-hand-label">{label}</h3>
@@ -26,6 +27,7 @@ export function Hand({ player, cards, isActive, selectedCardId, onSelect, label,
             selected={card.id === selectedCardId}
             disabled={!isActive}
             onClick={() => onSelect(card)}
+            onInspect={() => onInspect(card)}
           />
         ))}
         {cards.length === 0 && <p className="tt-hand-empty">No cards left</p>}

@@ -1,0 +1,96 @@
+.tt-lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 10, 14, 0.72);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  padding: 24px;
+  box-sizing: border-box;
+  animation: tt-lightbox-in 0.15s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tt-lightbox {
+    animation: none;
+  }
+}
+
+@keyframes tt-lightbox-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.tt-lightbox-card {
+  position: relative;
+  border-radius: 16px;
+  border: 3px solid var(--card-border);
+  overflow: hidden;
+  background: var(--card-bg);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+  line-height: 0;
+}
+
+.tt-lightbox-card.owner-a {
+  border-color: var(--player-a);
+}
+
+.tt-lightbox-card.owner-b {
+  border-color: var(--player-b);
+}
+
+.tt-lightbox-card img {
+  display: block;
+  max-width: min(85vw, 380px);
+  max-height: 78dvh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+.tt-lightbox-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  border: none;
+  color: #1a1a1f;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.tt-lightbox-fallback {
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  min-width: 220px;
+  line-height: normal;
+}
+
+.tt-lightbox-name {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-h);
+}
+
+.tt-lightbox-ranks {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-h);
+}

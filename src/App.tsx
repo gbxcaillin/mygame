@@ -2,12 +2,13 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } fr
 import type { CSSProperties } from "react";
 import { Board } from "./game/Board";
 import { Hand } from "./game/Hand";
+import { CardLightbox } from "./game/CardLightbox";
 import { createInitialState, placeCard } from "./game/engine";
 import { dealHands } from "./game/cards";
 import { chooseAiMove, DIFFICULTY_LABELS } from "./game/ai";
 import type { Difficulty } from "./game/ai";
 import { DEFAULT_RULES } from "./game/types";
-import type { Card, GameState, RuleSet } from "./game/types";
+import type { Card, GameState, PlayerId, RuleSet } from "./game/types";
 import "./App.css";
 
 type OpponentType = "human" | "ai";
@@ -33,6 +34,7 @@ function App() {
   const [opponentType, setOpponentType] = useState<OpponentType>("ai");
   const [difficulty, setDifficulty] = useState<Difficulty>(3);
   const [aiThinking, setAiThinking] = useState(false);
+  const [inspecting, setInspecting] = useState<{ card: Card; owner?: PlayerId } | null>(null);
 
   const appRef = useRef<HTMLDivElement>(null);
   const handRowRef = useRef<HTMLDivElement>(null);
@@ -195,6 +197,7 @@ function App() {
           isActive={state.turn === "B" && !state.winner && opponentType === "human"}
           selectedCardId={selectedCard?.id ?? null}
           onSelect={handleSelect}
+          onInspect={(card) => setInspecting({ card, owner: "B" })}
           label={player2Label}
         />
 
@@ -203,6 +206,7 @@ function App() {
           onCellClick={handleCellClick}
           canPlace={!!selectedCard && !state.winner}
           justCaptured={state.lastMove?.captured ?? []}
+          onInspect={(cell) => setInspecting({ card: cell.card, owner: cell.owner })}
         />
 
         <Hand
@@ -211,9 +215,12 @@ function App() {
           isActive={state.turn === "A" && !state.winner}
           selectedCardId={selectedCard?.id ?? null}
           onSelect={handleSelect}
+          onInspect={(card) => setInspecting({ card, owner: "A" })}
           label="Player 1"
           cardsRowRef={handRowRef}
         />
+
+        <p className="tt-hint">Hold a card to see it full size &mdash; tap a board card to peek.</p>
 
         <details
           className="tt-rules"
@@ -244,6 +251,9 @@ function App() {
           </div>
         </details>
       </div>
+      {inspecting && (
+        <CardLightbox card={inspecting.card} owner={inspecting.owner} onClose={() => setInspecting(null)} />
+      )}
     </div>
   );
 }
