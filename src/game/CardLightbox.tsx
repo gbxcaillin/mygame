@@ -26,7 +26,15 @@ export function CardLightbox({ card, owner, onClose }: CardLightboxProps) {
           &times;
         </button>
         {card.image ? (
-          <img src={card.image} alt={card.name} />
+          <>
+            <img src={card.image} alt={card.name} />
+            {/* Overlaid because the source card sheet's baked-in numbers don't reliably
+                match the real stats for every card - this is the only number to trust. */}
+            <span className="tt-lightbox-rank top">{rankLabel(card.ranks.top)}</span>
+            <span className="tt-lightbox-rank left">{rankLabel(card.ranks.left)}</span>
+            <span className="tt-lightbox-rank right">{rankLabel(card.ranks.right)}</span>
+            <span className="tt-lightbox-rank bottom">{rankLabel(card.ranks.bottom)}</span>
+          </>
         ) : (
           <div className="tt-lightbox-fallback">
             <span className="tt-lightbox-name">{card.name}</span>

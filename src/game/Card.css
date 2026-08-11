@@ -64,14 +64,24 @@
   -webkit-box-orient: vertical;
 }
 
+/* Opaque so it fully covers whatever number the artwork itself happens to show at
+   this position - the artwork's baked-in numbers aren't reliably accurate, so this
+   badge (sourced from game data) is the only one that should ever be visible. */
 .rank {
   position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: clamp(8px, calc(var(--card-size, 64px) * 0.155), 16px);
   font-weight: 700;
-  color: var(--text-h);
+  color: #fff;
   line-height: 1;
-  min-width: calc(var(--card-size, 64px) * 0.167);
+  min-width: calc(var(--card-size, 64px) * 0.2);
+  min-height: calc(var(--card-size, 64px) * 0.2);
   text-align: center;
+  background: rgba(10, 10, 14, 0.88);
+  border-radius: calc(var(--card-size, 64px) * 0.04);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.18);
 }
 
 .rank-top {

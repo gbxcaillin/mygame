@@ -54,6 +54,48 @@
   object-fit: contain;
 }
 
+/* Opaque so it fully covers whatever number the artwork itself happens to show at
+   this position - see the comment in CardLightbox.tsx for why this can't be trusted. */
+.tt-lightbox-rank {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 15%;
+  min-height: 15%;
+  padding: 0 4px;
+  font-size: clamp(16px, 5.5vw, 26px);
+  font-weight: 700;
+  color: #fff;
+  background: rgba(10, 10, 14, 0.88);
+  border-radius: 6px;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.18);
+}
+
+.tt-lightbox-rank.top {
+  top: 3%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.tt-lightbox-rank.bottom {
+  bottom: 3%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.tt-lightbox-rank.left {
+  left: 3%;
+  top: 62%;
+  transform: translateY(-50%);
+}
+
+.tt-lightbox-rank.right {
+  right: 3%;
+  top: 62%;
+  transform: translateY(-50%);
+}
+
 .tt-lightbox-close {
   position: absolute;
   top: 8px;
