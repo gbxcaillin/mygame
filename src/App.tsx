@@ -4,9 +4,14 @@ import { Board } from "./game/Board";
 import { Hand } from "./game/Hand";
 import { createInitialState, placeCard } from "./game/engine";
 import { dealHands } from "./game/cards";
+import { chooseAiMove, DIFFICULTY_LABELS } from "./game/ai";
+import type { Difficulty } from "./game/ai";
 import { DEFAULT_RULES } from "./game/types";
 import type { Card, GameState, RuleSet } from "./game/types";
 import "./App.css";
+
+type OpponentType = "human" | "ai";
+const AI_THINK_DELAY_MS = 550;
 
 // Must match the padding + gap set on .tt-board in Board.css (2 * padding + 2 * gap).
 const BOARD_CHROME_PX = 2 * 8 + 2 * 6;
@@ -25,6 +30,9 @@ function App() {
   const [selectedCard, setSelectedCard] = useState<Card | null>(null);
   const [rulesOpen, setRulesOpen] = useState(false);
   const [cardSize, setCardSize] = useState(64);
+  const [opponentType, setOpponentType] = useState<OpponentType>("ai");
+  const [difficulty, setDifficulty] = useState<Difficulty>(3);
+  const [aiThinking, setAiThinking] = useState(false);
 
   const appRef = useRef<HTMLDivElement>(null);
   const handRowRef = useRef<HTMLDivElement>(null);
@@ -73,6 +81,20 @@ function App() {
     };
   }, [recompute]);
 
+  useEffect(() => {
+    if (opponentType !== "ai" || state.turn !== "B" || state.winner) {
+      setAiThinking(false);
+      return;
+    }
+    setAiThinking(true);
+    const timer = setTimeout(() => {
+      const move = chooseAiMove(state, "B", difficulty);
+      setState((prev) => (prev.turn === "B" && !prev.winner ? placeCard(prev, move.cellIndex, move.card) : prev));
+      setAiThinking(false);
+    }, AI_THINK_DELAY_MS);
+    return () => clearTimeout(timer);
+  }, [state, opponentType, difficulty]);
+
   const counts = useMemo(() => {
     let a = 0;
     let b = 0;
@@ -105,8 +127,15 @@ function App() {
     handleNewGame(nextRules);
   }
 
+  const player2Label = opponentType === "ai" ? "Computer" : "Player 2";
   const winnerLabel =
-    state.winner === "A" ? "Player 1 wins!" : state.winner === "B" ? "Player 2 wins!" : state.winner === "draw" ? "Draw!" : null;
+    state.winner === "A"
+      ? "Player 1 wins!"
+      : state.winner === "B"
+        ? `${player2Label} wins!`
+        : state.winner === "draw"
+          ? "Draw!"
+          : null;
 
   return (
     <div className="tt-app-outer">
@@ -120,7 +149,11 @@ function App() {
 
         <div className="tt-status-row">
           <div className={`tt-turn-indicator ${!state.winner ? `turn-${state.turn}` : ""}`}>
-            {state.winner ? winnerLabel : `${state.turn === "A" ? "Player 1" : "Player 2"}'s turn`}
+            {state.winner
+              ? winnerLabel
+              : aiThinking
+                ? `${player2Label} is thinking…`
+                : `${state.turn === "A" ? "Player 1" : player2Label}'s turn`}
           </div>
           <div className="tt-score">
             <span className="score-a">P1: {counts.a}</span>
@@ -128,13 +161,41 @@ function App() {
           </div>
         </div>
 
+        <div className="tt-opponent-row">
+          <label>
+            Opponent
+            <select
+              value={opponentType}
+              onChange={(e) => setOpponentType(e.target.value as OpponentType)}
+            >
+              <option value="ai">Computer</option>
+              <option value="human">Human (pass &amp; play)</option>
+            </select>
+          </label>
+          {opponentType === "ai" && (
+            <label>
+              Difficulty
+              <select
+                value={difficulty}
+                onChange={(e) => setDifficulty(Number(e.target.value) as Difficulty)}
+              >
+                {([1, 2, 3, 4, 5] as const).map((d) => (
+                  <option key={d} value={d}>
+                    {DIFFICULTY_LABELS[d]}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
+        </div>
+
         <Hand
           player="B"
           cards={state.hands.B}
-          isActive={state.turn === "B" && !state.winner}
+          isActive={state.turn === "B" && !state.winner && opponentType === "human"}
           selectedCardId={selectedCard?.id ?? null}
           onSelect={handleSelect}
-          label="Player 2"
+          label={player2Label}
         />
 
         <Board
