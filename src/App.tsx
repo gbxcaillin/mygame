@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import type { CSSProperties } from "react";
 import { Board } from "./game/Board";
 import { Hand } from "./game/Hand";
 import { createInitialState, placeCard } from "./game/engine";
@@ -6,6 +7,12 @@ import { dealHands } from "./game/cards";
 import { DEFAULT_RULES } from "./game/types";
 import type { Card, GameState, RuleSet } from "./game/types";
 import "./App.css";
+
+// Must match the padding + gap set on .tt-board in Board.css (2 * padding + 2 * gap).
+const BOARD_CHROME_PX = 2 * 8 + 2 * 6;
+const HAND_GAP_PX = 8;
+const MIN_CARD_PX = 26;
+const MAX_CARD_PX = 130;
 
 function newGame(rules: RuleSet): GameState {
   const { handA, handB } = dealHands();
@@ -16,6 +23,55 @@ function App() {
   const [rules, setRules] = useState<RuleSet>(DEFAULT_RULES);
   const [state, setState] = useState<GameState>(() => newGame(rules));
   const [selectedCard, setSelectedCard] = useState<Card | null>(null);
+  const [rulesOpen, setRulesOpen] = useState(false);
+  const [cardSize, setCardSize] = useState(64);
+
+  const appRef = useRef<HTMLDivElement>(null);
+  const handRowRef = useRef<HTMLDivElement>(null);
+
+  const recompute = useCallback(() => {
+    const app = appRef.current;
+    const row = handRowRef.current;
+    if (!app || !row) return;
+    const viewportH = window.visualViewport?.height ?? window.innerHeight;
+
+    // Read the currently-*rendered* card size straight from the DOM rather than
+    // trusting React's queued state: StrictMode invokes this effect twice back
+    // to back with no repaint in between, so a second call's "previous state"
+    // argument can describe a size that hasn't actually been painted yet. The
+    // DOM's computed style always matches what app.scrollHeight was measured
+    // against, keeping this calculation idempotent no matter how many times
+    // (or how close together) it runs.
+    const renderedCardSize = parseFloat(getComputedStyle(app).getPropertyValue("--card-size")) || 64;
+
+    const naturalH = app.scrollHeight;
+    const chromeH = naturalH - 5 * renderedCardSize - BOARD_CHROME_PX;
+    const availH = viewportH - chromeH - BOARD_CHROME_PX;
+    const cardSizeByHeight = availH / 5;
+
+    const rowW = row.clientWidth;
+    const cardSizeByWidth = (rowW - 4 * HAND_GAP_PX) / 5;
+
+    const next = Math.floor(
+      Math.max(MIN_CARD_PX, Math.min(MAX_CARD_PX, Math.min(cardSizeByHeight, cardSizeByWidth)))
+    );
+    setCardSize((prev) => (Math.abs(next - prev) > 0.5 ? next : prev));
+  }, []);
+
+  useLayoutEffect(() => {
+    recompute();
+  }, [recompute, state.turn, state.winner, rulesOpen]);
+
+  useEffect(() => {
+    window.addEventListener("resize", recompute);
+    window.addEventListener("orientationchange", recompute);
+    window.visualViewport?.addEventListener("resize", recompute);
+    return () => {
+      window.removeEventListener("resize", recompute);
+      window.removeEventListener("orientationchange", recompute);
+      window.visualViewport?.removeEventListener("resize", recompute);
+    };
+  }, [recompute]);
 
   const counts = useMemo(() => {
     let a = 0;
@@ -53,71 +109,80 @@ function App() {
     state.winner === "A" ? "Player 1 wins!" : state.winner === "B" ? "Player 2 wins!" : state.winner === "draw" ? "Draw!" : null;
 
   return (
-    <div className="tt-app">
-      <header className="tt-header">
-        <h1>Triple Triad</h1>
-        <button type="button" className="tt-new-game" onClick={() => handleNewGame()}>
-          New Game
-        </button>
-      </header>
+    <div className="tt-app-outer">
+      <div className="tt-app" ref={appRef} style={{ "--card-size": `${cardSize}px` } as CSSProperties}>
+        <header className="tt-header">
+          <h1>Triple Triad</h1>
+          <button type="button" className="tt-new-game" onClick={() => handleNewGame()}>
+            New Game
+          </button>
+        </header>
 
-      <div className="tt-status-row">
-        <div className={`tt-turn-indicator ${!state.winner ? `turn-${state.turn}` : ""}`}>
-          {state.winner ? winnerLabel : `${state.turn === "A" ? "Player 1" : "Player 2"}'s turn`}
+        <div className="tt-status-row">
+          <div className={`tt-turn-indicator ${!state.winner ? `turn-${state.turn}` : ""}`}>
+            {state.winner ? winnerLabel : `${state.turn === "A" ? "Player 1" : "Player 2"}'s turn`}
+          </div>
+          <div className="tt-score">
+            <span className="score-a">P1: {counts.a}</span>
+            <span className="score-b">P2: {counts.b}</span>
+          </div>
         </div>
-        <div className="tt-score">
-          <span className="score-a">P1: {counts.a}</span>
-          <span className="score-b">P2: {counts.b}</span>
-        </div>
+
+        <Hand
+          player="B"
+          cards={state.hands.B}
+          isActive={state.turn === "B" && !state.winner}
+          selectedCardId={selectedCard?.id ?? null}
+          onSelect={handleSelect}
+          label="Player 2"
+        />
+
+        <Board
+          board={state.board}
+          onCellClick={handleCellClick}
+          canPlace={!!selectedCard && !state.winner}
+          justCaptured={state.lastMove?.captured ?? []}
+        />
+
+        <Hand
+          player="A"
+          cards={state.hands.A}
+          isActive={state.turn === "A" && !state.winner}
+          selectedCardId={selectedCard?.id ?? null}
+          onSelect={handleSelect}
+          label="Player 1"
+          cardsRowRef={handRowRef}
+        />
+
+        <details
+          className="tt-rules"
+          open={rulesOpen}
+          onToggle={(e) => setRulesOpen(e.currentTarget.open)}
+        >
+          <summary>Rules {rulesOpen ? "▾" : "▸"}</summary>
+          <div className="tt-rules-content">
+            <p className="tt-rules-note">
+              Open is always on in local pass-and-play &mdash; both hands share one screen. Changing a rule restarts the match.
+            </p>
+            <label>
+              <input type="checkbox" checked={rules.same} onChange={() => toggleRule("same")} />
+              Same
+            </label>
+            <label>
+              <input type="checkbox" checked={rules.plus} onChange={() => toggleRule("plus")} />
+              Plus
+            </label>
+            <label>
+              <input type="checkbox" checked={rules.combo} onChange={() => toggleRule("combo")} />
+              Combo
+            </label>
+            <label>
+              <input type="checkbox" checked={rules.sameWall} onChange={() => toggleRule("sameWall")} />
+              Same Wall
+            </label>
+          </div>
+        </details>
       </div>
-
-      <Hand
-        player="B"
-        cards={state.hands.B}
-        isActive={state.turn === "B" && !state.winner}
-        selectedCardId={selectedCard?.id ?? null}
-        onSelect={handleSelect}
-        label="Player 2"
-      />
-
-      <Board
-        board={state.board}
-        onCellClick={handleCellClick}
-        canPlace={!!selectedCard && !state.winner}
-        justCaptured={state.lastMove?.captured ?? []}
-      />
-
-      <Hand
-        player="A"
-        cards={state.hands.A}
-        isActive={state.turn === "A" && !state.winner}
-        selectedCardId={selectedCard?.id ?? null}
-        onSelect={handleSelect}
-        label="Player 1"
-      />
-
-      <fieldset className="tt-rules">
-        <legend>Rules (changing restarts the match)</legend>
-        <p className="tt-rules-note">
-          Open is always on in local pass-and-play &mdash; both hands share one screen.
-        </p>
-        <label>
-          <input type="checkbox" checked={rules.same} onChange={() => toggleRule("same")} />
-          Same
-        </label>
-        <label>
-          <input type="checkbox" checked={rules.plus} onChange={() => toggleRule("plus")} />
-          Plus
-        </label>
-        <label>
-          <input type="checkbox" checked={rules.combo} onChange={() => toggleRule("combo")} />
-          Combo
-        </label>
-        <label>
-          <input type="checkbox" checked={rules.sameWall} onChange={() => toggleRule("sameWall")} />
-          Same Wall
-        </label>
-      </fieldset>
     </div>
   );
 }

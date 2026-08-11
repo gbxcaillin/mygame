@@ -1,3 +1,4 @@
+import type { Ref } from "react";
 import type { Card, PlayerId } from "./types";
 import { CardView } from "./Card";
 import "./Hand.css";
@@ -9,13 +10,14 @@ interface HandProps {
   selectedCardId: string | null;
   onSelect: (card: Card) => void;
   label: string;
+  cardsRowRef?: Ref<HTMLDivElement>;
 }
 
-export function Hand({ player, cards, isActive, selectedCardId, onSelect, label }: HandProps) {
+export function Hand({ player, cards, isActive, selectedCardId, onSelect, label, cardsRowRef }: HandProps) {
   return (
     <div className={`tt-hand ${isActive ? "active" : ""}`}>
       <h3 className="tt-hand-label">{label}</h3>
-      <div className="tt-hand-cards">
+      <div className="tt-hand-cards" ref={cardsRowRef}>
         {cards.map((card) => (
           <CardView
             key={card.id}

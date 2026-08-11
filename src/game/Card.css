@@ -1,8 +1,9 @@
 .tt-card {
   position: relative;
-  width: 84px;
-  height: 84px;
-  border-radius: 10px;
+  width: var(--card-size, 64px);
+  height: var(--card-size, 64px);
+  flex: none;
+  border-radius: calc(var(--card-size, 64px) * 0.12);
   border: 2px solid var(--card-border);
   background: var(--card-bg);
   color: var(--text-h);
@@ -38,11 +39,11 @@
 
 .card-name {
   position: absolute;
-  top: 19px;
-  left: 6px;
-  right: 6px;
+  top: calc(var(--card-size, 64px) * 0.226);
+  left: calc(var(--card-size, 64px) * 0.071);
+  right: calc(var(--card-size, 64px) * 0.071);
   text-align: center;
-  font-size: 8.5px;
+  font-size: clamp(6px, calc(var(--card-size, 64px) * 0.101), 11px);
   line-height: 1.2;
   color: var(--text);
   overflow: hidden;
@@ -53,34 +54,34 @@
 
 .rank {
   position: absolute;
-  font-size: 13px;
+  font-size: clamp(8px, calc(var(--card-size, 64px) * 0.155), 16px);
   font-weight: 700;
   color: var(--text-h);
   line-height: 1;
-  min-width: 14px;
+  min-width: calc(var(--card-size, 64px) * 0.167);
   text-align: center;
 }
 
 .rank-top {
-  top: 4px;
+  top: calc(var(--card-size, 64px) * 0.048);
   left: 50%;
   transform: translateX(-50%);
 }
 
 .rank-bottom {
-  bottom: 4px;
+  bottom: calc(var(--card-size, 64px) * 0.048);
   left: 50%;
   transform: translateX(-50%);
 }
 
 .rank-left {
-  left: 4px;
-  top: 56px;
+  left: calc(var(--card-size, 64px) * 0.048);
+  top: calc(var(--card-size, 64px) * 0.667);
   transform: translateY(-50%);
 }
 
 .rank-right {
-  right: 4px;
-  top: 56px;
+  right: calc(var(--card-size, 64px) * 0.048);
+  top: calc(var(--card-size, 64px) * 0.667);
   transform: translateY(-50%);
 }

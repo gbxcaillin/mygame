@@ -1,18 +1,19 @@
 .tt-board {
   display: grid;
-  grid-template-columns: repeat(3, 84px);
-  grid-template-rows: repeat(3, 84px);
-  gap: 10px;
-  padding: 14px;
+  grid-template-columns: repeat(3, var(--card-size, 64px));
+  grid-template-rows: repeat(3, var(--card-size, 64px));
+  gap: 6px;
+  padding: 8px;
   background: var(--board-bg);
   border-radius: 14px;
   border: 1px solid var(--border);
+  flex: none;
 }
 
 .tt-cell {
-  width: 84px;
-  height: 84px;
-  border-radius: 10px;
+  width: var(--card-size, 64px);
+  height: var(--card-size, 64px);
+  border-radius: calc(var(--card-size, 64px) * 0.12);
 }
 
 .tt-cell.flash {

@@ -62,20 +62,29 @@
   }
 }
 
-#root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
+html {
+  height: 100%;
+  overflow: hidden;
 }
 
 body {
+  height: 100%;
   margin: 0;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+#root {
+  width: 1126px;
+  max-width: 100%;
+  height: 100dvh;
+  margin: 0 auto;
+  text-align: center;
+  border-inline: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 h1,
