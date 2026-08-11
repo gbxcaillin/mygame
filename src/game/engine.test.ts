@@ -12,7 +12,7 @@ const NO_SPECIAL_RULES: RuleSet = {
 
 function card(id: string, ranks: [number, number, number, number]): Card {
   const [top, bottom, left, right] = ranks;
-  return { id, name: id, ranks: { top, bottom, left, right } };
+  return { id, name: id, ranks: { top, bottom, left, right }, rarity: "Common", tier: 1 };
 }
 
 describe("basic capture rule", () => {

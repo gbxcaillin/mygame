@@ -9,10 +9,20 @@ export interface Ranks {
   right: number;
 }
 
+export type Rarity =
+  | "Common"
+  | "Uncommon"
+  | "Rare"
+  | "Epic"
+  | "Legendary"
+  | "Mythic";
+
 export interface Card {
   id: string;
   name: string;
   ranks: Ranks;
+  rarity: Rarity;
+  tier: number;
 }
 
 export interface PlacedCard {
