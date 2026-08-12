@@ -10,7 +10,8 @@ import { chooseAiMove, DIFFICULTY_LABELS } from "./game/ai";
 import type { Difficulty } from "./game/ai";
 import { DEFAULT_RULES } from "./game/types";
 import type { Card, GameState, PlayerId, RuleSet } from "./game/types";
-import backdrop from "./assets/clash-of-beasts-backdrop.png";
+import backdrop from "./assets/clash-of-beasts-backdrop-v3.png";
+import backdropWide from "./assets/clash-of-beasts-backdrop-wide-v2.png";
 import "./App.css";
 
 type OpponentType = "human" | "ai";
@@ -46,8 +47,8 @@ function App() {
 
     // Size cards from the fixed 2:3 artwork stage so the live board and hands
     // remain aligned with the background at every viewport size.
-    const byWidth = stage.clientWidth * 0.135;
-    const byHeight = stage.clientHeight * 0.090;
+    const byWidth = stage.clientWidth * 0.127;
+    const byHeight = stage.clientHeight * 0.085;
     const next = Math.floor(
       Math.max(MIN_CARD_PX, Math.min(MAX_CARD_PX, Math.min(byWidth, byHeight)))
     );
@@ -129,7 +130,8 @@ function App() {
   return (
     <div className="tt-app-outer">
       <div className="tt-backdrop-blur" aria-hidden="true">
-        <img src={backdrop} alt="" />
+        <img src={backdropWide} className="tt-blur-wide" alt="" />
+        <img src={backdrop} className="tt-blur-portrait" alt="" />
       </div>
 
       <div
