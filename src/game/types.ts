@@ -43,9 +43,9 @@ export interface RuleSet {
 
 export const DEFAULT_RULES: RuleSet = {
   open: true,
-  same: true,
-  plus: true,
-  combo: true,
+  same: false,
+  plus: false,
+  combo: false,
   sameWall: false,
 };
 
