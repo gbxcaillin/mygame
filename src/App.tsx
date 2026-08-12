@@ -225,6 +225,8 @@ function App() {
         </section>
 
         <div className="tt-board-area">
+          <div className="tt-guardian-pedestal tt-guardian-pedestal-left" aria-hidden="true" />
+          <div className="tt-guardian-pedestal tt-guardian-pedestal-right" aria-hidden="true" />
           <img src={bgDragon} className="tt-sentinel tt-sentinel-left" alt="" aria-hidden="true" />
           <img src={bgPhoenix} className="tt-sentinel tt-sentinel-right" alt="" aria-hidden="true" />
           <div className="tt-arcane-circle" aria-hidden="true">
