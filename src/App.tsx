@@ -10,19 +10,15 @@ import { chooseAiMove, DIFFICULTY_LABELS } from "./game/ai";
 import type { Difficulty } from "./game/ai";
 import { DEFAULT_RULES } from "./game/types";
 import type { Card, GameState, PlayerId, RuleSet } from "./game/types";
-import bgDragon from "./assets/cards/ancient-dragon.jpg";
-import bgPhoenix from "./assets/cards/phoenix.jpg";
-import bgHydra from "./assets/cards/hydra.jpg";
+import backdrop from "./assets/clash-of-beasts-backdrop.png";
 import "./App.css";
 
 type OpponentType = "human" | "ai";
 const AI_THINK_DELAY_MS = 550;
 
 // Must match the padding + gap set on .tt-board in Board.css (2 * padding + 2 * gap).
-const BOARD_CHROME_PX = 2 * 10 + 2 * 6;
-const HAND_GAP_PX = 8;
-const MIN_CARD_PX = 26;
-const MAX_CARD_PX = 130;
+const MIN_CARD_PX = 30;
+const MAX_CARD_PX = 112;
 
 function newGame(rules: RuleSet): GameState {
   const { handA, handB } = dealHands();
@@ -45,31 +41,17 @@ function App() {
   const handRowRef = useRef<HTMLDivElement>(null);
 
   const recompute = useCallback(() => {
-    const app = appRef.current;
-    const row = handRowRef.current;
-    if (!app || !row) return;
-    const viewportH = window.visualViewport?.height ?? window.innerHeight;
+    const stage = appRef.current;
+    if (!stage) return;
 
-    // Read the currently-*rendered* card size straight from the DOM rather than
-    // trusting React's queued state: StrictMode invokes this effect twice back
-    // to back with no repaint in between, so a second call's "previous state"
-    // argument can describe a size that hasn't actually been painted yet. The
-    // DOM's computed style always matches what app.scrollHeight was measured
-    // against, keeping this calculation idempotent no matter how many times
-    // (or how close together) it runs.
-    const renderedCardSize = parseFloat(getComputedStyle(app).getPropertyValue("--card-size")) || 64;
-
-    const naturalH = app.scrollHeight;
-    const chromeH = naturalH - 5 * renderedCardSize - BOARD_CHROME_PX;
-    const availH = viewportH - chromeH - BOARD_CHROME_PX;
-    const cardSizeByHeight = availH / 5;
-
-    const rowW = row.clientWidth;
-    const cardSizeByWidth = (rowW - 4 * HAND_GAP_PX) / 5;
-
+    // Size cards from the fixed 2:3 artwork stage so the live board and hands
+    // remain aligned with the background at every viewport size.
+    const byWidth = stage.clientWidth * 0.094;
+    const byHeight = stage.clientHeight * 0.0625;
     const next = Math.floor(
-      Math.max(MIN_CARD_PX, Math.min(MAX_CARD_PX, Math.min(cardSizeByHeight, cardSizeByWidth)))
+      Math.max(MIN_CARD_PX, Math.min(MAX_CARD_PX, Math.min(byWidth, byHeight)))
     );
+
     setCardSize((prev) => (Math.abs(next - prev) > 0.5 ? next : prev));
   }, []);
 
@@ -146,16 +128,19 @@ function App() {
 
   return (
     <div className="tt-app-outer">
-      <div className="tt-bg-art" aria-hidden="true">
-        <img src={bgHydra} className="tt-bg-img" alt="" />
-        <div className="tt-bg-vignette" />
-        <div className="tt-banner tt-banner-left"><span /></div>
-        <div className="tt-banner tt-banner-right"><span /></div>
+      <div className="tt-backdrop-blur" aria-hidden="true">
+        <img src={backdrop} alt="" />
       </div>
-      <div className="tt-app" ref={appRef} style={{ "--card-size": `${cardSize}px` } as CSSProperties}>
+
+      <div
+        className="tt-app"
+        ref={appRef}
+        style={{ "--card-size": `${cardSize}px` } as CSSProperties}
+      >
+        <img src={backdrop} className="tt-backdrop" alt="" aria-hidden="true" />
+
         <header className="tt-header">
-          <div className="tt-header-beast tt-header-beast-left" aria-hidden="true">◆</div>
-          <h1>Clash of Beasts</h1>
+          <h1 className="tt-title-accessible">Clash of Beasts</h1>
           <button
             type="button"
             className="tt-help-btn"
@@ -167,7 +152,6 @@ function App() {
           <button type="button" className="tt-new-game" onClick={() => handleNewGame()}>
             New Game
           </button>
-          <div className="tt-header-beast tt-header-beast-right" aria-hidden="true">◆</div>
         </header>
 
         <div className="tt-status-row">
@@ -225,19 +209,6 @@ function App() {
         </section>
 
         <div className="tt-board-area">
-          <div className="tt-guardian-pedestal tt-guardian-pedestal-left" aria-hidden="true" />
-          <div className="tt-guardian-pedestal tt-guardian-pedestal-right" aria-hidden="true" />
-          <img src={bgDragon} className="tt-sentinel tt-sentinel-left" alt="" aria-hidden="true" />
-          <img src={bgPhoenix} className="tt-sentinel tt-sentinel-right" alt="" aria-hidden="true" />
-          <div className="tt-arcane-circle" aria-hidden="true">
-            <div className="tt-arcane-ring tt-arcane-ring-outer" />
-            <div className="tt-arcane-ring tt-arcane-ring-inner" />
-            <div className="tt-arcane-runes">
-              {['ᛟ','ᚨ','ᛉ','ᚦ','ᛗ','ᚹ','ᛊ','ᚱ'].map((r, i) => (
-                <span key={i} className="tt-rune" style={{ '--i': i } as React.CSSProperties}>{r}</span>
-              ))}
-            </div>
-          </div>
           <Board
             board={state.board}
             onCellClick={handleCellClick}
