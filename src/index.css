@@ -1,25 +1,29 @@
 :root {
   --text: #b8a99a;
-  --text-h: #f0e6d6;
-  --bg: #1a1410;
-  --border: #3a2e24;
-  --code-bg: #231c14;
-  --accent: #d4a54a;
-  --accent-bg: rgba(212, 165, 74, 0.12);
-  --accent-border: rgba(212, 165, 74, 0.5);
-  --social-bg: rgba(35, 28, 20, 0.5);
+  --text-h: #e8dcc8;
+  --bg: #111015;
+  --border: #2e2520;
+  --code-bg: #1a1618;
+  --accent: #c9943e;
+  --accent-bg: rgba(201, 148, 62, 0.1);
+  --accent-border: rgba(201, 148, 62, 0.4);
   --shadow:
-    rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
+    rgba(0, 0, 0, 0.5) 0 10px 15px -3px, rgba(0, 0, 0, 0.3) 0 4px 6px -2px;
 
-  --player-a: #5b9cf5;
-  --player-a-bg: rgba(91, 156, 245, 0.12);
-  --player-b: #e85d52;
-  --player-b-bg: rgba(232, 93, 82, 0.12);
-  --board-bg: #1e1712;
-  --board-border: #4a3928;
-  --board-accent: rgba(212, 165, 74, 0.08);
-  --card-bg: #2a2118;
-  --card-border: #4a3928;
+  --player-a: #4d8ce8;
+  --player-a-bg: rgba(77, 140, 232, 0.1);
+  --player-b: #d44a3e;
+  --player-b-bg: rgba(212, 74, 62, 0.1);
+  --board-bg: #15131a;
+  --board-border: #3a3028;
+  --card-bg: #1e1a20;
+  --card-border: #3a3028;
+
+  --frame: #302820;
+  --frame-hi: rgba(201, 148, 62, 0.15);
+  --frame-lo: rgba(0, 0, 0, 0.6);
+  --stone: #1a171e;
+  --stone-light: #24202a;
 
   --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
   --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
@@ -50,6 +54,10 @@ body {
   margin: 0;
   overflow: hidden;
   overscroll-behavior: none;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(80, 50, 20, 0.08) 0%, transparent 60%),
+    radial-gradient(ellipse at 50% 100%, rgba(80, 50, 20, 0.06) 0%, transparent 60%),
+    var(--bg);
 }
 
 #root {
@@ -58,7 +66,6 @@ body {
   height: 100dvh;
   margin: 0 auto;
   text-align: center;
-  border-inline: 1px solid rgba(74, 57, 40, 0.3);
   display: flex;
   flex-direction: column;
   box-sizing: border-box;

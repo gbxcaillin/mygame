@@ -211,13 +211,24 @@ function App() {
           label={player2Label}
         />
 
-        <Board
-          board={state.board}
-          onCellClick={handleCellClick}
-          canPlace={!!selectedCard && !state.winner}
-          justCaptured={state.lastMove?.captured ?? []}
-          onInspect={(cell) => setInspecting({ card: cell.card, owner: cell.owner })}
-        />
+        <div className="tt-board-area">
+          <div className="tt-arcane-circle" aria-hidden="true">
+            <div className="tt-arcane-ring tt-arcane-ring-outer" />
+            <div className="tt-arcane-ring tt-arcane-ring-inner" />
+            <div className="tt-arcane-runes">
+              {['ᛟ','ᚨ','ᛉ','ᚦ','ᛗ','ᚹ','ᛊ','ᚱ'].map((r, i) => (
+                <span key={i} className="tt-rune" style={{ '--i': i } as React.CSSProperties}>{r}</span>
+              ))}
+            </div>
+          </div>
+          <Board
+            board={state.board}
+            onCellClick={handleCellClick}
+            canPlace={!!selectedCard && !state.winner}
+            justCaptured={state.lastMove?.captured ?? []}
+            onInspect={(cell) => setInspecting({ card: cell.card, owner: cell.owner })}
+          />
+        </div>
 
         <Hand
           player="A"
