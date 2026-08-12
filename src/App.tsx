@@ -145,7 +145,7 @@ function App() {
     <div className="tt-app-outer">
       <div className="tt-app" ref={appRef} style={{ "--card-size": `${cardSize}px` } as CSSProperties}>
         <header className="tt-header">
-          <h1>Triple Triad</h1>
+          <h1>Clash of Beasts</h1>
           <button
             type="button"
             className="tt-help-btn"

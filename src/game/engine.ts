@@ -168,22 +168,20 @@ function resolveCaptures(
 
   const capturedSet = new Set<number>(special);
 
-  if (special.length > 0) {
-    if (rules.combo) {
-      const queue = [...special];
-      while (queue.length > 0) {
-        const comboIdx = queue.shift() as number;
-        const basic = basicCaptures(board, comboIdx, player, capturedSet);
-        for (const idx of basic) {
-          capturedSet.add(idx);
-          queue.push(idx);
-        }
+  if (special.length > 0 && rules.combo) {
+    const queue = [...special];
+    while (queue.length > 0) {
+      const comboIdx = queue.shift() as number;
+      const comboBasic = basicCaptures(board, comboIdx, player, capturedSet);
+      for (const idx of comboBasic) {
+        capturedSet.add(idx);
+        queue.push(idx);
       }
     }
-  } else {
-    const basic = basicCaptures(board, placedIndex, player, capturedSet);
-    for (const idx of basic) capturedSet.add(idx);
   }
+
+  const basic = basicCaptures(board, placedIndex, player, capturedSet);
+  for (const idx of basic) capturedSet.add(idx);
 
   return {
     indices: [...capturedSet],

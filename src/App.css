@@ -36,26 +36,35 @@
 .tt-header h1 {
   margin: 0;
   font-size: clamp(16px, 5.5vw, 26px);
-  letter-spacing: -0.5px;
+  letter-spacing: 1.5px;
   white-space: nowrap;
+  text-transform: uppercase;
+  background: linear-gradient(180deg, #f0d890 0%, #c89a3c 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 800;
 }
 
 .tt-new-game {
   font-family: var(--sans);
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
   padding: 5px 10px;
   border-radius: 8px;
   border: 2px solid var(--accent-border);
   background: var(--accent-bg);
   color: var(--accent);
   cursor: pointer;
-  transition: border-color 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
   white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .tt-new-game:hover {
   border-color: var(--accent);
+  box-shadow: 0 0 10px rgba(212, 165, 74, 0.2);
 }
 
 .tt-help-btn {

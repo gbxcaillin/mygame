@@ -4,10 +4,17 @@
   grid-template-rows: repeat(3, var(--card-size, 64px));
   gap: 6px;
   padding: 8px;
-  background: var(--board-bg);
+  background:
+    radial-gradient(ellipse at center, rgba(212, 165, 74, 0.06) 0%, transparent 70%),
+    var(--board-bg);
   border-radius: 14px;
-  border: 1px solid var(--border);
+  border: 2px solid var(--board-border);
+  box-shadow:
+    inset 0 1px 0 rgba(212, 165, 74, 0.08),
+    0 4px 20px rgba(0, 0, 0, 0.4),
+    0 0 40px rgba(0, 0, 0, 0.2);
   flex: none;
+  position: relative;
 }
 
 .tt-cell {
@@ -33,14 +40,17 @@
   width: 100%;
   height: 100%;
   border-radius: 10px;
-  border: 2px dashed var(--border);
-  background: transparent;
+  border: 1px solid rgba(212, 165, 74, 0.15);
+  background: rgba(212, 165, 74, 0.03);
   cursor: pointer;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
 }
 
 .tt-empty-cell:hover:not(:disabled) {
   border-color: var(--accent);
   background: var(--accent-bg);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3), 0 0 8px rgba(212, 165, 74, 0.15);
 }
 
 .tt-empty-cell:disabled {
