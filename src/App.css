@@ -204,14 +204,17 @@
    ------------------------------------------------------------ */
 
 .tt-status-row {
-  left: 17.5%;
-  top: 10.2%;
-  width: 66%;
-  height: 3.4%;
+  left: 17%;
+  top: 9.5%;
+  width: 67%;
+  height: 4.8%;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 4%;
+  background: rgba(10, 9, 7, .96);
+  border-radius: 4px;
+  border: 1px solid rgba(140, 100, 45, .25);
 }
 
 .tt-turn-indicator {
@@ -256,15 +259,18 @@
    ------------------------------------------------------------ */
 
 .tt-opponent-row {
-  left: 17.5%;
-  top: 15%;
-  width: 66%;
-  height: 3.5%;
+  left: 17%;
+  top: 14.8%;
+  width: 67%;
+  height: 5%;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8%;
   font-size: clamp(10px, calc(var(--card-size) * .13), 14px);
+  background: rgba(10, 9, 7, .96);
+  border-radius: 4px;
+  border: 1px solid rgba(140, 100, 45, .25);
 }
 
 .tt-opponent-row label {
@@ -305,7 +311,7 @@
 
 .tt-hand-shell-b {
   left: 16.5%;
-  top: 20.5%;
+  top: 20.8%;
   width: 80%;
   height: 10%;
 }
@@ -342,6 +348,10 @@
   text-transform: uppercase;
   letter-spacing: .08em;
   text-shadow: 0 1px 2px #000;
+  background: rgba(10, 9, 7, .85) !important;
+  padding: 1px 12% !important;
+  margin-inline: -5% !important;
+  border-radius: 2px;
 }
 
 /* ------------------------------------------------------------
