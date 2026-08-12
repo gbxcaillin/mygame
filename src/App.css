@@ -288,3 +288,19 @@
 .tt-guardian-pedestal-left { right:calc(50% + var(--card-size,64px)*1.93); }
 .tt-guardian-pedestal-right { left:calc(50% + var(--card-size,64px)*1.93); }
 @media(max-width:680px){.tt-guardian-pedestal{width:calc(var(--card-size,64px)*1.1)}.tt-guardian-pedestal-left{right:calc(50% + var(--card-size,64px)*1.72)}.tt-guardian-pedestal-right{left:calc(50% + var(--card-size,64px)*1.72)}}
+
+/* ===== WIREFRAME MODE: blank all artwork areas for screenshot ===== */
+.tt-app-outer { background:#1a1a1a !important; }
+.tt-app-outer::before, .tt-app-outer::after { display:none !important; }
+.tt-bg-art { display:none !important; }
+.tt-banner { display:none !important; }
+.tt-sentinel { display:none !important; }
+.tt-guardian-pedestal { display:none !important; }
+.tt-arcane-circle { display:none !important; }
+.tt-board-area::before, .tt-board-area::after { display:none !important; }
+.tt-header { background:#2a2a2a !important; border-color:#444 !important; box-shadow:none !important; }
+.tt-header::before, .tt-header::after { display:none !important; }
+.tt-header-beast { display:none !important; }
+.tt-header h1 { visibility:hidden; }
+.tt-hand-shell { background:#222 !important; border-color:#444 !important; box-shadow:none !important; }
+.tt-hand-shell::before { display:none !important; }
