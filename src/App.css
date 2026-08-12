@@ -33,10 +33,10 @@
     max(4px, env(safe-area-inset-left));
 }
 
-/* Fills wide desktop/tablet gutters without distorting the actual stage. */
+/* Fills wide desktop/tablet gutters with the backdrop artwork. */
 .tt-backdrop-blur {
   position: absolute;
-  inset: -30px;
+  inset: 0;
   z-index: 0;
   overflow: hidden;
   pointer-events: none;
@@ -47,16 +47,14 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transform: scale(1.08);
-  filter: blur(26px) brightness(.28) saturate(.8);
-  opacity: .9;
+  filter: brightness(.55) saturate(.85);
 }
 
 .tt-backdrop-blur::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: rgba(4, 4, 4, .48);
+  background: radial-gradient(ellipse at center, transparent 30%, rgba(4, 4, 4, .5) 100%);
 }
 
 /* All percentage positioning below is relative to this fixed 2:3 stage. */
