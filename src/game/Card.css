@@ -64,9 +64,8 @@
   -webkit-box-orient: vertical;
 }
 
-/* Opaque so it fully covers whatever number the artwork itself happens to show at
-   this position - the artwork's baked-in numbers aren't reliably accurate, so this
-   badge (sourced from game data) is the only one that should ever be visible. */
+/* Fallback-only: drawn for a card that has no artwork (every shipped card bakes
+   its numbers into the art, so this path is a safety net, not the normal render). */
 .rank {
   position: absolute;
   display: flex;

@@ -45,15 +45,20 @@ export function CardView({ card, owner, selected, disabled, onClick, onInspect }
       aria-disabled={disabled || undefined}
       aria-label={`${card.name}, top ${card.ranks.top}, bottom ${card.ranks.bottom}, left ${card.ranks.left}, right ${card.ranks.right}`}
     >
-      {card.image && <img className="card-art" src={card.image} alt="" draggable={false} />}
-      {/* Ranks are always rendered from game data, never read off the artwork: the
-          source card sheet's baked-in numbers don't reliably match the real stats
-          for every card, so this overlay is the only number players should trust. */}
-      <span className="rank rank-top">{rankLabel(card.ranks.top)}</span>
-      <span className="rank rank-left">{rankLabel(card.ranks.left)}</span>
-      <span className="rank rank-right">{rankLabel(card.ranks.right)}</span>
-      <span className="rank rank-bottom">{rankLabel(card.ranks.bottom)}</span>
-      {!card.image && <span className="card-name">{card.name}</span>}
+      {card.image ? (
+        // The ranks are baked into the artwork's number slots from authoritative
+        // game data (see scripts that generate src/assets/cards), so no separate
+        // overlay is drawn here. The aria-label below still carries the numbers.
+        <img className="card-art" src={card.image} alt="" draggable={false} />
+      ) : (
+        <>
+          <span className="rank rank-top">{rankLabel(card.ranks.top)}</span>
+          <span className="rank rank-left">{rankLabel(card.ranks.left)}</span>
+          <span className="rank rank-right">{rankLabel(card.ranks.right)}</span>
+          <span className="rank rank-bottom">{rankLabel(card.ranks.bottom)}</span>
+          <span className="card-name">{card.name}</span>
+        </>
+      )}
     </button>
   );
 }
