@@ -149,7 +149,7 @@
 }
 
 .tt-help-btn {
-  right: 6%;
+  left: 6%;
   top: 3.5%;
   width: calc(var(--card-size) * .38);
   height: calc(var(--card-size) * .38);
@@ -165,7 +165,7 @@
 
 .tt-new-game {
   right: 6%;
-  top: 9%;
+  top: 3.5%;
   padding: calc(var(--card-size) * .08) calc(var(--card-size) * .18);
   border-radius: 3px;
   white-space: nowrap;
@@ -350,11 +350,12 @@
 }
 
 .tt-rules {
-  left: 50%;
-  top: 93.1%;
-  transform: translateX(-50%);
+  position: absolute;
+  pointer-events: auto;
+  left: 6%;
+  top: 8.5%;
   min-width: calc(var(--card-size) * 1.15);
-  max-width: 62%;
+  max-width: 52%;
   margin: 0;
   border: 1px solid #76572e;
   border-radius: 4px;
@@ -369,7 +370,7 @@
   list-style: none;
   cursor: pointer;
   padding: calc(var(--card-size) * .07) calc(var(--card-size) * .16);
-  text-align: center;
+  text-align: left;
   font-size: clamp(9px, calc(var(--card-size) * .12), 13px);
   line-height: 1;
   text-transform: uppercase;
@@ -380,11 +381,7 @@
   display: none;
 }
 
-/* Open upward rather than falling outside the backdrop. */
 .tt-rules[open] {
-  top: auto;
-  bottom: 5.5%;
-  width: 62%;
   background: rgba(14, 11, 8, .98);
   z-index: 8;
 }
@@ -417,13 +414,18 @@
 /* Small phone refinements. */
 @media (max-width: 520px) {
   .tt-help-btn {
-    right: 4%;
+    left: 4%;
     top: 2.5%;
+  }
+
+  .tt-rules {
+    left: 4%;
+    top: 7%;
   }
 
   .tt-new-game {
     right: 4%;
-    top: 7.5%;
+    top: 2.5%;
     padding-inline: calc(var(--card-size) * .12);
   }
 

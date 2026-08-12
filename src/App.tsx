@@ -152,6 +152,34 @@ function App() {
           <button type="button" className="tt-new-game" onClick={() => handleNewGame()}>
             New Game
           </button>
+          <details
+            className="tt-rules"
+            open={rulesOpen}
+            onToggle={(e) => setRulesOpen(e.currentTarget.open)}
+          >
+            <summary>Rules {rulesOpen ? "▾" : "▸"}</summary>
+            <div className="tt-rules-content">
+              <p className="tt-rules-note">
+                Changing a rule restarts the match.
+              </p>
+              <label>
+                <input type="checkbox" checked={rules.same} onChange={() => toggleRule("same")} />
+                Same
+              </label>
+              <label>
+                <input type="checkbox" checked={rules.plus} onChange={() => toggleRule("plus")} />
+                Plus
+              </label>
+              <label>
+                <input type="checkbox" checked={rules.combo} onChange={() => toggleRule("combo")} />
+                Combo
+              </label>
+              <label>
+                <input type="checkbox" checked={rules.sameWall} onChange={() => toggleRule("sameWall")} />
+                Same Wall
+              </label>
+            </div>
+          </details>
         </header>
 
         <div className="tt-status-row">
@@ -232,35 +260,6 @@ function App() {
         </section>
 
         <p className="tt-hint">Double-tap any card to see it full size.</p>
-
-        <details
-          className="tt-rules"
-          open={rulesOpen}
-          onToggle={(e) => setRulesOpen(e.currentTarget.open)}
-        >
-          <summary>Rules {rulesOpen ? "▾" : "▸"}</summary>
-          <div className="tt-rules-content">
-            <p className="tt-rules-note">
-              Open is always on in local pass-and-play &mdash; both hands share one screen. Changing a rule restarts the match.
-            </p>
-            <label>
-              <input type="checkbox" checked={rules.same} onChange={() => toggleRule("same")} />
-              Same
-            </label>
-            <label>
-              <input type="checkbox" checked={rules.plus} onChange={() => toggleRule("plus")} />
-              Plus
-            </label>
-            <label>
-              <input type="checkbox" checked={rules.combo} onChange={() => toggleRule("combo")} />
-              Combo
-            </label>
-            <label>
-              <input type="checkbox" checked={rules.sameWall} onChange={() => toggleRule("sameWall")} />
-              Same Wall
-            </label>
-          </div>
-        </details>
       </div>
       {inspecting && (
         <CardLightbox card={inspecting.card} owner={inspecting.owner} onClose={() => setInspecting(null)} />
