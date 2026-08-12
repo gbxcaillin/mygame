@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Generated card placeholder exports (see scripts/extract_cards.py)
+card_placeholders/
+card_placeholders_1024/
+card_placeholders.zip
