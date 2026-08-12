@@ -17,8 +17,8 @@ type OpponentType = "human" | "ai";
 const AI_THINK_DELAY_MS = 550;
 
 // Must match the padding + gap set on .tt-board in Board.css (2 * padding + 2 * gap).
-const MIN_CARD_PX = 36;
-const MAX_CARD_PX = 140;
+const MIN_CARD_PX = 40;
+const MAX_CARD_PX = 160;
 
 function newGame(rules: RuleSet): GameState {
   const { handA, handB } = dealHands();
@@ -46,8 +46,8 @@ function App() {
 
     // Size cards from the fixed 2:3 artwork stage so the live board and hands
     // remain aligned with the background at every viewport size.
-    const byWidth = stage.clientWidth * 0.115;
-    const byHeight = stage.clientHeight * 0.077;
+    const byWidth = stage.clientWidth * 0.135;
+    const byHeight = stage.clientHeight * 0.090;
     const next = Math.floor(
       Math.max(MIN_CARD_PX, Math.min(MAX_CARD_PX, Math.min(byWidth, byHeight)))
     );
