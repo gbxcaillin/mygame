@@ -44,29 +44,51 @@ def rank_label(n):
     return "X" if n == 10 else str(n)
 
 
-def local_box(gray, size, cfx, cfy, half=0.11):
-    """Return the (fx, fy) centre of the black box near (cfx, cfy), or None."""
+def _blob(gray, size, cfx, cfy, half=0.11, thr=30):
+    """Largest dark blob near (cfx, cfy): (fx, fy, height_frac, fill) or None."""
     cx, cy, hw = cfx * size, cfy * size, half * size
     x0, x1 = int(max(0, cx - hw)), int(min(size, cx + hw))
     y0, y1 = int(max(0, cy - hw)), int(min(size, cy + hw))
-    lbl, n = ndimage.label(gray[y0:y1, x0:x1] < 45)
+    lbl, n = ndimage.label(gray[y0:y1, x0:x1] < thr)
     best, best_score = None, -1.0
     for i in range(1, n + 1):
         ys, xs = np.where(lbl == i)
         area = len(xs)
-        if area < 120:
+        if area < 150:
             continue
         w = xs.max() - xs.min() + 1
         h = ys.max() - ys.min() + 1
-        fill = area / (w * h)
-        if fill < 0.75 or not (0.5 <= w / h <= 2.0):
+        if not (0.4 <= w / h <= 2.2):
             continue
         ccx, ccy = xs.mean(), ys.mean()
         dist = ((ccx - (x1 - x0) / 2) ** 2 + (ccy - (y1 - y0) / 2) ** 2) ** 0.5
-        score = fill * area - dist * 3
+        score = area - dist * 4
         if score > best_score:
-            best_score, best = score, ((x0 + ccx) / size, (y0 + ccy) / size)
+            best_score = score
+            best = ((x0 + ccx) / size, (y0 + ccy) / size, h / size, area / (w * h))
     return best
+
+
+def detect_boxes(gray, size):
+    """Centre of each of the four number boxes as canvas fractions.
+
+    Top/bottom are found independently. Left and right share one vertical
+    centre taken from whichever of the two is a clean (unmerged) box, so a
+    left/right box that blends into dark artwork still gets the right Y while
+    keeping its own reliable X. Falls back to canonical positions if needed.
+    """
+    t = _blob(gray, size, *CANON["top"])
+    b = _blob(gray, size, *CANON["bottom"])
+    lft = _blob(gray, size, *CANON["left"])
+    rgt = _blob(gray, size, *CANON["right"])
+    clean = [c[1] for c in (lft, rgt) if c and c[3] > 0.82 and c[2] < 0.19]
+    fy = float(np.mean(clean)) if clean else CANON["left"][1]
+    return {
+        "top": (t[0], t[1]) if t else CANON["top"],
+        "bottom": (b[0], b[1]) if b else CANON["bottom"],
+        "left": (lft[0], fy) if lft else (CANON["left"][0], fy),
+        "right": (rgt[0], fy) if rgt else (CANON["right"][0], fy),
+    }
 
 
 def main():
@@ -75,30 +97,16 @@ def main():
     files = sorted(glob.glob(os.path.join(PLACEHOLDERS, "*.png")))
     assert len(files) == len(creatures) == 60, (len(files), len(creatures))
 
-    # Pass 1: detect every box; build a median fallback per side.
-    detected = []
-    for path in files:
-        gray = np.array(Image.open(path).convert("L"))
-        size = gray.shape[0]
-        detected.append({k: local_box(gray, size, *CANON[k]) for k in CANON})
-    median = {}
-    for k in CANON:
-        xs = [d[k][0] for d in detected if d[k]]
-        ys = [d[k][1] for d in detected if d[k]]
-        median[k] = (float(np.median(xs)), float(np.median(ys)))
-
     font = ImageFont.truetype(FONT, FONT_PX)
-    misses = 0
-    for creature, path, boxes in zip(creatures, files, detected):
+    for creature, path in zip(creatures, files):
+        gray = np.array(Image.open(path).convert("L"))
+        boxes = detect_boxes(gray, gray.shape[0])
         img = Image.open(path).convert("RGB").resize((OUT, OUT), Image.LANCZOS)
         draw = ImageDraw.Draw(img)
         vals = {"top": creature["top"], "left": creature["left"],
                 "right": creature["right"], "bottom": creature["bottom"]}
-        for side in CANON:
-            pos = boxes[side] or median[side]
-            if boxes[side] is None:
-                misses += 1
-            cx, cy = pos[0] * OUT, pos[1] * OUT
+        for side, (fx, fy) in boxes.items():
+            cx, cy = fx * OUT, fy * OUT
             text = rank_label(vals[side])
             bb = draw.textbbox((0, 0), text, font=font)
             tw, th = bb[2] - bb[0], bb[3] - bb[1]
@@ -108,7 +116,6 @@ def main():
                  quality=92, optimize=True)
 
     print(f"Baked {len(creatures)} cards -> {OUT_DIR}")
-    print(f"Boxes placed by detection: {240 - misses}/240 (fallback: {misses})")
 
 
 if __name__ == "__main__":
