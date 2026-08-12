@@ -10,13 +10,16 @@ import { chooseAiMove, DIFFICULTY_LABELS } from "./game/ai";
 import type { Difficulty } from "./game/ai";
 import { DEFAULT_RULES } from "./game/types";
 import type { Card, GameState, PlayerId, RuleSet } from "./game/types";
+import bgDragon from "./assets/cards/ancient-dragon.jpg";
+import bgPhoenix from "./assets/cards/phoenix.jpg";
+import bgHydra from "./assets/cards/hydra.jpg";
 import "./App.css";
 
 type OpponentType = "human" | "ai";
 const AI_THINK_DELAY_MS = 550;
 
 // Must match the padding + gap set on .tt-board in Board.css (2 * padding + 2 * gap).
-const BOARD_CHROME_PX = 2 * 8 + 2 * 6;
+const BOARD_CHROME_PX = 2 * 10 + 2 * 6;
 const HAND_GAP_PX = 8;
 const MIN_CARD_PX = 26;
 const MAX_CARD_PX = 130;
@@ -143,6 +146,9 @@ function App() {
 
   return (
     <div className="tt-app-outer">
+      <div className="tt-bg-art" aria-hidden="true">
+        <img src={bgHydra} className="tt-bg-img" alt="" />
+      </div>
       <div className="tt-app" ref={appRef} style={{ "--card-size": `${cardSize}px` } as CSSProperties}>
         <header className="tt-header">
           <h1>Clash of Beasts</h1>
@@ -212,6 +218,8 @@ function App() {
         />
 
         <div className="tt-board-area">
+          <img src={bgDragon} className="tt-sentinel tt-sentinel-left" alt="" aria-hidden="true" />
+          <img src={bgPhoenix} className="tt-sentinel tt-sentinel-right" alt="" aria-hidden="true" />
           <div className="tt-arcane-circle" aria-hidden="true">
             <div className="tt-arcane-ring tt-arcane-ring-outer" />
             <div className="tt-arcane-ring tt-arcane-ring-inner" />
