@@ -146,6 +146,14 @@ function App() {
 
   return (
     <div className="tt-app-outer">
+      <div className="tt-fantasy-frame" aria-hidden="true">
+        <span className="tt-corner tt-corner-tl" />
+        <span className="tt-corner tt-corner-tr" />
+        <span className="tt-corner tt-corner-bl" />
+        <span className="tt-corner tt-corner-br" />
+        <span className="tt-banner tt-banner-red" />
+        <span className="tt-banner tt-banner-blue" />
+      </div>
       <div className="tt-bg-art" aria-hidden="true">
         <img src={bgHydra} className="tt-bg-img" alt="" />
       </div>

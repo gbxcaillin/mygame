@@ -1,3 +1,4 @@
+/* ── Dark-fantasy presentation layer. Gameplay/layout logic is unchanged. ── */
 .tt-app-outer {
   display: flex;
   flex-direction: column;
@@ -5,31 +6,37 @@
   min-height: 0;
   min-width: 0;
   overflow: hidden;
-  padding: max(6px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right))
-    max(6px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+  padding: max(8px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right))
+    max(8px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
   box-sizing: border-box;
   position: relative;
+  isolation: isolate;
+  background:
+    radial-gradient(circle at 50% 43%, rgba(123, 87, 37, 0.12), transparent 28%),
+    linear-gradient(rgba(7, 8, 9, 0.78), rgba(7, 8, 9, 0.88)),
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.015) 0 1px, transparent 1px 5px),
+    #0b0c0d;
 }
 
-/* ── Full-bleed background art ── */
+/* Existing creature art is retained as a very subtle atmospheric texture. */
 .tt-bg-art {
   position: absolute;
   inset: 0;
   overflow: hidden;
   pointer-events: none;
-  z-index: 0;
+  z-index: -3;
 }
 
 .tt-bg-img {
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
-  width: 140%;
-  height: 140%;
+  transform: translate(-50%, -50%) scale(1.06);
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  filter: blur(12px) brightness(0.15) saturate(0.4);
-  opacity: 0.7;
+  filter: blur(20px) brightness(0.11) saturate(0.45) contrast(1.25);
+  opacity: 0.42;
 }
 
 .tt-bg-art::after {
@@ -37,29 +44,71 @@
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse at 50% 40%, transparent 20%, rgba(17, 16, 21, 0.7) 70%),
-    linear-gradient(180deg, rgba(17, 16, 21, 0.3) 0%, transparent 20%, transparent 80%, rgba(17, 16, 21, 0.5) 100%);
+    radial-gradient(ellipse at 50% 46%, transparent 12%, rgba(4,5,6,.35) 52%, rgba(2,3,4,.86) 100%),
+    linear-gradient(90deg, rgba(106,26,18,.10), transparent 18% 82%, rgba(22,55,88,.12));
 }
 
-/* Outer ornate frame */
-.tt-app-outer::before {
-  content: '';
+/* Stone / forged-metal perimeter inspired by the mock-up. */
+.tt-fantasy-frame {
   position: absolute;
   inset: 3px;
-  border: 1px solid rgba(201, 148, 62, 0.12);
-  border-radius: 4px;
+  z-index: 4;
   pointer-events: none;
-  z-index: 2;
+  border: 2px solid rgba(123, 94, 50, 0.58);
+  border-radius: 8px;
+  box-shadow:
+    inset 0 0 0 2px rgba(12, 13, 14, .95),
+    inset 0 0 0 4px rgba(181, 139, 71, .12),
+    inset 0 0 34px rgba(0,0,0,.75),
+    0 0 0 1px rgba(0,0,0,.9);
 }
 
-.tt-app-outer::after {
+.tt-fantasy-frame::before,
+.tt-fantasy-frame::after {
   content: '';
   position: absolute;
-  inset: 7px;
-  border: 1px solid rgba(201, 148, 62, 0.06);
-  pointer-events: none;
-  z-index: 2;
+  left: 7%;
+  right: 7%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(188,145,73,.35) 12%, rgba(78,58,35,.85) 50%, rgba(188,145,73,.35) 88%, transparent);
+  box-shadow: 0 1px 0 rgba(0,0,0,.9);
 }
+.tt-fantasy-frame::before { top: 5px; }
+.tt-fantasy-frame::after { bottom: 5px; }
+
+.tt-corner {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  border-color: rgba(197, 151, 75, .55);
+  filter: drop-shadow(0 2px 2px rgba(0,0,0,.8));
+}
+.tt-corner-tl { top: 7px; left: 7px; border-top: 3px solid; border-left: 3px solid; }
+.tt-corner-tr { top: 7px; right: 7px; border-top: 3px solid; border-right: 3px solid; }
+.tt-corner-bl { bottom: 7px; left: 7px; border-bottom: 3px solid; border-left: 3px solid; }
+.tt-corner-br { bottom: 7px; right: 7px; border-bottom: 3px solid; border-right: 3px solid; }
+
+/* Faded opposing war-banners: decorative only. */
+.tt-banner {
+  position: absolute;
+  top: 54px;
+  width: clamp(20px, 4vw, 46px);
+  height: min(30vh, 230px);
+  opacity: .18;
+  filter: saturate(.7);
+  clip-path: polygon(0 0, 100% 0, 100% 84%, 72% 78%, 52% 100%, 28% 80%, 0 88%);
+}
+.tt-banner::after {
+  content: '✦';
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: clamp(14px, 2.5vw, 28px);
+  color: rgba(0,0,0,.65);
+}
+.tt-banner-red { left: 8px; background: linear-gradient(180deg, #6d1712, #2b0908 80%, transparent); }
+.tt-banner-blue { right: 8px; background: linear-gradient(180deg, #173e68, #081b31 80%, transparent); }
 
 .tt-app {
   width: 100%;
@@ -336,4 +385,104 @@
   gap: 6px;
   font-size: 13px;
   cursor: pointer;
+}
+
+
+/* ── Mock-up-inspired surfaces; visual only ── */
+.tt-app {
+  padding: clamp(4px, .8dvh, 8px) clamp(4px, 1vw, 12px);
+}
+
+.tt-header {
+  position: relative;
+  padding: 3px 14px 5px;
+}
+
+.tt-header::before {
+  content: '';
+  position: absolute;
+  left: -24px;
+  right: -24px;
+  bottom: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(198,151,73,.42), transparent);
+}
+
+.tt-header h1 {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-weight: 800;
+  letter-spacing: clamp(2px, .55vw, 5px);
+  filter: drop-shadow(0 2px 1px #000) drop-shadow(0 0 8px rgba(201,148,62,.12));
+}
+
+.tt-new-game, .tt-help-btn, .tt-turn-indicator, .tt-opponent-row select, .tt-rules {
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.tt-new-game {
+  border-color: rgba(194,145,65,.55);
+  background: linear-gradient(180deg, rgba(78,57,29,.72), rgba(25,20,14,.82));
+  box-shadow: inset 0 1px 0 rgba(255,225,160,.08), 0 3px 8px rgba(0,0,0,.45);
+}
+
+.tt-status-row, .tt-opponent-row {
+  position: relative;
+  z-index: 1;
+}
+
+.tt-board-area {
+  padding: clamp(8px, calc(var(--card-size, 64px) * .13), 16px);
+  border-radius: 12px;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(111,79,34,.13), transparent 62%),
+    linear-gradient(145deg, rgba(49,43,33,.42), rgba(7,8,9,.55));
+  border: 1px solid rgba(161,119,59,.32);
+  box-shadow:
+    inset 0 0 0 2px rgba(0,0,0,.55),
+    inset 0 0 22px rgba(0,0,0,.45),
+    0 8px 22px rgba(0,0,0,.30);
+}
+
+.tt-board-area::before, .tt-board-area::after {
+  content: '';
+  position: absolute;
+  width: 44%;
+  height: 1px;
+  top: 50%;
+  opacity: .22;
+  background: linear-gradient(90deg, transparent, #b58a46);
+  pointer-events: none;
+}
+.tt-board-area::before { right: 100%; }
+.tt-board-area::after { left: 100%; transform: scaleX(-1); }
+
+.tt-arcane-circle {
+  width: calc(var(--card-size, 64px) * 4.9);
+  height: calc(var(--card-size, 64px) * 4.9);
+  opacity: .9;
+  filter: drop-shadow(0 0 6px rgba(171,127,61,.10));
+}
+.tt-arcane-ring { border-color: rgba(190,145,72,.15); }
+.tt-arcane-ring-inner { border-color: rgba(190,145,72,.10); }
+.tt-rune { color: rgba(201,148,62,.24); }
+
+.tt-sentinel {
+  filter: brightness(.25) saturate(.42) sepia(.12);
+  opacity: .42;
+}
+
+.tt-rules {
+  border-color: rgba(151,112,58,.34);
+  background: linear-gradient(180deg, rgba(31,27,22,.72), rgba(10,10,11,.76));
+}
+
+@media (max-width: 600px) {
+  .tt-banner { opacity: .10; width: 20px; }
+  .tt-fantasy-frame { inset: 2px; }
+  .tt-board-area { padding: 6px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tt-new-game, .tt-help-btn { transition: none; }
 }
