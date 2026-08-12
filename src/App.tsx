@@ -146,19 +146,15 @@ function App() {
 
   return (
     <div className="tt-app-outer">
-      <div className="tt-fantasy-frame" aria-hidden="true">
-        <span className="tt-corner tt-corner-tl" />
-        <span className="tt-corner tt-corner-tr" />
-        <span className="tt-corner tt-corner-bl" />
-        <span className="tt-corner tt-corner-br" />
-        <span className="tt-banner tt-banner-red" />
-        <span className="tt-banner tt-banner-blue" />
-      </div>
       <div className="tt-bg-art" aria-hidden="true">
         <img src={bgHydra} className="tt-bg-img" alt="" />
+        <div className="tt-bg-vignette" />
+        <div className="tt-banner tt-banner-left"><span /></div>
+        <div className="tt-banner tt-banner-right"><span /></div>
       </div>
       <div className="tt-app" ref={appRef} style={{ "--card-size": `${cardSize}px` } as CSSProperties}>
         <header className="tt-header">
+          <div className="tt-header-beast tt-header-beast-left" aria-hidden="true">◆</div>
           <h1>Clash of Beasts</h1>
           <button
             type="button"
@@ -171,6 +167,7 @@ function App() {
           <button type="button" className="tt-new-game" onClick={() => handleNewGame()}>
             New Game
           </button>
+          <div className="tt-header-beast tt-header-beast-right" aria-hidden="true">◆</div>
         </header>
 
         <div className="tt-status-row">
@@ -215,6 +212,7 @@ function App() {
           )}
         </div>
 
+        <section className="tt-hand-shell tt-hand-shell-b">
         <Hand
           player="B"
           cards={state.hands.B}
@@ -224,6 +222,7 @@ function App() {
           onInspect={(card) => setInspecting({ card, owner: "B" })}
           label={player2Label}
         />
+        </section>
 
         <div className="tt-board-area">
           <img src={bgDragon} className="tt-sentinel tt-sentinel-left" alt="" aria-hidden="true" />
@@ -246,6 +245,7 @@ function App() {
           />
         </div>
 
+        <section className="tt-hand-shell tt-hand-shell-a">
         <Hand
           player="A"
           cards={state.hands.A}
@@ -256,6 +256,7 @@ function App() {
           label="Player 1"
           cardsRowRef={handRowRef}
         />
+        </section>
 
         <p className="tt-hint">Double-tap any card to see it full size.</p>
 
