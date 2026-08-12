@@ -33,7 +33,7 @@ export function Board({ board, onCellClick, canPlace, justCaptured, onInspect }:
     const timer = setTimeout(() => {
       setFlipping(new Set());
       setPrevOwners(new Map());
-    }, 500);
+    }, 950);
 
     prevBoardRef.current = board;
     return () => clearTimeout(timer);
