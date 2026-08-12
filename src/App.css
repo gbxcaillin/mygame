@@ -326,10 +326,10 @@
    ------------------------------------------------------------ */
 
 .tt-board-area {
-  left: 31.8%;
-  top: 45.6%;
-  width: 36.4%;
-  height: 27.6%;
+  left: 33.4%;
+  top: 46.4%;
+  width: 32.7%;
+  height: 25.1%;
   display: grid;
   place-items: center;
   padding: 0;
@@ -341,7 +341,7 @@
   height: 100%;
   box-sizing: border-box;
   padding: 0;
-  gap: 3%;
+  gap: 5.3%;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(3, 1fr);
   background: transparent !important;
