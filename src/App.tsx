@@ -10,6 +10,7 @@ import type { Difficulty } from "./game/ai";
 import { DEFAULT_RULES } from "./game/types";
 import type { Card, GameState, PlayerId, RuleSet } from "./game/types";
 import backdropWide from "./assets/clash-of-beasts-backdrop-wide-v5.png";
+import backdropPortrait from "./assets/clash-of-beasts-backdrop-v5.png";
 import "./App.css";
 
 type OpponentType = "human" | "ai";
@@ -90,11 +91,14 @@ function App() {
 
   return (
     <div className="tt-app">
-      <img src={backdropWide} className="tt-backdrop" alt="" aria-hidden="true" />
+      <picture>
+        <source srcSet={backdropPortrait} media="(orientation: portrait)" />
+        <img src={backdropWide} className="tt-backdrop" alt="" aria-hidden="true" />
+      </picture>
 
       <div className="tt-stage">
         <div className="tt-title-area">
-          <h1 className="tt-title">Clash of Beasts</h1>
+          <h1 className="tt-title visually-hidden">Clash of Beasts</h1>
         </div>
 
         <div className="tt-controls">

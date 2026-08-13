@@ -1,34 +1,31 @@
-/* Card styling — 170×170 1:1 */
+/* Card styling — backdrop art provides slot frames */
 
 .tt-card {
   position: relative;
   width: var(--card-size, 170px);
   height: var(--card-size, 170px);
-  border: 2px solid rgba(232, 220, 200, 0.2);
-  border-radius: 6px;
-  background: #1e1a20;
+  border: none;
+  border-radius: 2px;
+  background: rgba(14, 12, 16, 0.85);
   overflow: hidden;
   cursor: pointer;
   padding: 0;
   flex: none;
   box-sizing: border-box;
-  transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+  transition: transform 0.15s, box-shadow 0.15s;
 }
 
 .tt-card.owner-a {
-  border-color: var(--player-a);
-  box-shadow: inset 0 0 14px var(--player-a-bg);
+  box-shadow: inset 0 0 18px var(--player-a-bg), 0 0 4px rgba(77, 140, 232, 0.3);
 }
 
 .tt-card.owner-b {
-  border-color: var(--player-b);
-  box-shadow: inset 0 0 14px var(--player-b-bg);
+  box-shadow: inset 0 0 18px var(--player-b-bg), 0 0 4px rgba(212, 74, 62, 0.3);
 }
 
 .tt-card.selected {
   transform: translateY(-8px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4), 0 0 12px rgba(232, 220, 200, 0.25);
-  border-color: #e8dcc8;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5), 0 0 16px rgba(232, 220, 200, 0.3);
 }
 
 .tt-card.disabled {
@@ -37,7 +34,7 @@
 }
 
 .tt-card:not(.disabled):hover {
-  border-color: rgba(232, 220, 200, 0.45);
+  box-shadow: 0 0 8px rgba(232, 220, 200, 0.15);
 }
 
 /* ── Card art ── */
@@ -57,7 +54,7 @@
   font-size: 20px;
   font-weight: 700;
   color: #e8dcc8;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
   line-height: 1;
   pointer-events: none;
 }

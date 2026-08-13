@@ -1,7 +1,4 @@
-/* Hand styling
-   Standard: 5×170 + 4×10 = 890px row
-   Ultra-wide: 5×178 + 4×8 = 922px row
-*/
+/* Hand styling — backdrop art provides slot frames */
 
 .tt-hand {
   position: relative;
@@ -15,16 +12,17 @@
   left: 4px;
   font-size: 11px;
   font-weight: 600;
-  color: rgba(232, 220, 200, 0.4);
+  color: rgba(232, 220, 200, 0.3);
   text-transform: uppercase;
   letter-spacing: 1px;
   margin: 0;
   z-index: 1;
   pointer-events: none;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
 }
 
 .tt-hand.active .tt-hand-label {
-  color: rgba(232, 220, 200, 0.8);
+  color: rgba(232, 220, 200, 0.7);
 }
 
 .tt-hand-cards {
