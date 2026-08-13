@@ -628,14 +628,14 @@
     left: 16%;
     top: 26%;
     width: 60%;
-    height: 10%;
+    height: 12%;
   }
 
   .tt-hand-shell-a {
     left: 16%;
-    top: 80%;
+    top: 79%;
     width: 60%;
-    height: 12%;
+    height: 14%;
   }
 
   .tt-hand-shell :is(.tt-hand-label, .hand-label, h2, h3) {
@@ -649,15 +649,19 @@
 
   /* Board: positioned to match inner cell area of backdrop grid */
   .tt-board-area {
-    left: 35.5%;
-    top: 39%;
-    width: 27%;
+    left: 34.5%;
+    top: 42.5%;
+    width: 29%;
     height: 37%;
   }
 
   .tt-board-area :is(.tt-board, .board) {
-    column-gap: 6%;
-    row-gap: 4.5%;
+    column-gap: 5%;
+    row-gap: 5%;
+  }
+
+  .tt-board-area .tt-cell {
+    overflow: hidden;
   }
 
   .tt-hint {

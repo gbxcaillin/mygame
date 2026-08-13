@@ -46,8 +46,8 @@ function App() {
     if (!stage) return;
 
     const isWide = stage.clientWidth / stage.clientHeight > 1.2;
-    const byWidth = stage.clientWidth * (isWide ? 0.055 : 0.094);
-    const byHeight = stage.clientHeight * (isWide ? 0.09 : 0.063);
+    const byWidth = stage.clientWidth * (isWide ? 0.08 : 0.094);
+    const byHeight = stage.clientHeight * (isWide ? 0.128 : 0.063);
     const next = Math.floor(
       Math.max(MIN_CARD_PX, Math.min(MAX_CARD_PX, Math.min(byWidth, byHeight)))
     );
