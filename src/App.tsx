@@ -11,7 +11,7 @@ import type { Difficulty } from "./game/ai";
 import { DEFAULT_RULES } from "./game/types";
 import type { Card, GameState, PlayerId, RuleSet } from "./game/types";
 import backdrop from "./assets/clash-of-beasts-backdrop-v4.png";
-import backdropWide from "./assets/clash-of-beasts-backdrop-wide-v2.png";
+import backdropWide from "./assets/clash-of-beasts-backdrop-wide-v3.png";
 import "./App.css";
 
 type OpponentType = "human" | "ai";
