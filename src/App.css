@@ -68,27 +68,8 @@
   }
 }
 
-/* Wide layout on foldable/tablet: blur top/bottom gutters with wide backdrop. */
-@media (min-aspect-ratio: 2/3) and (max-aspect-ratio: 16/9) {
-  .tt-backdrop-blur .tt-blur-wide {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    filter: brightness(.35) saturate(.6);
-  }
-
-  .tt-backdrop-blur::after {
-    display: block;
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(ellipse at center, transparent 25%, rgba(4, 4, 4, .65) 100%);
-  }
-}
-
-/* Full widescreen: stage fills, no blur needed. */
-@media (min-aspect-ratio: 16/9) {
+/* Widescreen (≥ 2:3): stage fills viewport, no gutters, no blur needed. */
+@media (min-aspect-ratio: 2/3) {
   .tt-backdrop-blur {
     display: none !important;
   }
@@ -578,85 +559,22 @@
 }
 
 /* ============================================================
-   WIDESCREEN LAYOUT (16:9)
+   WIDESCREEN LAYOUT
    Triggered on foldable/tablet/desktop (wider than 2:3).
-   Uses the wide-v5 backdrop (1672×941).
+   Uses the wide-v5 backdrop (1672×941, aspect ≈ 16:9).
 
-   Wireframe reference at 1920×1080:
-   Slot size:  200×200 (1:1)  |  Slot spacing: 20px
-   Grid cell:  ~200×200 (1:1) |  Grid spacing: 20px
-   Tray width: 1080px centered | Grid: ~640×640 centered
+   2:3 → 16:9 range: stage fills viewport, backdrop cropped
+   via object-fit: cover.  JS sets --wide-board-left,
+   --wide-board-width, --wide-tray-left, --wide-tray-width
+   to dynamically track the visible portion of the backdrop.
+
+   ≥ 16:9: stage fixed at 16:9, exact backdrop alignment.
    ============================================================ */
 
+/* --- Shared widescreen base (≥ 2:3) --- */
 @media (min-aspect-ratio: 2/3) {
-  .tt-app {
-    aspect-ratio: 16 / 9;
-    width: min(
-      calc(100vw - max(8px, env(safe-area-inset-left)) - max(8px, env(safe-area-inset-right))),
-      calc((100dvh - max(8px, env(safe-area-inset-top)) - max(8px, env(safe-area-inset-bottom))) * 16 / 9)
-    );
-    max-width: 1920px;
-    max-height: 1080px;
-  }
-
-  .tt-backdrop-portrait {
-    display: none;
-  }
-
-  .tt-backdrop-wide {
-    display: block;
-    object-fit: cover;
-  }
-
-  /* Controls: positioned between title frame (~15%) and red tray (~25%) */
-  .tt-help-btn {
-    left: 22%;
-    top: 15%;
-    width: 3%;
-    height: 3.5%;
-  }
-
-  .tt-new-game {
-    right: 22%;
-    top: 15%;
-    width: 8%;
-    height: 3.5%;
-  }
-
-  .tt-rules {
-    left: 22%;
-    top: 19.5%;
-  }
-
-  .tt-status-row {
-    left: 27%;
-    top: 15%;
-    width: 46%;
-    height: 3.5%;
-  }
-
-  .tt-opponent-row {
-    left: 27%;
-    top: 19.5%;
-    width: 46%;
-    height: 3%;
-  }
-
-  /* Red tray (computer): frame spans ~25-42% y, slots centered at 50% x */
-  .tt-hand-shell-b {
-    left: 22%;
-    top: 25%;
-    width: 56%;
-    height: 16%;
-  }
-
-  /* Blue tray (player): frame spans ~76-95% y */
-  .tt-hand-shell-a {
-    left: 22%;
-    top: 76%;
-    width: 56%;
-    height: 16%;
-  }
+  .tt-backdrop-portrait { display: none; }
+  .tt-backdrop-wide { display: block; object-fit: cover; }
 
   .tt-hand-shell :is(.tt-hand-label, .hand-label, h2, h3) {
     display: none !important;
@@ -667,25 +585,78 @@
     max-width: 100% !important;
   }
 
-  /* Board: inner cell area from gold frame scan
-     Cols: 37.58-62.26% x  |  Rows: 41.26-81.58% y
-     Dividers: ~2.2% x, ~1.9% y  */
-  .tt-board-area {
-    left: 37.5%;
-    top: 41.3%;
-    width: 25%;
-    height: 40.3%;
-  }
-
   .tt-board-area :is(.tt-board, .board) {
     column-gap: 8.8%;
     row-gap: 4.7%;
   }
 
-  /* overflow: hidden is now in base styles */
+  .tt-hint { top: 96%; }
 
-  .tt-hint {
-    top: 96%;
+  .tt-help-btn  { top: 14%; width: 3%;  height: 3.5%; }
+  .tt-new-game  { top: 14%; width: 8%;  height: 3.5%; }
+  .tt-rules     { top: 19.5%; }
+  .tt-status-row   { top: 15%; height: 3.5%; }
+  .tt-opponent-row { top: 19.5%; height: 3%; }
+  .tt-hand-shell-b { top: 25%; height: 16%; }
+  .tt-hand-shell-a { top: 76%; height: 16%; }
+  .tt-board-area   { top: 41.3%; height: 40.3%; }
+}
+
+/* --- Intermediate: foldable / tablet (2:3 → 16:9) --- */
+@media (min-aspect-ratio: 2/3) and (max-aspect-ratio: 16/9) {
+  .tt-app {
+    aspect-ratio: unset;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
   }
+
+  .tt-board-area {
+    left: var(--wide-board-left, 37.5%);
+    width: var(--wide-board-width, 25%);
+  }
+
+  .tt-hand-shell-b,
+  .tt-hand-shell-a {
+    left: var(--wide-tray-left, 22%);
+    width: var(--wide-tray-width, 56%);
+  }
+
+  .tt-help-btn { left: var(--wide-tray-left, 22%); }
+  .tt-new-game { right: var(--wide-tray-left, 22%); }
+  .tt-rules    { left: var(--wide-tray-left, 22%); }
+
+  .tt-status-row {
+    left: calc(var(--wide-tray-left, 22%) + 5%);
+    width: calc(var(--wide-tray-width, 56%) - 10%);
+  }
+
+  .tt-opponent-row {
+    left: calc(var(--wide-tray-left, 22%) + 5%);
+    width: calc(var(--wide-tray-width, 56%) - 10%);
+  }
+}
+
+/* --- Full widescreen (≥ 16:9) — fixed 16:9 stage --- */
+@media (min-aspect-ratio: 16/9) {
+  .tt-app {
+    aspect-ratio: 16 / 9;
+    width: min(
+      calc(100vw - max(8px, env(safe-area-inset-left)) - max(8px, env(safe-area-inset-right))),
+      calc((100dvh - max(8px, env(safe-area-inset-top)) - max(8px, env(safe-area-inset-bottom))) * 16 / 9)
+    );
+    max-width: 1920px;
+    max-height: 1080px;
+  }
+
+  .tt-board-area   { left: 37.5%; width: 25%; }
+  .tt-hand-shell-b { left: 22%; width: 56%; }
+  .tt-hand-shell-a { left: 22%; width: 56%; }
+  .tt-help-btn     { left: 22%; }
+  .tt-new-game     { right: 22%; }
+  .tt-rules        { left: 22%; }
+  .tt-status-row   { left: 27%; width: 46%; }
+  .tt-opponent-row { left: 27%; width: 46%; }
 }
 

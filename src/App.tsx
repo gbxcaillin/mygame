@@ -45,12 +45,36 @@ function App() {
     const stage = appRef.current;
     if (!stage) return;
 
-    const isWide = stage.clientWidth / stage.clientHeight > 1.2;
-    const byWidth = stage.clientWidth * (isWide ? 0.067 : 0.15);
-    const byHeight = stage.clientHeight * (isWide ? 0.12 : 0.07);
-    const next = Math.floor(
-      Math.max(MIN_CARD_PX, Math.min(MAX_CARD_PX, Math.min(byWidth, byHeight)))
-    );
+    const W = stage.clientWidth;
+    const H = stage.clientHeight;
+    const R = W / H;
+    const WIDE_THRESHOLD = 2 / 3;
+    const BACKDROP_RATIO = 16 / 9;
+
+    let next: number;
+
+    if (R > WIDE_THRESHOLD) {
+      const visFrac = Math.min(1, R / BACKDROP_RATIO);
+
+      const boardW = Math.min(0.80, 0.25 / visFrac);
+      const boardL = 50 - (boardW * 100) / 2;
+      const trayW = Math.min(0.94, 0.56 / visFrac);
+      const trayL = 50 - (trayW * 100) / 2;
+
+      stage.style.setProperty("--wide-board-left", `${boardL}%`);
+      stage.style.setProperty("--wide-board-width", `${boardW * 100}%`);
+      stage.style.setProperty("--wide-tray-left", `${trayL}%`);
+      stage.style.setProperty("--wide-tray-width", `${trayW * 100}%`);
+
+      const cellPx = W * boardW * 0.2747;
+      const trayPx = W * trayW;
+      const handFit = trayPx / 6.28;
+      next = Math.floor(Math.max(MIN_CARD_PX, Math.min(MAX_CARD_PX, Math.min(cellPx * 0.85, handFit))));
+    } else {
+      const byWidth = W * 0.15;
+      const byHeight = H * 0.07;
+      next = Math.floor(Math.max(MIN_CARD_PX, Math.min(MAX_CARD_PX, Math.min(byWidth, byHeight))));
+    }
 
     setCardSize((prev) => (Math.abs(next - prev) > 0.5 ? next : prev));
   }, []);
