@@ -501,25 +501,49 @@
 /* Small phone refinements. */
 @media (max-width: 520px) {
   .tt-help-btn {
-    left: 3.5%;
+    left: 5%;
     top: 2.5%;
+    width: 5.5%;
+    height: 3.8%;
   }
 
   .tt-rules {
-    left: 2.5%;
-    top: 7%;
+    left: 3%;
+    top: 6.5%;
   }
 
   .tt-new-game {
-    right: 2%;
+    right: 3.5%;
     top: 2.5%;
+    width: 13%;
+    font-size: clamp(7px, calc(var(--card-size) * .11), 11px) !important;
+  }
+
+  .tt-status-row {
+    left: 19%;
+    width: 62%;
+    font-size: clamp(8px, calc(var(--card-size) * .12), 12px);
   }
 
   .tt-opponent-row {
-    gap: 4%;
+    left: 19%;
+    width: 62%;
+    gap: 3%;
+    font-size: clamp(8px, calc(var(--card-size) * .10), 11px);
   }
 
   .tt-opponent-row select {
-    min-width: calc(var(--card-size) * 1.2);
+    min-width: calc(var(--card-size) * 1.0);
+    font-size: clamp(8px, calc(var(--card-size) * .10), 11px);
+  }
+
+  .tt-hand-shell :is(.tt-hand-cards, .hand-cards, .cards-row, .tt-cards-row) {
+    gap: calc(var(--card-size) * 0.14) !important;
+    max-width: 63% !important;
+  }
+
+  .tt-hand-shell :is(.tt-hand-label, .hand-label, h2, h3) {
+    font-size: clamp(7px, calc(var(--card-size) * .11), 11px) !important;
+    padding: 0 calc(var(--card-size) * .10) !important;
   }
 }
