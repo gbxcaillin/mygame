@@ -314,16 +314,16 @@
 
 .tt-hand-shell-b {
   left: 8%;
-  top: 18.5%;
+  top: 19%;
   width: 84%;
-  height: 13%;
+  height: 11%;
 }
 
 .tt-hand-shell-a {
   left: 8%;
-  top: 66%;
+  top: 64%;
   width: 84%;
-  height: 11%;
+  height: 13%;
 }
 
 .tt-hand-shell::before {
@@ -372,10 +372,10 @@
    ------------------------------------------------------------ */
 
 .tt-board-area {
-  left: 24%;
-  top: 32%;
-  width: 52%;
-  height: 31%;
+  left: 29%;
+  top: 31%;
+  width: 42%;
+  height: 33%;
   display: grid;
   place-items: center;
   padding: 0;
@@ -387,8 +387,8 @@
   height: 100%;
   box-sizing: border-box;
   padding: 0;
-  column-gap: 4%;
-  row-gap: 4%;
+  column-gap: 3.5%;
+  row-gap: 3%;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(3, 1fr);
   background: transparent !important;
