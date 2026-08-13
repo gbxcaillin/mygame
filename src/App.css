@@ -59,8 +59,8 @@
   }
 }
 
-/* Wider-than-portrait: show the portrait backdrop blurred in the gutters. */
-@media (min-aspect-ratio: 3/4) {
+/* Wider-than-portrait but narrower than 4:3: blur gutters with portrait image. */
+@media (min-aspect-ratio: 3/4) and (max-aspect-ratio: 4/3) {
   .tt-backdrop-blur .tt-blur-portrait {
     display: block;
     width: 100%;
@@ -104,6 +104,10 @@
   object-fit: contain;
   pointer-events: none;
   user-select: none;
+}
+
+.tt-backdrop-wide {
+  display: none;
 }
 
 .tt-header,
@@ -547,6 +551,110 @@
   .tt-hand-shell :is(.tt-hand-label, .hand-label, h2, h3) {
     font-size: clamp(7px, calc(var(--card-size) * .11), 11px) !important;
     padding: 0 calc(var(--card-size) * .10) !important;
+  }
+}
+
+/* ============================================================
+   WIDESCREEN LAYOUT (16:9)
+   Triggered on viewports wider than 4:3.
+   Uses the wide-v4 backdrop (1672×941).
+
+   Frame positions (% of 16:9 stage):
+   Title frame:  ~28-72% x,  ~4-16% y
+   Red tray:     ~15-75% x, ~26-36% y
+   Board 3×3:    ~34-64% x, ~38-78% y
+   Blue tray:    ~15-75% x, ~80-93% y
+   ============================================================ */
+
+@media (min-aspect-ratio: 4/3) {
+  .tt-app {
+    aspect-ratio: 16 / 9;
+    width: min(
+      calc(100vw - max(8px, env(safe-area-inset-left)) - max(8px, env(safe-area-inset-right))),
+      calc((100dvh - max(8px, env(safe-area-inset-top)) - max(8px, env(safe-area-inset-bottom))) * 16 / 9)
+    );
+    max-width: 1920px;
+    max-height: 1080px;
+  }
+
+  .tt-backdrop-portrait {
+    display: none;
+  }
+
+  .tt-backdrop-wide {
+    display: block;
+    object-fit: cover;
+  }
+
+  .tt-backdrop-blur {
+    display: none !important;
+  }
+
+  .tt-help-btn {
+    left: 29%;
+    top: 3%;
+    width: 3%;
+    height: 5%;
+  }
+
+  .tt-new-game {
+    right: 29%;
+    top: 3%;
+    width: 8%;
+    height: 5%;
+  }
+
+  .tt-rules {
+    left: 28%;
+    top: 9%;
+  }
+
+  .tt-status-row {
+    left: 22%;
+    top: 17.5%;
+    width: 48%;
+    height: 3.5%;
+  }
+
+  .tt-opponent-row {
+    left: 22%;
+    top: 21.5%;
+    width: 48%;
+    height: 3%;
+  }
+
+  .tt-hand-shell-b {
+    left: 15%;
+    top: 26%;
+    width: 61%;
+    height: 10%;
+  }
+
+  .tt-hand-shell-a {
+    left: 15%;
+    top: 80%;
+    width: 61%;
+    height: 12%;
+  }
+
+  .tt-hand-shell :is(.tt-hand-label, .hand-label, h2, h3) {
+    display: none !important;
+  }
+
+  .tt-hand-shell :is(.tt-hand-cards, .hand-cards, .cards-row, .tt-cards-row) {
+    gap: calc(var(--card-size) * 0.20) !important;
+    max-width: 92% !important;
+  }
+
+  .tt-board-area {
+    left: 34%;
+    top: 37.5%;
+    width: 30%;
+    height: 39%;
+  }
+
+  .tt-hint {
+    top: 93%;
   }
 }
 
