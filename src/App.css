@@ -590,50 +590,51 @@
     display: none !important;
   }
 
+  /* Buttons: flanking the status/opponent rows, below the title frame */
   .tt-help-btn {
-    left: 29%;
-    top: 3%;
+    left: 17%;
+    top: 17%;
     width: 3%;
-    height: 5%;
+    height: 3.5%;
   }
 
   .tt-new-game {
-    right: 29%;
-    top: 3%;
+    right: 17%;
+    top: 17%;
     width: 8%;
-    height: 5%;
+    height: 3.5%;
   }
 
   .tt-rules {
-    left: 28%;
-    top: 9%;
+    left: 17%;
+    top: 21%;
   }
 
   .tt-status-row {
     left: 22%;
-    top: 17.5%;
+    top: 17%;
     width: 48%;
     height: 3.5%;
   }
 
   .tt-opponent-row {
     left: 22%;
-    top: 21.5%;
+    top: 21%;
     width: 48%;
     height: 3%;
   }
 
   .tt-hand-shell-b {
-    left: 15%;
+    left: 16%;
     top: 26%;
-    width: 61%;
+    width: 60%;
     height: 10%;
   }
 
   .tt-hand-shell-a {
-    left: 15%;
+    left: 16%;
     top: 80%;
-    width: 61%;
+    width: 60%;
     height: 12%;
   }
 
@@ -646,11 +647,17 @@
     max-width: 92% !important;
   }
 
+  /* Board: positioned to match inner cell area of backdrop grid */
   .tt-board-area {
-    left: 34%;
-    top: 37.5%;
-    width: 30%;
-    height: 39%;
+    left: 35.5%;
+    top: 39%;
+    width: 27%;
+    height: 37%;
+  }
+
+  .tt-board-area :is(.tt-board, .board) {
+    column-gap: 6%;
+    row-gap: 4.5%;
   }
 
   .tt-hint {
