@@ -103,77 +103,81 @@ function App() {
           <h1 className="tt-title visually-hidden">Clash of Beasts</h1>
         </div>
 
-        <div className="tt-controls">
-          <button
-            type="button"
-            className="tt-help-btn"
-            onClick={() => setTutorialOpen(true)}
-            aria-label="How to play"
-          >
-            ?
-          </button>
-
-          <div className={`tt-turn-indicator ${!state.winner ? `turn-${state.turn}` : ""}`}>
-            {state.winner
-              ? winnerLabel
-              : aiThinking
-                ? `${player2Label} is thinking…`
-                : `${state.turn === "A" ? "Player 1" : player2Label}'s turn`}
-          </div>
-
-          <div className="tt-score">
-            <span className="score-a">P1: {counts.a}</span>
-            <span className="score-b">P2: {counts.b}</span>
-          </div>
-
-          <button type="button" className="tt-new-game" onClick={() => handleNewGame()}>
-            New Game
-          </button>
-
-          <details
-            className="tt-rules"
-            open={rulesOpen}
-            onToggle={(e) => setRulesOpen(e.currentTarget.open)}
-          >
-            <summary>Rules {rulesOpen ? "▾" : "▸"}</summary>
-            <div className="tt-rules-content">
-              <label>
-                <input type="checkbox" checked={rules.same} onChange={() => toggleRule("same")} />
-                Same
-              </label>
-              <label>
-                <input type="checkbox" checked={rules.plus} onChange={() => toggleRule("plus")} />
-                Plus
-              </label>
-              <label>
-                <input type="checkbox" checked={rules.combo} onChange={() => toggleRule("combo")} />
-                Combo
-              </label>
-              <label>
-                <input type="checkbox" checked={rules.sameWall} onChange={() => toggleRule("sameWall")} />
-                Same Wall
-              </label>
+        <div className="tt-controls-wrap">
+          <div className="tt-status-bar">
+            <div className={`tt-turn-indicator ${!state.winner ? `turn-${state.turn}` : ""}`}>
+              {state.winner
+                ? winnerLabel
+                : aiThinking
+                  ? `${player2Label} is thinking…`
+                  : `${state.turn === "A" ? "Player 1" : player2Label}'s turn`}
             </div>
-          </details>
 
-          <label className="tt-opponent-label">
-            Opponent
-            <select value={opponentType} onChange={(e) => setOpponentType(e.target.value as OpponentType)}>
-              <option value="ai">Computer</option>
-              <option value="human">Human (pass &amp; play)</option>
-            </select>
-          </label>
+            <div className="tt-score">
+              <span className="score-a">P1: {counts.a}</span>
+              <span className="score-b">P2: {counts.b}</span>
+            </div>
+          </div>
 
-          {opponentType === "ai" && (
-            <label className="tt-difficulty-label">
-              Difficulty
-              <select value={difficulty} onChange={(e) => setDifficulty(Number(e.target.value) as Difficulty)}>
-                {([1, 2, 3, 4, 5] as const).map((d) => (
-                  <option key={d} value={d}>{DIFFICULTY_LABELS[d]}</option>
-                ))}
+          <div className="tt-settings-bar">
+            <button
+              type="button"
+              className="tt-help-btn"
+              onClick={() => setTutorialOpen(true)}
+              aria-label="How to play"
+            >
+              ?
+            </button>
+
+            <button type="button" className="tt-new-game" onClick={() => handleNewGame()}>
+              New Game
+            </button>
+
+            <details
+              className="tt-rules"
+              open={rulesOpen}
+              onToggle={(e) => setRulesOpen(e.currentTarget.open)}
+            >
+              <summary>Rules {rulesOpen ? "▾" : "▸"}</summary>
+              <div className="tt-rules-content">
+                <label>
+                  <input type="checkbox" checked={rules.same} onChange={() => toggleRule("same")} />
+                  Same
+                </label>
+                <label>
+                  <input type="checkbox" checked={rules.plus} onChange={() => toggleRule("plus")} />
+                  Plus
+                </label>
+                <label>
+                  <input type="checkbox" checked={rules.combo} onChange={() => toggleRule("combo")} />
+                  Combo
+                </label>
+                <label>
+                  <input type="checkbox" checked={rules.sameWall} onChange={() => toggleRule("sameWall")} />
+                  Same Wall
+                </label>
+              </div>
+            </details>
+
+            <label className="tt-opponent-label">
+              Opponent
+              <select value={opponentType} onChange={(e) => setOpponentType(e.target.value as OpponentType)}>
+                <option value="ai">Computer</option>
+                <option value="human">Human (pass &amp; play)</option>
               </select>
             </label>
-          )}
+
+            {opponentType === "ai" && (
+              <label className="tt-difficulty-label">
+                Difficulty
+                <select value={difficulty} onChange={(e) => setDifficulty(Number(e.target.value) as Difficulty)}>
+                  {([1, 2, 3, 4, 5] as const).map((d) => (
+                    <option key={d} value={d}>{DIFFICULTY_LABELS[d]}</option>
+                  ))}
+                </select>
+              </label>
+            )}
+          </div>
         </div>
 
         <section className="tt-hand-shell tt-hand-shell-b">

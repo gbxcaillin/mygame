@@ -129,7 +129,7 @@
 
 /* ── Controls ── */
 
-.tt-controls {
+.tt-controls-wrap {
   flex: none;
   min-height: var(--controls-height);
   width: 100%;
@@ -140,6 +140,11 @@
   gap: 6px 14px;
   padding: 0 16px;
   box-sizing: border-box;
+}
+
+.tt-status-bar,
+.tt-settings-bar {
+  display: contents;
 }
 
 .tt-help-btn {
@@ -271,23 +276,43 @@
   backdrop-filter: blur(4px);
 }
 
-/* ── Portrait controls: spread across width with opaque background ── */
+/* ── Portrait controls: status below title, settings at bottom ── */
 
 @media (orientation: portrait) {
-  .tt-controls {
+  .tt-controls-wrap {
+    display: contents;
+  }
+
+  .tt-status-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3vw;
+    padding: 1.5vw 3vw;
+    background: rgba(20, 18, 24, 0.6);
+    backdrop-filter: blur(4px);
+    border-radius: 1.5vw;
+  }
+
+  .tt-settings-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5vw 2vw;
     order: 5;
     margin-top: auto;
+    width: 100%;
+    box-sizing: border-box;
     background: rgba(20, 18, 24, 0.85);
     backdrop-filter: blur(8px);
     border-radius: 1.5vw 1.5vw 0 0;
     padding: 2vw 3vw;
     padding-bottom: max(2vw, env(safe-area-inset-bottom, 0px));
-    justify-content: space-between;
-    gap: 1.5vw 2vw;
   }
 
   .tt-hand-shell-b {
-    margin-top: 20vw;
+    margin-top: 10vw;
   }
 
   .tt-help-btn {
