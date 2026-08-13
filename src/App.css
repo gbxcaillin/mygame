@@ -206,9 +206,9 @@
 
 .tt-status-row {
   left: 17%;
-  top: 11.0%;
+  top: 13%;
   width: 66%;
-  height: 2.2%;
+  height: 2.5%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -255,10 +255,10 @@
    ------------------------------------------------------------ */
 
 .tt-opponent-row {
-  left: 23%;
-  top: 14.2%;
-  width: 54%;
-  height: 2.2%;
+  left: 17%;
+  top: 15.5%;
+  width: 66%;
+  height: 2.5%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -302,17 +302,17 @@
 }
 
 .tt-hand-shell-b {
-  left: 16.5%;
-  top: 20.8%;
-  width: 80%;
-  height: 10%;
+  left: 8%;
+  top: 20%;
+  width: 84%;
+  height: 12.5%;
 }
 
 .tt-hand-shell-a {
-  left: 3.5%;
-  top: 67%;
-  width: 94%;
-  height: 10.5%;
+  left: 8%;
+  top: 66.5%;
+  width: 84%;
+  height: 11%;
 }
 
 .tt-hand-shell::before {
@@ -351,10 +351,10 @@
    ------------------------------------------------------------ */
 
 .tt-board-area {
-  left: 28.8%;
-  top: 34.5%;
-  width: 43.5%;
-  height: 31.2%;
+  left: 25%;
+  top: 34%;
+  width: 50%;
+  height: 32%;
   display: grid;
   place-items: center;
   padding: 0;
@@ -366,8 +366,8 @@
   height: 100%;
   box-sizing: border-box;
   padding: 0;
-  column-gap: 5.5%;
-  row-gap: 5.5%;
+  column-gap: 4%;
+  row-gap: 4%;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(3, 1fr);
   background: transparent !important;
@@ -398,7 +398,7 @@
 
 .tt-hint {
   left: 20%;
-  top: 79.5%;
+  top: 77.5%;
   width: 60%;
   margin: 0;
   color: #c7aa7c;
