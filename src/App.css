@@ -275,12 +275,19 @@
 
 @media (orientation: portrait) {
   .tt-controls {
+    order: 5;
+    margin-top: auto;
     background: rgba(20, 18, 24, 0.85);
     backdrop-filter: blur(8px);
-    border-radius: 1.5vw;
+    border-radius: 1.5vw 1.5vw 0 0;
     padding: 2vw 3vw;
+    padding-bottom: max(2vw, env(safe-area-inset-bottom, 0px));
     justify-content: space-between;
     gap: 1.5vw 2vw;
+  }
+
+  .tt-hand-shell-b {
+    margin-top: 20vw;
   }
 
   .tt-help-btn {
