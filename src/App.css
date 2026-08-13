@@ -1,24 +1,23 @@
-/* App layout — rebuilt from wireframes
-   4:3 landscape (default): cards 170, grid 526, section-gap 8px
-   16:9 landscape (≥3:2): cards 170, grid 526, section-gap 6px
-   Ultra-wide landscape (>2:1): cards 178, grid 546, stage 1120px
-   Portrait: cards responsive ~195 at 1080w, grid 609, top-aligned
+/* App layout — viewport-relative units to match backdrop scaling
+   Landscape: vh-based (170px cards at 1080px height = 15.74vh)
+   Portrait:  vw-based (195px cards at 1080px width  = 18vw)
+   Ultra-wide: fixed px (stage capped at 1120px)
 */
 
 :root {
-  --card-size: 170px;
-  --cell-size: 170px;
-  --grid-gap: 8px;
-  --card-gap: 10px;
-  --section-gap: 8px;
-  --title-height: 86px;
-  --controls-height: 62px;
-  --bottom-pad: 16px;
+  --card-size: 15.74vh;
+  --cell-size: 15.74vh;
+  --grid-gap: 0.74vh;
+  --card-gap: 0.93vh;
+  --section-gap: 0.74vh;
+  --title-height: 7.96vh;
+  --controls-height: 5.74vh;
+  --bottom-pad: 1.48vh;
 }
 
 @media (min-aspect-ratio: 3/2) {
   :root {
-    --section-gap: 6px;
+    --section-gap: 0.56vh;
   }
 }
 
@@ -37,13 +36,13 @@
 
 @media (orientation: portrait) {
   :root {
-    --card-size: calc((100vw - 108px) / 5);
-    --cell-size: calc((100vw - 108px) / 5);
-    --grid-gap: 12px;
-    --card-gap: 12px;
-    --section-gap: 24px;
-    --title-height: 250px;
-    --controls-height: 190px;
+    --card-size: 18vw;
+    --cell-size: 18vw;
+    --grid-gap: 1.11vw;
+    --card-gap: 1.11vw;
+    --section-gap: 2.22vw;
+    --title-height: 23.15vw;
+    --controls-height: 17.59vw;
     --bottom-pad: 0px;
   }
 }
@@ -86,7 +85,7 @@
 .tt-stage {
   position: relative;
   z-index: 1;
-  width: min(calc(82.5vw + 196px), 100vw);
+  width: 96vw;
   height: 100dvh;
   display: flex;
   flex-direction: column;
@@ -97,6 +96,12 @@
   box-sizing: border-box;
 }
 
+@media (min-aspect-ratio: 3/2) {
+  .tt-stage {
+    width: 93vw;
+  }
+}
+
 @media (min-aspect-ratio: 2/1) {
   .tt-stage {
     width: 1120px;
@@ -105,15 +110,10 @@
 
 @media (orientation: portrait) {
   .tt-stage {
-    width: calc(100vw - 56px);
+    width: 95vw;
     justify-content: flex-start;
-    padding-top: 18px;
+    padding-top: 1.67vw;
     padding-bottom: 0;
-  }
-
-  .tt-title-area,
-  .tt-controls {
-    margin-bottom: 2px;
   }
 }
 
@@ -131,7 +131,7 @@
 
 .tt-controls {
   flex: none;
-  height: var(--controls-height);
+  min-height: var(--controls-height);
   width: 100%;
   display: flex;
   flex-wrap: wrap;
