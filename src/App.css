@@ -557,13 +557,12 @@
 /* ============================================================
    WIDESCREEN LAYOUT (16:9)
    Triggered on viewports wider than 4:3.
-   Uses the wide-v4 backdrop (1672×941).
+   Uses the wide-v5 backdrop (1672×941).
 
-   Frame positions (% of 16:9 stage):
-   Title frame:  ~28-72% x,  ~4-16% y
-   Red tray:     ~15-75% x, ~26-36% y
-   Board 3×3:    ~34-64% x, ~38-78% y
-   Blue tray:    ~15-75% x, ~80-93% y
+   Wireframe reference at 1920×1080:
+   Slot size:  200×200 (1:1)  |  Slot spacing: 20px
+   Grid cell:  ~200×200 (1:1) |  Grid spacing: 20px
+   Tray width: 1080px centered | Grid: ~640×640 centered
    ============================================================ */
 
 @media (min-aspect-ratio: 4/3) {
@@ -590,52 +589,54 @@
     display: none !important;
   }
 
-  /* Buttons: flanking the status/opponent rows, below the title frame */
+  /* Controls: positioned between title frame (~15%) and red tray (~25%) */
   .tt-help-btn {
-    left: 17%;
-    top: 17%;
+    left: 22%;
+    top: 15%;
     width: 3%;
     height: 3.5%;
   }
 
   .tt-new-game {
-    right: 17%;
-    top: 17%;
+    right: 22%;
+    top: 15%;
     width: 8%;
     height: 3.5%;
   }
 
   .tt-rules {
-    left: 17%;
-    top: 21%;
+    left: 22%;
+    top: 19.5%;
   }
 
   .tt-status-row {
-    left: 22%;
-    top: 17%;
-    width: 48%;
+    left: 27%;
+    top: 15%;
+    width: 46%;
     height: 3.5%;
   }
 
   .tt-opponent-row {
-    left: 22%;
-    top: 21%;
-    width: 48%;
+    left: 27%;
+    top: 19.5%;
+    width: 46%;
     height: 3%;
   }
 
+  /* Red tray (computer): frame spans ~25-42% y, slots centered at 50% x */
   .tt-hand-shell-b {
-    left: 16%;
-    top: 26%;
-    width: 60%;
-    height: 12%;
+    left: 22%;
+    top: 25%;
+    width: 56%;
+    height: 16%;
   }
 
+  /* Blue tray (player): frame spans ~76-95% y */
   .tt-hand-shell-a {
-    left: 16%;
-    top: 79%;
-    width: 60%;
-    height: 14%;
+    left: 22%;
+    top: 76%;
+    width: 56%;
+    height: 16%;
   }
 
   .tt-hand-shell :is(.tt-hand-label, .hand-label, h2, h3) {
@@ -643,21 +644,23 @@
   }
 
   .tt-hand-shell :is(.tt-hand-cards, .hand-cards, .cards-row, .tt-cards-row) {
-    gap: calc(var(--card-size) * 0.20) !important;
-    max-width: 92% !important;
+    gap: calc(var(--card-size) * 0.32) !important;
+    max-width: 100% !important;
   }
 
-  /* Board: positioned to match inner cell area of backdrop grid */
+  /* Board: inner cell area from gold frame scan
+     Cols: 37.58-62.26% x  |  Rows: 41.26-81.58% y
+     Dividers: ~2.2% x, ~1.9% y  */
   .tt-board-area {
-    left: 34.5%;
-    top: 42.5%;
-    width: 29%;
-    height: 37%;
+    left: 37.5%;
+    top: 41.3%;
+    width: 25%;
+    height: 40.3%;
   }
 
   .tt-board-area :is(.tt-board, .board) {
-    column-gap: 5%;
-    row-gap: 5%;
+    column-gap: 8.8%;
+    row-gap: 4.7%;
   }
 
   .tt-board-area .tt-cell {
@@ -665,7 +668,7 @@
   }
 
   .tt-hint {
-    top: 93%;
+    top: 96%;
   }
 }
 
