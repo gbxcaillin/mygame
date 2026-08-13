@@ -271,6 +271,56 @@
   backdrop-filter: blur(4px);
 }
 
+/* ── Portrait controls: spread across width with opaque background ── */
+
+@media (orientation: portrait) {
+  .tt-controls {
+    background: rgba(20, 18, 24, 0.85);
+    backdrop-filter: blur(8px);
+    border-radius: 1.5vw;
+    padding: 2vw 3vw;
+    justify-content: space-between;
+    gap: 1.5vw 2vw;
+  }
+
+  .tt-help-btn {
+    width: 7vw;
+    height: 7vw;
+    font-size: 3.5vw;
+  }
+
+  .tt-turn-indicator {
+    font-size: 3.2vw;
+    padding: 1.2vw 3vw;
+  }
+
+  .tt-score {
+    font-size: 3vw;
+    gap: 2vw;
+  }
+
+  .tt-new-game {
+    font-size: 3vw;
+    padding: 1.2vw 3vw;
+  }
+
+  .tt-rules summary {
+    font-size: 3vw;
+    padding: 1.2vw 3vw;
+  }
+
+  .tt-opponent-label,
+  .tt-difficulty-label {
+    font-size: 3vw;
+  }
+
+  .tt-opponent-label select,
+  .tt-difficulty-label select {
+    font-size: 3vw;
+    padding: 1vw 2vw;
+  }
+}
+
 /* ── Gameplay sections ── */
 
 .tt-hand-shell {
