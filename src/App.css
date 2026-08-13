@@ -285,13 +285,16 @@
 
   .tt-status-bar {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: center;
-    gap: 3vw;
+    gap: 1.5vw 3vw;
     padding: 1.5vw 3vw;
-    background: rgba(20, 18, 24, 0.6);
-    backdrop-filter: blur(4px);
+    background: rgba(20, 18, 24, 0.7);
+    backdrop-filter: blur(6px);
     border-radius: 1.5vw;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   .tt-settings-bar {
@@ -312,7 +315,7 @@
   }
 
   .tt-hand-shell-b {
-    margin-top: 10vw;
+    margin-top: 4vw;
   }
 
   .tt-help-btn {

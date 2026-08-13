@@ -105,6 +105,15 @@ function App() {
 
         <div className="tt-controls-wrap">
           <div className="tt-status-bar">
+            <button
+              type="button"
+              className="tt-help-btn"
+              onClick={() => setTutorialOpen(true)}
+              aria-label="How to play"
+            >
+              ?
+            </button>
+
             <div className={`tt-turn-indicator ${!state.winner ? `turn-${state.turn}` : ""}`}>
               {state.winner
                 ? winnerLabel
@@ -117,17 +126,6 @@ function App() {
               <span className="score-a">P1: {counts.a}</span>
               <span className="score-b">P2: {counts.b}</span>
             </div>
-          </div>
-
-          <div className="tt-settings-bar">
-            <button
-              type="button"
-              className="tt-help-btn"
-              onClick={() => setTutorialOpen(true)}
-              aria-label="How to play"
-            >
-              ?
-            </button>
 
             <button type="button" className="tt-new-game" onClick={() => handleNewGame()}>
               New Game
@@ -158,7 +156,9 @@ function App() {
                 </label>
               </div>
             </details>
+          </div>
 
+          <div className="tt-settings-bar">
             <label className="tt-opponent-label">
               Opponent
               <select value={opponentType} onChange={(e) => setOpponentType(e.target.value as OpponentType)}>
