@@ -45,10 +45,9 @@ function App() {
     const stage = appRef.current;
     if (!stage) return;
 
-    // Size cards from the fixed 2:3 artwork stage so the live board and hands
-    // remain aligned with the background at every viewport size.
-    const byWidth = stage.clientWidth * 0.094;
-    const byHeight = stage.clientHeight * 0.063;
+    const isWide = stage.clientWidth / stage.clientHeight > 1.2;
+    const byWidth = stage.clientWidth * (isWide ? 0.06 : 0.094);
+    const byHeight = stage.clientHeight * (isWide ? 0.1065 : 0.063);
     const next = Math.floor(
       Math.max(MIN_CARD_PX, Math.min(MAX_CARD_PX, Math.min(byWidth, byHeight)))
     );
@@ -139,7 +138,8 @@ function App() {
         ref={appRef}
         style={{ "--card-size": `${cardSize}px` } as CSSProperties}
       >
-        <img src={backdrop} className="tt-backdrop" alt="" aria-hidden="true" />
+        <img src={backdrop} className="tt-backdrop tt-backdrop-portrait" alt="" aria-hidden="true" />
+        <img src={backdropWide} className="tt-backdrop tt-backdrop-wide" alt="" aria-hidden="true" />
 
         <header className="tt-header">
           <h1 className="tt-title-accessible">Clash of Beasts</h1>

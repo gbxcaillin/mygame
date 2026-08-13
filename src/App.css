@@ -110,6 +110,10 @@
   user-select: none;
 }
 
+.tt-backdrop-wide {
+  display: none;
+}
+
 .tt-header,
 .tt-status-row,
 .tt-opponent-row,
@@ -545,5 +549,120 @@
   .tt-hand-shell :is(.tt-hand-label, .hand-label, h2, h3) {
     font-size: clamp(7px, calc(var(--card-size) * .11), 11px) !important;
     padding: 0 calc(var(--card-size) * .10) !important;
+  }
+}
+
+/* ============================================================
+   WIDESCREEN LAYOUT (16:9)
+   Triggered on viewports wider than 4:3.
+   Uses the widescreen backdrop with horizontal card trays,
+   centered 3×3 board, and side decorative areas.
+
+   Reference: 1920×1080 (wide-v3 backdrop)
+   Card slot: 115px = 6% width = 10.65% height
+   Board: 375×375px = 19.5% × 34.7%
+   Tray: 5 cells, ~38% wide, 10.6% tall
+   ============================================================ */
+
+@media (min-aspect-ratio: 4/3) {
+  /* --- Stage: switch to 16:9 --- */
+  .tt-app {
+    aspect-ratio: 16 / 9;
+    width: min(
+      calc(100vw - max(8px, env(safe-area-inset-left)) - max(8px, env(safe-area-inset-right))),
+      calc((100dvh - max(8px, env(safe-area-inset-top)) - max(8px, env(safe-area-inset-bottom))) * 16 / 9)
+    );
+    max-width: 1920px;
+    max-height: 1080px;
+  }
+
+  /* --- Backdrops: show wide, hide portrait --- */
+  .tt-backdrop-portrait {
+    display: none;
+  }
+
+  .tt-backdrop-wide {
+    display: block;
+    object-fit: cover;
+  }
+
+  .tt-backdrop-blur {
+    display: none !important;
+  }
+
+  /* --- Header / buttons --- */
+  .tt-help-btn {
+    left: 33%;
+    top: 2.5%;
+    width: 3%;
+    height: 5%;
+  }
+
+  .tt-new-game {
+    right: 33%;
+    top: 2.5%;
+    width: 8%;
+    height: 5%;
+  }
+
+  .tt-rules {
+    left: 32%;
+    top: 8%;
+  }
+
+  /* --- Status / turn bar --- */
+  .tt-status-row {
+    left: 35%;
+    top: 12%;
+    width: 30%;
+    height: 3.5%;
+  }
+
+  /* --- Opponent / difficulty --- */
+  .tt-opponent-row {
+    left: 35%;
+    top: 16%;
+    width: 30%;
+    height: 3%;
+  }
+
+  /* --- Computer hand (red tray) --- */
+  .tt-hand-shell-b {
+    left: 31%;
+    top: 21%;
+    width: 38%;
+    height: 11%;
+  }
+
+  /* --- Player hand (blue tray) --- */
+  .tt-hand-shell-a {
+    left: 31%;
+    top: 72%;
+    width: 38%;
+    height: 11%;
+  }
+
+  /* Hand label: hide in widescreen (color of tray frame suffices) */
+  .tt-hand-shell :is(.tt-hand-label, .hand-label, h2, h3) {
+    display: none !important;
+  }
+
+  /* Card row: fill the tray, widescreen gap */
+  .tt-hand-shell :is(.tt-hand-cards, .hand-cards, .cards-row, .tt-cards-row) {
+    gap: calc(var(--card-size) * 0.20) !important;
+    max-width: 92% !important;
+  }
+
+  /* --- Board (3×3 grid) --- */
+  .tt-board-area {
+    left: 40.2%;
+    top: 34%;
+    width: 19.6%;
+    height: 35%;
+  }
+
+  /* --- Hint --- */
+  .tt-hint {
+    top: 85%;
   }
 }
