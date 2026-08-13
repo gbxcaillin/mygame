@@ -1,17 +1,7 @@
 /* ============================================================
-   CLASH OF BEASTS — v3 clean-backdrop layout
-   Background artwork contains:
-   - main title art
-   - red / blue banners
-   - side creatures
-   - braziers
-   - computer tray frame (red)
-   - 3x3 board frame / runic circle
-   - player tray frame (blue)
-   - decorative frames for status bar, opponent row, buttons
-   - NO baked-in text — React renders all text/controls.
-
-   Master artwork: 1023 x 1537 (~2:3).
+   CLASH OF BEASTS — v5 clean-backdrop layout
+   Portrait artwork: 711 × 1536.
+   Widescreen artwork: 1672 × 941.
    ============================================================ */
 
 .tt-app-outer {
@@ -52,15 +42,15 @@
   display: none;
 }
 
-/* Portrait screens: hide the blur fill entirely (the 2:3 stage fills). */
-@media (max-aspect-ratio: 3/4) {
+/* Portrait screens: hide the blur fill entirely (the narrow stage fills). */
+@media (max-aspect-ratio: 1/2) {
   .tt-backdrop-blur img {
     display: none !important;
   }
 }
 
 /* Wider-than-portrait but narrower than 4:3: blur gutters with portrait image. */
-@media (min-aspect-ratio: 3/4) and (max-aspect-ratio: 4/3) {
+@media (min-aspect-ratio: 1/2) and (max-aspect-ratio: 4/3) {
   .tt-backdrop-blur .tt-blur-portrait {
     display: block;
     width: 100%;
@@ -78,16 +68,16 @@
   }
 }
 
-/* All percentage positioning below is relative to this fixed 2:3 stage. */
+/* All percentage positioning below is relative to this fixed 711:1536 stage. */
 .tt-app {
   position: relative;
   z-index: 1;
-  aspect-ratio: 2 / 3;
+  aspect-ratio: 711 / 1536;
   width: min(
     calc(100vw - max(8px, env(safe-area-inset-left)) - max(8px, env(safe-area-inset-right))),
-    calc((100dvh - max(8px, env(safe-area-inset-top)) - max(8px, env(safe-area-inset-bottom))) * 2 / 3)
+    calc((100dvh - max(8px, env(safe-area-inset-top)) - max(8px, env(safe-area-inset-bottom))) * 711 / 1536)
   );
-  max-width: 1024px;
+  max-width: 711px;
   max-height: 1536px;
   overflow: visible;
   box-sizing: border-box;
@@ -202,14 +192,14 @@
 
 /* ------------------------------------------------------------
    TURN / SCORE
-   v3 status bar frame: x≈17-85%, y≈9-14%
+   v5 controls zone: y 286-484 (18.6-31.5%)
    ------------------------------------------------------------ */
 
 .tt-status-row {
-  left: 17%;
-  top: 11.5%;
-  width: 66%;
-  height: 3%;
+  left: 5%;
+  top: 20%;
+  width: 90%;
+  height: 3.5%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -257,14 +247,14 @@
 
 /* ------------------------------------------------------------
    OPPONENT / DIFFICULTY
-   v3 opponent frame: x≈17-85%, y≈15-20%
+   v5 controls zone: y 286-484 (18.6-31.5%)
    ------------------------------------------------------------ */
 
 .tt-opponent-row {
-  left: 17%;
-  top: 14.8%;
-  width: 66%;
-  height: 2.8%;
+  left: 5%;
+  top: 24%;
+  width: 90%;
+  height: 3%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -297,9 +287,8 @@
 
 /* ------------------------------------------------------------
    COMPUTER / PLAYER TRAYS
-   Frames are baked into the image. Only cards and labels sit here.
-   v3 computer tray: x≈15-98%, y≈20-31%
-   v3 player tray:   x≈2-99%,  y≈66-78%
+   v5 red tray: x 19-687 (2.7-96.6%), y 486-637 (31.6-41.5%)
+   v5 blue tray: x 20-687 (2.8-96.6%), y 1244-1400 (81-91.1%)
    ------------------------------------------------------------ */
 
 .tt-hand-shell {
@@ -313,17 +302,17 @@
 }
 
 .tt-hand-shell-b {
-  left: 8%;
-  top: 19%;
-  width: 84%;
-  height: 11%;
+  left: 3%;
+  top: 31.5%;
+  width: 94%;
+  height: 10%;
 }
 
 .tt-hand-shell-a {
-  left: 8%;
-  top: 64%;
-  width: 84%;
-  height: 13%;
+  left: 3%;
+  top: 81%;
+  width: 94%;
+  height: 10%;
 }
 
 .tt-hand-shell::before {
@@ -341,8 +330,8 @@
 
 .tt-hand-shell :is(.tt-hand-cards, .hand-cards, .cards-row, .tt-cards-row) {
   justify-content: center !important;
-  gap: calc(var(--card-size) * 0.22) !important;
-  max-width: 68% !important;
+  gap: calc(var(--card-size) * 0.13) !important;
+  max-width: 90% !important;
   margin-left: auto !important;
   margin-right: auto !important;
 }
@@ -367,15 +356,15 @@
 
 /* ------------------------------------------------------------
    BOARD
-   v3 board grid: x≈24-76%, y≈31-66%
-   Cell interiors (inner): x≈29-72%, y≈34.5-65.7%
+   v5 board: x 91-609 (12.8-85.7%), y 683-1196 (44.5-77.9%)
+   Grid width ≈518px, cells ≈171×171 (1:1)
    ------------------------------------------------------------ */
 
 .tt-board-area {
-  left: 29%;
-  top: 31%;
-  width: 42%;
-  height: 33%;
+  left: 13%;
+  top: 44.5%;
+  width: 73%;
+  height: 33.5%;
   display: grid;
   place-items: center;
   padding: 0;
@@ -387,7 +376,7 @@
   height: 100%;
   box-sizing: border-box;
   padding: 0;
-  column-gap: 3.5%;
+  column-gap: 3%;
   row-gap: 3%;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(3, 1fr);
@@ -399,6 +388,7 @@
 .tt-board-area .tt-cell {
   width: 100%;
   height: 100%;
+  aspect-ratio: 1 / 1;
   overflow: hidden;
 }
 
@@ -421,13 +411,13 @@
 
 /* ------------------------------------------------------------
    FOOTER
-   v3 hint area: y≈78-83%
+   v5 hint: below blue tray, y≈92%
    ------------------------------------------------------------ */
 
 .tt-hint {
   left: 50%;
   transform: translateX(-50%);
-  top: 78%;
+  top: 92%;
   width: fit-content;
   max-width: 60%;
   margin: 0;
@@ -533,14 +523,14 @@
   }
 
   .tt-status-row {
-    left: 19%;
-    width: 62%;
+    left: 7%;
+    width: 86%;
     font-size: clamp(8px, calc(var(--card-size) * .12), 12px);
   }
 
   .tt-opponent-row {
-    left: 19%;
-    width: 62%;
+    left: 7%;
+    width: 86%;
     gap: 3%;
     font-size: clamp(8px, calc(var(--card-size) * .10), 11px);
   }
@@ -551,8 +541,8 @@
   }
 
   .tt-hand-shell :is(.tt-hand-cards, .hand-cards, .cards-row, .tt-cards-row) {
-    gap: calc(var(--card-size) * 0.14) !important;
-    max-width: 63% !important;
+    gap: calc(var(--card-size) * 0.10) !important;
+    max-width: 88% !important;
   }
 
   .tt-hand-shell :is(.tt-hand-label, .hand-label, h2, h3) {

@@ -10,7 +10,7 @@ import { chooseAiMove, DIFFICULTY_LABELS } from "./game/ai";
 import type { Difficulty } from "./game/ai";
 import { DEFAULT_RULES } from "./game/types";
 import type { Card, GameState, PlayerId, RuleSet } from "./game/types";
-import backdrop from "./assets/clash-of-beasts-backdrop-v4.png";
+import backdrop from "./assets/clash-of-beasts-backdrop-v5.png";
 import backdropWide from "./assets/clash-of-beasts-backdrop-wide-v5.png";
 import "./App.css";
 
@@ -46,8 +46,8 @@ function App() {
     if (!stage) return;
 
     const isWide = stage.clientWidth / stage.clientHeight > 1.2;
-    const byWidth = stage.clientWidth * (isWide ? 0.067 : 0.094);
-    const byHeight = stage.clientHeight * (isWide ? 0.12 : 0.063);
+    const byWidth = stage.clientWidth * (isWide ? 0.067 : 0.15);
+    const byHeight = stage.clientHeight * (isWide ? 0.12 : 0.07);
     const next = Math.floor(
       Math.max(MIN_CARD_PX, Math.min(MAX_CARD_PX, Math.min(byWidth, byHeight)))
     );
