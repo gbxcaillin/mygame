@@ -207,13 +207,14 @@
 
 .tt-status-row {
   left: 17%;
-  top: 13%;
+  top: 11.5%;
   width: 66%;
-  height: 2.5%;
+  height: 3%;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 4%;
+  padding: 0 2%;
   background: rgba(10, 8, 5, .7);
   border: 1px solid rgba(176, 123, 56, .3);
   border-radius: 3px;
@@ -261,13 +262,14 @@
 
 .tt-opponent-row {
   left: 17%;
-  top: 15.5%;
+  top: 14.8%;
   width: 66%;
-  height: 2.5%;
+  height: 2.8%;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 6%;
+  padding: 0 2%;
   font-size: clamp(9px, calc(var(--card-size) * .12), 13px);
   background: rgba(10, 8, 5, .7);
   border: 1px solid rgba(176, 123, 56, .3);
@@ -312,16 +314,16 @@
 
 .tt-hand-shell-b {
   left: 8%;
-  top: 19.5%;
+  top: 18.5%;
   width: 84%;
-  height: 10.5%;
+  height: 13%;
 }
 
 .tt-hand-shell-a {
   left: 8%;
-  top: 65.5%;
+  top: 64%;
   width: 84%;
-  height: 10%;
+  height: 12%;
 }
 
 .tt-hand-shell::before {
@@ -411,7 +413,7 @@
 
 .tt-hint {
   left: 20%;
-  top: 77%;
+  top: 77.5%;
   width: 60%;
   margin: 0;
   color: #c7aa7c;

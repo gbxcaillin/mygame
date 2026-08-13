@@ -47,8 +47,8 @@ function App() {
 
     // Size cards from the fixed 2:3 artwork stage so the live board and hands
     // remain aligned with the background at every viewport size.
-    const byWidth = stage.clientWidth * 0.105;
-    const byHeight = stage.clientHeight * 0.070;
+    const byWidth = stage.clientWidth * 0.094;
+    const byHeight = stage.clientHeight * 0.063;
     const next = Math.floor(
       Math.max(MIN_CARD_PX, Math.min(MAX_CARD_PX, Math.min(byWidth, byHeight)))
     );
