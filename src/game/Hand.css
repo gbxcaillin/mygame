@@ -1,10 +1,12 @@
-/* Hand styling — 5 cards × 170px + 4 gaps × 10px = 890px row */
+/* Hand styling
+   Standard: 5×170 + 4×10 = 890px row
+   Ultra-wide: 5×178 + 4×8 = 922px row
+*/
 
 .tt-hand {
   position: relative;
   display: flex;
   align-items: center;
-  gap: 10px;
 }
 
 .tt-hand-label {
@@ -27,7 +29,7 @@
 
 .tt-hand-cards {
   display: flex;
-  gap: 10px;
+  gap: var(--card-gap, 10px);
   align-items: center;
 }
 

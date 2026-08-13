@@ -1,4 +1,7 @@
-/* Board grid — 526×526: 3×170 cells + 2×8 gaps */
+/* Board grid
+   Standard: 526px (3×170 + 2×8)
+   Ultra-wide: 546px (3×178 + 2×6)
+*/
 
 .tt-board {
   display: grid;

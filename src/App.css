@@ -1,13 +1,44 @@
 /* App layout — rebuilt from wireframes
-   19.5:9 (2340×1080): functional 2120px, gutters 110px
-   16:9   (1920×1080): functional 1780px, gutters 70px
-   4:3    (1440×1080): functional 1384px, gutters 28px
+   Standard landscape (≤2:1): cards 170, grid 526, stage scales
+   Ultra-wide landscape (>2:1): cards 178, grid 546, stage 1120px
+   Portrait: cards responsive ~195 at 1080w, grid 609, top-aligned
 */
 
 :root {
   --card-size: 170px;
   --cell-size: 170px;
   --grid-gap: 8px;
+  --card-gap: 10px;
+  --section-gap: 8px;
+  --title-height: 86px;
+  --controls-height: 62px;
+  --bottom-pad: 16px;
+}
+
+@media (min-aspect-ratio: 2/1) {
+  :root {
+    --card-size: 178px;
+    --cell-size: 178px;
+    --grid-gap: 6px;
+    --card-gap: 8px;
+    --section-gap: 6px;
+    --title-height: 74px;
+    --controls-height: 54px;
+    --bottom-pad: 12px;
+  }
+}
+
+@media (orientation: portrait) {
+  :root {
+    --card-size: calc((100vw - 108px) / 5);
+    --cell-size: calc((100vw - 108px) / 5);
+    --grid-gap: 12px;
+    --card-gap: 12px;
+    --section-gap: 24px;
+    --title-height: 250px;
+    --controls-height: 190px;
+    --bottom-pad: 0px;
+  }
 }
 
 .tt-app {
@@ -32,22 +63,42 @@
 .tt-stage {
   position: relative;
   z-index: 1;
-  width: min(calc(82.5vw + 196px), 100vw, 2120px);
+  width: min(calc(82.5vw + 196px), 100vw);
   height: 100dvh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-end;
-  gap: 8px;
-  padding-bottom: 16px;
+  gap: var(--section-gap);
+  padding-bottom: var(--bottom-pad);
   box-sizing: border-box;
+}
+
+@media (min-aspect-ratio: 2/1) {
+  .tt-stage {
+    width: 1120px;
+  }
+}
+
+@media (orientation: portrait) {
+  .tt-stage {
+    width: calc(100vw - 56px);
+    justify-content: flex-start;
+    padding-top: 18px;
+    padding-bottom: 0;
+  }
+
+  .tt-title-area,
+  .tt-controls {
+    margin-bottom: 2px;
+  }
 }
 
 /* ── Title ── */
 
 .tt-title-area {
   flex: none;
-  height: 86px;
+  height: var(--title-height);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -68,7 +119,7 @@
 
 .tt-controls {
   flex: none;
-  height: 62px;
+  height: var(--controls-height);
   width: 100%;
   display: flex;
   flex-wrap: wrap;
