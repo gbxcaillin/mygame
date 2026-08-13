@@ -11,7 +11,6 @@ import type { Difficulty } from "./game/ai";
 import { DEFAULT_RULES } from "./game/types";
 import type { Card, GameState, PlayerId, RuleSet } from "./game/types";
 import backdrop from "./assets/clash-of-beasts-backdrop-v4.png";
-import backdropWide from "./assets/clash-of-beasts-backdrop-wide-v3.png";
 import "./App.css";
 
 type OpponentType = "human" | "ai";
@@ -45,9 +44,8 @@ function App() {
     const stage = appRef.current;
     if (!stage) return;
 
-    const isWide = stage.clientWidth / stage.clientHeight > 1.2;
-    const byWidth = stage.clientWidth * (isWide ? 0.06 : 0.094);
-    const byHeight = stage.clientHeight * (isWide ? 0.1065 : 0.063);
+    const byWidth = stage.clientWidth * 0.094;
+    const byHeight = stage.clientHeight * 0.063;
     const next = Math.floor(
       Math.max(MIN_CARD_PX, Math.min(MAX_CARD_PX, Math.min(byWidth, byHeight)))
     );
@@ -129,7 +127,6 @@ function App() {
   return (
     <div className="tt-app-outer">
       <div className="tt-backdrop-blur" aria-hidden="true">
-        <img src={backdropWide} className="tt-blur-wide" alt="" />
         <img src={backdrop} className="tt-blur-portrait" alt="" />
       </div>
 
@@ -138,8 +135,7 @@ function App() {
         ref={appRef}
         style={{ "--card-size": `${cardSize}px` } as CSSProperties}
       >
-        <img src={backdrop} className="tt-backdrop tt-backdrop-portrait" alt="" aria-hidden="true" />
-        <img src={backdropWide} className="tt-backdrop tt-backdrop-wide" alt="" aria-hidden="true" />
+        <img src={backdrop} className="tt-backdrop" alt="" aria-hidden="true" />
 
         <header className="tt-header">
           <h1 className="tt-title-accessible">Clash of Beasts</h1>
