@@ -1,5 +1,6 @@
 /* App layout — rebuilt from wireframes
-   Standard landscape (≤2:1): cards 170, grid 526, stage scales
+   4:3 landscape (default): cards 170, grid 526, section-gap 8px
+   16:9 landscape (≥3:2): cards 170, grid 526, section-gap 6px
    Ultra-wide landscape (>2:1): cards 178, grid 546, stage 1120px
    Portrait: cards responsive ~195 at 1080w, grid 609, top-aligned
 */
@@ -13,6 +14,12 @@
   --title-height: 86px;
   --controls-height: 62px;
   --bottom-pad: 16px;
+}
+
+@media (min-aspect-ratio: 3/2) {
+  :root {
+    --section-gap: 6px;
+  }
 }
 
 @media (min-aspect-ratio: 2/1) {

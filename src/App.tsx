@@ -9,8 +9,9 @@ import { chooseAiMove, DIFFICULTY_LABELS } from "./game/ai";
 import type { Difficulty } from "./game/ai";
 import { DEFAULT_RULES } from "./game/types";
 import type { Card, GameState, PlayerId, RuleSet } from "./game/types";
-import backdropWide from "./assets/clash-of-beasts-backdrop-wide-v5.png";
-import backdropPortrait from "./assets/clash-of-beasts-backdrop-v5.png";
+import backdrop16x9 from "./assets/Backdrop16x9.png";
+import backdrop4x3 from "./assets/Backdrop4x3.png";
+import backdropPortrait from "./assets/Backdrop9x19.5.png";
 import "./App.css";
 
 type OpponentType = "human" | "ai";
@@ -93,7 +94,8 @@ function App() {
     <div className="tt-app">
       <picture>
         <source srcSet={backdropPortrait} media="(orientation: portrait)" />
-        <img src={backdropWide} className="tt-backdrop" alt="" aria-hidden="true" />
+        <source srcSet={backdrop4x3} media="(max-aspect-ratio: 3/2)" />
+        <img src={backdrop16x9} className="tt-backdrop" alt="" aria-hidden="true" />
       </picture>
 
       <div className="tt-stage">
