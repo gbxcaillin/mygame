@@ -159,14 +159,15 @@
   font-family: Georgia, "Times New Roman", serif;
   cursor: pointer;
   color: #e4bd76;
-  border: none;
-  background: transparent;
-  box-shadow: none;
+  border: 1px solid rgba(176, 123, 56, .35);
+  background: rgba(10, 8, 5, .75);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .5), inset 0 1px 0 rgba(201, 148, 62, .08);
 }
 
 .tt-help-btn:hover,
 .tt-new-game:hover {
   filter: brightness(1.15);
+  border-color: rgba(201, 148, 62, .55);
 }
 
 .tt-help-btn {
@@ -213,6 +214,10 @@
   align-items: center;
   justify-content: center;
   gap: 4%;
+  background: rgba(10, 8, 5, .7);
+  border: 1px solid rgba(176, 123, 56, .3);
+  border-radius: 3px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, .4);
 }
 
 .tt-turn-indicator {
@@ -264,6 +269,10 @@
   justify-content: center;
   gap: 6%;
   font-size: clamp(9px, calc(var(--card-size) * .12), 13px);
+  background: rgba(10, 8, 5, .7);
+  border: 1px solid rgba(176, 123, 56, .3);
+  border-radius: 3px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, .4);
 }
 
 .tt-opponent-row label {
@@ -340,9 +349,12 @@
   text-transform: uppercase;
   letter-spacing: .08em;
   text-shadow: 0 1px 3px #000, 0 0 6px rgba(0,0,0,.6);
-  background: transparent !important;
-  padding: 0 !important;
+  background: rgba(10, 8, 5, .65) !important;
+  border: 1px solid rgba(176, 123, 56, .3);
+  border-radius: 3px;
+  padding: 1px calc(var(--card-size) * .15) !important;
   margin-bottom: 2px !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, .3);
 }
 
 /* ------------------------------------------------------------
@@ -408,6 +420,11 @@
   font-size: clamp(9px, calc(var(--card-size) * .12), 13px);
   line-height: 1.1;
   white-space: nowrap;
+  background: rgba(10, 8, 5, .6);
+  border: 1px solid rgba(176, 123, 56, .25);
+  border-radius: 3px;
+  padding: 0.3% 2%;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, .3);
 }
 
 .tt-rules {
@@ -418,10 +435,10 @@
   min-width: calc(var(--card-size) * 1.15);
   max-width: 52%;
   margin: 0;
-  border: none;
+  border: 1px solid rgba(176, 123, 56, .35);
   border-radius: 4px;
-  background: transparent;
-  box-shadow: none;
+  background: rgba(10, 8, 5, .75);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .5), inset 0 1px 0 rgba(201, 148, 62, .08);
   color: #d7b67b;
 }
 
