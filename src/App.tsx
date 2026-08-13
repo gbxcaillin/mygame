@@ -130,6 +130,7 @@ function App() {
     <div className="tt-app-outer">
       <div className="tt-backdrop-blur" aria-hidden="true">
         <img src={backdrop} className="tt-blur-portrait" alt="" />
+        <img src={backdropWide} className="tt-blur-wide" alt="" />
       </div>
 
       <div
