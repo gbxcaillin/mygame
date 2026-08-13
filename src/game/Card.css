@@ -1,22 +1,46 @@
+/* Card styling — 170×170 1:1 */
+
 .tt-card {
   position: relative;
-  width: var(--card-size, 64px);
-  height: var(--card-size, 64px);
-  flex: none;
+  width: var(--card-size, 170px);
+  height: var(--card-size, 170px);
+  border: 2px solid rgba(232, 220, 200, 0.2);
+  border-radius: 6px;
+  background: #1e1a20;
   overflow: hidden;
-  border-radius: calc(var(--card-size, 64px) * 0.12);
-  border: 1.5px solid rgba(201, 148, 62, 0.2);
-  background: var(--card-bg);
-  color: var(--text-h);
   cursor: pointer;
   padding: 0;
-  font-family: var(--sans);
-  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
-  touch-action: manipulation;
-  -webkit-touch-callout: none;
-  user-select: none;
+  flex: none;
+  box-sizing: border-box;
+  transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
 }
+
+.tt-card.owner-a {
+  border-color: var(--player-a);
+  box-shadow: inset 0 0 14px var(--player-a-bg);
+}
+
+.tt-card.owner-b {
+  border-color: var(--player-b);
+  box-shadow: inset 0 0 14px var(--player-b-bg);
+}
+
+.tt-card.selected {
+  transform: translateY(-8px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4), 0 0 12px rgba(232, 220, 200, 0.25);
+  border-color: #e8dcc8;
+}
+
+.tt-card.disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.tt-card:not(.disabled):hover {
+  border-color: rgba(232, 220, 200, 0.45);
+}
+
+/* ── Card art ── */
 
 .card-art {
   width: 100%;
@@ -26,37 +50,40 @@
   pointer-events: none;
 }
 
-.tt-card:hover:not(.disabled) {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5), 0 0 10px rgba(201, 148, 62, 0.08);
+/* ── Rank fallback ── */
+
+.rank {
+  position: absolute;
+  font-size: 20px;
+  font-weight: 700;
+  color: #e8dcc8;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+  line-height: 1;
+  pointer-events: none;
 }
 
-.tt-card.disabled {
-  cursor: default;
-}
+.rank-top    { top: 10px;   left: 50%; transform: translateX(-50%); }
+.rank-bottom { bottom: 10px; left: 50%; transform: translateX(-50%); }
+.rank-left   { left: 10px;  top: 50%;  transform: translateY(-50%); }
+.rank-right  { right: 10px; top: 50%;  transform: translateY(-50%); }
 
-.tt-card.selected {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 2px var(--accent-bg), 0 0 12px rgba(201, 148, 62, 0.15);
-}
-
-.tt-card.owner-a {
-  border-color: rgba(77, 140, 232, 0.5);
-  background: var(--player-a-bg);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4), 0 0 6px rgba(77, 140, 232, 0.1);
-}
-
-.tt-card.owner-b {
-  border-color: rgba(212, 74, 62, 0.5);
-  background: var(--player-b-bg);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4), 0 0 6px rgba(212, 74, 62, 0.1);
+.card-name {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 12px;
+  font-weight: 600;
+  color: #b8a99a;
+  text-align: center;
+  max-width: 80%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  pointer-events: none;
 }
 
 /* ── 3D flip on capture ── */
-.tt-card-flip-container {
-  width: var(--card-size, 64px);
-  height: var(--card-size, 64px);
-}
 
 .tt-card-flipper {
   position: relative;
@@ -91,62 +118,4 @@
 
 @media (prefers-reduced-motion: reduce) {
   .tt-card-flip-container.flipping .tt-card-flipper { animation: none; }
-}
-
-.card-name {
-  position: absolute;
-  top: calc(var(--card-size, 64px) * 0.226);
-  left: calc(var(--card-size, 64px) * 0.071);
-  right: calc(var(--card-size, 64px) * 0.071);
-  text-align: center;
-  font-size: clamp(6px, calc(var(--card-size, 64px) * 0.101), 11px);
-  line-height: 1.2;
-  color: var(--text);
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-}
-
-/* Fallback-only: drawn for a card that has no artwork (every shipped card bakes
-   its numbers into the art, so this path is a safety net, not the normal render). */
-.rank {
-  position: absolute;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: clamp(8px, calc(var(--card-size, 64px) * 0.155), 16px);
-  font-weight: 700;
-  color: #fff;
-  line-height: 1;
-  min-width: calc(var(--card-size, 64px) * 0.2);
-  min-height: calc(var(--card-size, 64px) * 0.2);
-  text-align: center;
-  background: rgba(10, 10, 14, 0.88);
-  border-radius: calc(var(--card-size, 64px) * 0.04);
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.18);
-}
-
-.rank-top {
-  top: calc(var(--card-size, 64px) * 0.048);
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-.rank-bottom {
-  bottom: calc(var(--card-size, 64px) * 0.048);
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-.rank-left {
-  left: calc(var(--card-size, 64px) * 0.048);
-  top: calc(var(--card-size, 64px) * 0.667);
-  transform: translateY(-50%);
-}
-
-.rank-right {
-  right: calc(var(--card-size, 64px) * 0.048);
-  top: calc(var(--card-size, 64px) * 0.667);
-  transform: translateY(-50%);
 }

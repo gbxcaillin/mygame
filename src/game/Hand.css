@@ -1,58 +1,39 @@
-.tt-hand {
-  align-self: stretch;
-  padding: 6px 10px;
-  border-radius: 6px;
-  border: 1px solid #2e2520;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.015) 0%, transparent 50%, rgba(0, 0, 0, 0.06) 100%),
-    rgba(0, 0, 0, 0.25);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.03),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.15),
-    0 2px 8px rgba(0, 0, 0, 0.3);
-  opacity: 0.6;
-  transition: opacity 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-  flex: none;
-  box-sizing: border-box;
-  position: relative;
-}
+/* Hand styling — 5 cards × 170px + 4 gaps × 10px = 890px row */
 
-.tt-hand.active {
-  opacity: 1;
-  border-color: rgba(201, 148, 62, 0.2);
-  box-shadow:
-    inset 0 1px 0 rgba(201, 148, 62, 0.06),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.15),
-    0 2px 8px rgba(0, 0, 0, 0.3),
-    0 0 15px rgba(201, 148, 62, 0.04);
+.tt-hand {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .tt-hand-label {
-  margin: 0 0 4px;
+  position: absolute;
+  top: 4px;
+  left: 4px;
   font-size: 11px;
-  font-weight: 700;
-  color: var(--text);
-  line-height: 1.2;
+  font-weight: 600;
+  color: rgba(232, 220, 200, 0.4);
   text-transform: uppercase;
-  letter-spacing: 1.5px;
-  text-align: center;
+  letter-spacing: 1px;
+  margin: 0;
+  z-index: 1;
+  pointer-events: none;
 }
 
 .tt-hand.active .tt-hand-label {
-  color: var(--text-h);
+  color: rgba(232, 220, 200, 0.8);
 }
 
 .tt-hand-cards {
   display: flex;
-  gap: 8px;
-  flex-wrap: nowrap;
-  height: var(--card-size, 64px);
+  gap: 10px;
   align-items: center;
-  justify-content: center;
 }
 
 .tt-hand-empty {
-  margin: 0;
   font-size: 13px;
-  color: var(--text);
+  color: #5a5050;
+  margin: 0;
+  padding: 60px 0;
 }

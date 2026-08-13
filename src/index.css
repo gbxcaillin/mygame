@@ -1,47 +1,16 @@
 :root {
-  --text: #b8a99a;
-  --text-h: #e8dcc8;
-  --bg: #111015;
-  --border: #2e2520;
-  --code-bg: #1a1618;
-  --accent: #c9943e;
-  --accent-bg: rgba(201, 148, 62, 0.1);
-  --accent-border: rgba(201, 148, 62, 0.4);
-  --shadow:
-    rgba(0, 0, 0, 0.5) 0 10px 15px -3px, rgba(0, 0, 0, 0.3) 0 4px 6px -2px;
-
   --player-a: #4d8ce8;
   --player-a-bg: rgba(77, 140, 232, 0.1);
   --player-b: #d44a3e;
   --player-b-bg: rgba(212, 74, 62, 0.1);
-  --board-bg: #15131a;
-  --board-border: #3a3028;
-  --card-bg: #1e1a20;
-  --card-border: #3a3028;
 
-  --frame: #302820;
-  --frame-hi: rgba(201, 148, 62, 0.15);
-  --frame-lo: rgba(0, 0, 0, 0.6);
-  --stone: #1a171e;
-  --stone-light: #24202a;
-
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
-
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
   color-scheme: dark;
-  color: var(--text);
-  background: var(--bg);
+  color: #b8a99a;
+  background: #111015;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
 }
 
 html {
@@ -54,62 +23,12 @@ body {
   margin: 0;
   overflow: hidden;
   overscroll-behavior: none;
-  background:
-    radial-gradient(ellipse at 50% 0%, rgba(80, 50, 20, 0.08) 0%, transparent 60%),
-    radial-gradient(ellipse at 50% 100%, rgba(80, 50, 20, 0.06) 0%, transparent 60%),
-    var(--bg);
+  background: #111015;
 }
 
 #root {
   width: 100%;
   height: 100dvh;
   margin: 0;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
   overflow: hidden;
-}
-
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 700;
-  color: var(--text-h);
-}
-
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
-}
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
-}
-p {
-  margin: 0;
-}
-
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
-}
-
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
 }

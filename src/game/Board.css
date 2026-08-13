@@ -1,61 +1,40 @@
+/* Board grid — 526×526: 3×170 cells + 2×8 gaps */
+
 .tt-board {
   display: grid;
-  grid-template-columns: repeat(3, var(--card-size, 64px));
-  grid-template-rows: repeat(3, var(--card-size, 64px));
-  gap: 6px;
-  padding: 10px;
-  background:
-    radial-gradient(ellipse at center, rgba(201, 148, 62, 0.03) 0%, transparent 70%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.02) 0%, transparent 50%, rgba(0, 0, 0, 0.1) 100%),
-    var(--board-bg);
-  border-radius: 8px;
-  border: 2px solid #3a3028;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.04),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.3),
-    0 0 0 1px rgba(0, 0, 0, 0.4),
-    0 0 0 3px #28221c,
-    0 0 0 4px rgba(201, 148, 62, 0.12),
-    0 8px 32px rgba(0, 0, 0, 0.5),
-    0 0 60px rgba(0, 0, 0, 0.3);
-  flex: none;
-  position: relative;
-  z-index: 1;
+  grid-template-columns: repeat(3, var(--cell-size, 170px));
+  grid-template-rows: repeat(3, var(--cell-size, 170px));
+  gap: var(--grid-gap, 8px);
 }
 
 .tt-cell {
-  width: var(--card-size, 64px);
-  height: var(--card-size, 64px);
-  border-radius: calc(var(--card-size, 64px) * 0.1);
-  perspective: 400px;
+  width: var(--cell-size, 170px);
+  height: var(--cell-size, 170px);
+  position: relative;
 }
 
 .tt-empty-cell {
   width: 100%;
   height: 100%;
-  border-radius: calc(var(--card-size, 64px) * 0.1);
-  border: 1px solid rgba(201, 148, 62, 0.1);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.01) 0%, transparent 40%, rgba(0, 0, 0, 0.08) 100%),
-    rgba(0, 0, 0, 0.2);
+  background: rgba(30, 26, 32, 0.45);
+  border: 1px dashed rgba(232, 220, 200, 0.15);
+  border-radius: 4px;
   cursor: pointer;
-  box-shadow:
-    inset 0 2px 4px rgba(0, 0, 0, 0.4),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.02),
-    0 1px 0 rgba(201, 148, 62, 0.04);
-  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+  transition: background 0.15s, border-color 0.15s;
 }
 
 .tt-empty-cell:hover:not(:disabled) {
-  border-color: rgba(201, 148, 62, 0.25);
-  background:
-    linear-gradient(180deg, rgba(201, 148, 62, 0.04) 0%, transparent 50%, rgba(0, 0, 0, 0.06) 100%),
-    rgba(201, 148, 62, 0.04);
-  box-shadow:
-    inset 0 2px 4px rgba(0, 0, 0, 0.3),
-    0 0 10px rgba(201, 148, 62, 0.08);
+  background: rgba(55, 48, 60, 0.65);
+  border-color: rgba(232, 220, 200, 0.3);
 }
 
 .tt-empty-cell:disabled {
   cursor: default;
+  opacity: 0.5;
+}
+
+.tt-cell .tt-card,
+.tt-cell .tt-card-flip-container {
+  width: 100%;
+  height: 100%;
 }

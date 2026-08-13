@@ -1,662 +1,213 @@
-/* ============================================================
-   CLASH OF BEASTS — v5 clean-backdrop layout
-   Portrait artwork: 711 × 1536.
-   Widescreen artwork: 1672 × 941.
-   ============================================================ */
+/* App layout — rebuilt from wireframes
+   19.5:9 (2340×1080): functional 2120px, gutters 110px
+   16:9   (1920×1080): functional 1780px, gutters 70px
+   4:3    (1440×1080): functional 1384px, gutters 28px
+*/
 
-.tt-app-outer {
-  --player-a: #69aaff;
-  --player-b: #ee675b;
-
-  position: relative;
-  display: grid;
-  place-items: center;
-  width: 100%;
-  min-width: 0;
-  height: 100dvh;
-  overflow: hidden;
-  box-sizing: border-box;
-  background: #080706;
-  padding:
-    max(4px, env(safe-area-inset-top))
-    max(4px, env(safe-area-inset-right))
-    max(4px, env(safe-area-inset-bottom))
-    max(4px, env(safe-area-inset-left));
+:root {
+  --card-size: 170px;
+  --cell-size: 170px;
+  --grid-gap: 8px;
 }
 
-/* Fills wide desktop/tablet gutters with the widescreen backdrop artwork. */
-.tt-backdrop-blur {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  overflow: hidden;
-  pointer-events: none;
-  background: #080706;
-}
-
-.tt-backdrop-blur img {
-  display: none;
-}
-
-.tt-backdrop-blur::after {
-  display: none;
-}
-
-/* Portrait screens: hide the blur fill entirely (the narrow stage fills). */
-@media (max-aspect-ratio: 1/2) {
-  .tt-backdrop-blur img {
-    display: none !important;
-  }
-}
-
-/* Wider-than-portrait but narrower than wide breakpoint: blur side gutters. */
-@media (min-aspect-ratio: 1/2) and (max-aspect-ratio: 2/3) {
-  .tt-backdrop-blur .tt-blur-portrait {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    filter: brightness(.4) saturate(.7);
-  }
-
-  .tt-backdrop-blur::after {
-    display: block;
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(ellipse at center, transparent 25%, rgba(4, 4, 4, .65) 100%);
-  }
-}
-
-/* Widescreen (≥ 2:3): stage fills viewport, no gutters, no blur needed. */
-@media (min-aspect-ratio: 2/3) {
-  .tt-backdrop-blur {
-    display: none !important;
-  }
-}
-
-/* All percentage positioning below is relative to this fixed 711:1536 stage. */
 .tt-app {
   position: relative;
-  z-index: 1;
-  aspect-ratio: 711 / 1536;
-  width: min(
-    calc(100vw - max(8px, env(safe-area-inset-left)) - max(8px, env(safe-area-inset-right))),
-    calc((100dvh - max(8px, env(safe-area-inset-top)) - max(8px, env(safe-area-inset-bottom))) * 711 / 1536)
-  );
-  max-width: 711px;
-  max-height: 1536px;
-  overflow: visible;
-  box-sizing: border-box;
-  color: #d8c8ad;
-  font-family: Georgia, "Times New Roman", serif;
+  width: 100%;
+  height: 100dvh;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
 }
 
 .tt-backdrop {
   position: absolute;
   inset: 0;
-  z-index: 0;
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
+  z-index: 0;
   pointer-events: none;
-  user-select: none;
 }
 
-.tt-backdrop-wide {
-  display: none;
-}
-
-.tt-header,
-.tt-status-row,
-.tt-opponent-row,
-.tt-hand-shell,
-.tt-board-area,
-.tt-hint,
-.tt-rules {
-  position: absolute;
-  z-index: 2;
+.tt-stage {
+  position: relative;
+  z-index: 1;
+  width: min(calc(82.5vw + 196px), 100vw, 2120px);
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-bottom: 16px;
   box-sizing: border-box;
 }
 
-/* ------------------------------------------------------------
-   TITLE / TOP CONTROLS
-   The title is baked into the backdrop, so the live H1 remains
-   semantic only and cannot visually duplicate it.
-   ------------------------------------------------------------ */
+/* ── Title ── */
 
-.tt-title-accessible {
-  position: absolute !important;
-  width: 1px !important;
-  height: 1px !important;
-  padding: 0 !important;
-  margin: -1px !important;
-  overflow: hidden !important;
-  clip: rect(0 0 0 0) !important;
-  white-space: nowrap !important;
-  border: 0 !important;
+.tt-title-area {
+  flex: none;
+  height: 86px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.tt-header {
-  left: 0;
-  top: 0;
+.tt-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #e8dcc8;
+  margin: 0;
+  text-align: center;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+/* ── Controls ── */
+
+.tt-controls {
+  flex: none;
+  height: 62px;
   width: 100%;
-  height: 100%;
-  pointer-events: none;
-  background: transparent !important;
-  border: 0 !important;
-  box-shadow: none !important;
-}
-
-.tt-help-btn,
-.tt-new-game {
-  position: absolute;
-  pointer-events: auto;
-  z-index: 4;
-  font-family: Georgia, "Times New Roman", serif;
-  cursor: pointer;
-  color: #e4bd76;
-  border: 1px solid rgba(176, 123, 56, .35);
-  background: rgba(10, 8, 5, .75);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, .5), inset 0 1px 0 rgba(201, 148, 62, .08);
-}
-
-.tt-help-btn:hover,
-.tt-new-game:hover {
-  filter: brightness(1.15);
-  border-color: rgba(201, 148, 62, .55);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 6px 14px;
+  padding: 0 16px;
+  box-sizing: border-box;
 }
 
 .tt-help-btn {
-  left: 4.5%;
-  top: 3.2%;
-  width: 6.5%;
-  height: 4.3%;
-  min-width: 24px;
-  min-height: 24px;
-  padding: 0;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
-  display: grid;
-  place-items: center;
-  font-size: clamp(12px, calc(var(--card-size) * .18), 20px);
+  border: 1px solid rgba(232, 220, 200, 0.3);
+  background: rgba(30, 26, 32, 0.7);
+  color: #e8dcc8;
+  font-size: 15px;
   font-weight: 700;
+  cursor: pointer;
+  flex: none;
 }
 
-.tt-new-game {
-  right: 3%;
-  top: 3%;
-  width: 15%;
-  height: 4.5%;
-  display: grid;
-  place-items: center;
-  border-radius: 3px;
-  white-space: nowrap;
-  font-size: clamp(9px, calc(var(--card-size) * .13), 13px);
-  font-weight: 700;
-  letter-spacing: .07em;
-  text-transform: uppercase;
-}
-
-/* ------------------------------------------------------------
-   TURN / SCORE
-   v5 controls zone: y 286-484 (18.6-31.5%)
-   ------------------------------------------------------------ */
-
-.tt-status-row {
-  left: 5%;
-  top: 20%;
-  width: 90%;
-  height: 3.5%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4%;
-  padding: 0 2%;
-  background: rgba(10, 8, 5, .7);
-  border: 1px solid rgba(176, 123, 56, .3);
-  border-radius: 3px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, .4);
+.tt-help-btn:hover {
+  background: rgba(60, 52, 64, 0.9);
 }
 
 .tt-turn-indicator {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 52%;
-  height: 100%;
-  padding: 0 5%;
-  border-radius: 3px;
-  border: none;
-  background: transparent;
-  color: var(--player-a);
-  white-space: nowrap;
-  text-transform: uppercase;
-  letter-spacing: .04em;
-  font-size: clamp(9px, calc(var(--card-size) * .14), 14px);
-  font-weight: 700;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, .8);
+  font-size: 15px;
+  font-weight: 600;
+  color: #e8dcc8;
+  padding: 5px 14px;
+  border-radius: 6px;
+  background: rgba(30, 26, 32, 0.6);
+}
+
+.tt-turn-indicator.turn-A {
+  border-left: 3px solid var(--player-a);
 }
 
 .tt-turn-indicator.turn-B {
-  color: var(--player-b);
+  border-left: 3px solid var(--player-b);
 }
 
 .tt-score {
   display: flex;
-  gap: calc(var(--card-size) * .14);
-  font-size: clamp(10px, calc(var(--card-size) * .15), 15px);
-  font-weight: 700;
-  white-space: nowrap;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .score-a { color: var(--player-a); }
 .score-b { color: var(--player-b); }
 
-/* ------------------------------------------------------------
-   OPPONENT / DIFFICULTY
-   v5 controls zone: y 286-484 (18.6-31.5%)
-   ------------------------------------------------------------ */
-
-.tt-opponent-row {
-  left: 5%;
-  top: 24%;
-  width: 90%;
-  height: 3%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6%;
-  padding: 0 2%;
-  font-size: clamp(9px, calc(var(--card-size) * .12), 13px);
-  background: rgba(10, 8, 5, .7);
-  border: 1px solid rgba(176, 123, 56, .3);
-  border-radius: 3px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, .4);
+.tt-new-game {
+  padding: 5px 14px;
+  border-radius: 6px;
+  border: 1px solid rgba(232, 220, 200, 0.25);
+  background: rgba(30, 26, 32, 0.7);
+  color: #e8dcc8;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
 }
 
-.tt-opponent-row label {
-  display: flex;
-  align-items: center;
-  gap: calc(var(--card-size) * .08);
-  color: #d8c4a6;
-  white-space: nowrap;
-}
-
-.tt-opponent-row select {
-  min-width: calc(var(--card-size) * 1.42);
-  color: #f1e5d3;
-  font: inherit;
-  padding: calc(var(--card-size) * .03) calc(var(--card-size) * .08);
-  border-radius: 3px;
-  border: 1px solid rgba(118, 85, 43, .5);
-  background: rgba(10, 8, 5, .7);
-}
-
-/* ------------------------------------------------------------
-   COMPUTER / PLAYER TRAYS
-   v5 red tray: x 19-687 (2.7-96.6%), y 486-637 (31.6-41.5%)
-   v5 blue tray: x 20-687 (2.8-96.6%), y 1244-1400 (81-91.1%)
-   ------------------------------------------------------------ */
-
-.tt-hand-shell {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.3% 1.5%;
-  background: transparent !important;
-  border: 0 !important;
-  box-shadow: none !important;
-}
-
-.tt-hand-shell-b {
-  left: 3%;
-  top: 31.5%;
-  width: 94%;
-  height: 10%;
-}
-
-.tt-hand-shell-a {
-  left: 3%;
-  top: 81%;
-  width: 94%;
-  height: 10%;
-}
-
-.tt-hand-shell::before {
-  display: none !important;
-}
-
-.tt-hand-shell :is(.tt-hand, .hand, .player-hand) {
-  width: 100% !important;
-  max-width: 100% !important;
-  background: transparent !important;
-  border: 0 !important;
-  box-shadow: none !important;
-  padding: 0 !important;
-}
-
-.tt-hand-shell :is(.tt-hand-cards, .hand-cards, .cards-row, .tt-cards-row) {
-  justify-content: center !important;
-  gap: calc(var(--card-size) * 0.13) !important;
-  max-width: 90% !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
-}
-
-.tt-hand-shell :is(.tt-hand-label, .hand-label, h2, h3) {
-  color: #dfbf87 !important;
-  font-family: Georgia, "Times New Roman", serif !important;
-  font-size: clamp(9px, calc(var(--card-size) * .13), 14px) !important;
-  text-transform: uppercase;
-  letter-spacing: .08em;
-  text-shadow: 0 1px 3px #000, 0 0 6px rgba(0,0,0,.6);
-  background: rgba(10, 8, 5, .65) !important;
-  border: 1px solid rgba(176, 123, 56, .3);
-  border-radius: 3px;
-  padding: 1px calc(var(--card-size) * .15) !important;
-  margin-bottom: 2px !important;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, .3);
-  width: fit-content !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
-}
-
-/* ------------------------------------------------------------
-   BOARD
-   v5 board: x 91-609 (12.8-85.7%), y 683-1196 (44.5-77.9%)
-   Grid width ≈518px, cells ≈171×171 (1:1)
-   ------------------------------------------------------------ */
-
-.tt-board-area {
-  left: 13%;
-  top: 44.5%;
-  width: 73%;
-  height: 33.5%;
-  display: grid;
-  place-items: center;
-  padding: 0;
-  margin: 0;
-}
-
-.tt-board-area :is(.tt-board, .board) {
-  width: 100%;
-  height: 100%;
-  box-sizing: border-box;
-  padding: 0;
-  column-gap: 3%;
-  row-gap: 3%;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(3, 1fr);
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-}
-
-.tt-board-area .tt-cell {
-  width: 100%;
-  height: 100%;
-  aspect-ratio: 1 / 1;
-  overflow: hidden;
-}
-
-.tt-board-area .tt-cell .tt-card,
-.tt-board-area .tt-cell .tt-card-flip-container {
-  width: 100%;
-  height: 100%;
-}
-
-.tt-board-area .tt-cell .tt-card-flipper,
-.tt-board-area .tt-cell .tt-card-face {
-  width: 100%;
-  height: 100%;
-}
-
-.tt-board-area .tt-cell .tt-empty-cell {
-  width: 100%;
-  height: 100%;
-}
-
-/* ------------------------------------------------------------
-   FOOTER
-   v5 hint: below blue tray, y≈92%
-   ------------------------------------------------------------ */
-
-.tt-hint {
-  left: 50%;
-  transform: translateX(-50%);
-  top: 92%;
-  width: fit-content;
-  max-width: 60%;
-  margin: 0;
-  color: #c7aa7c;
-  opacity: .9;
-  text-align: center;
-  font-size: clamp(9px, calc(var(--card-size) * .12), 13px);
-  line-height: 1.1;
-  white-space: nowrap;
-  background: rgba(10, 8, 5, .6);
-  border: 1px solid rgba(176, 123, 56, .25);
-  border-radius: 3px;
-  padding: 0.3% 2%;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, .3);
+.tt-new-game:hover {
+  background: rgba(60, 52, 64, 0.9);
 }
 
 .tt-rules {
-  position: absolute;
-  pointer-events: auto;
-  left: 3%;
-  top: 7.5%;
-  min-width: calc(var(--card-size) * 1.15);
-  max-width: 52%;
-  margin: 0;
-  border: 1px solid rgba(176, 123, 56, .35);
-  border-radius: 4px;
-  background: rgba(10, 8, 5, .75);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, .5), inset 0 1px 0 rgba(201, 148, 62, .08);
-  color: #d7b67b;
+  position: relative;
 }
 
 .tt-rules summary {
-  list-style: none;
+  font-size: 13px;
+  color: #e8dcc8;
   cursor: pointer;
-  padding: calc(var(--card-size) * .07) calc(var(--card-size) * .16);
-  text-align: left;
-  font-size: clamp(9px, calc(var(--card-size) * .12), 13px);
-  line-height: 1;
-  text-transform: uppercase;
-  letter-spacing: .06em;
+  padding: 5px 12px;
+  border-radius: 6px;
+  background: rgba(30, 26, 32, 0.7);
+  border: 1px solid rgba(232, 220, 200, 0.25);
+  list-style: none;
 }
 
 .tt-rules summary::-webkit-details-marker {
   display: none;
 }
 
-.tt-rules[open] {
-  background: rgba(14, 11, 8, .96);
-  border: 1px solid rgba(118, 85, 43, .5);
-  z-index: 8;
-}
-
 .tt-rules-content {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 4px;
+  background: #1e1a20;
+  border: 1px solid rgba(232, 220, 200, 0.15);
+  border-radius: 6px;
+  padding: 8px 14px;
   display: flex;
-  flex-wrap: wrap;
-  gap: calc(var(--card-size) * .08);
-  align-items: center;
-  padding: calc(var(--card-size) * .10);
-  border-top: 1px solid rgba(176, 123, 56, .28);
-}
-
-.tt-rules-note {
-  margin: 0;
-  flex-basis: 100%;
-  font-size: clamp(8px, calc(var(--card-size) * .10), 11px);
-  color: #b9ad9a;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  z-index: 10;
+  white-space: nowrap;
 }
 
 .tt-rules-content label {
   display: flex;
   align-items: center;
-  gap: 5px;
-  color: #ded0ba;
+  gap: 6px;
+  color: #b8a99a;
   cursor: pointer;
-  font-size: clamp(9px, calc(var(--card-size) * .11), 12px);
 }
 
-/* Raise header stacking context when Rules panel is open so it
-   paints above the status/opponent rows (which share z-index: 2). */
-.tt-header:has(.tt-rules[open]) {
-  z-index: 10;
+.tt-opponent-label,
+.tt-difficulty-label {
+  font-size: 13px;
+  color: #b8a99a;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
-/* Small phone refinements. */
-@media (max-width: 520px) {
-  .tt-help-btn {
-    left: 5%;
-    top: 2.5%;
-    width: 5.5%;
-    height: 3.8%;
-  }
-
-  .tt-rules {
-    left: 3%;
-    top: 6.5%;
-  }
-
-  .tt-new-game {
-    right: 3.5%;
-    top: 2.5%;
-    width: 13%;
-    font-size: clamp(7px, calc(var(--card-size) * .11), 11px) !important;
-  }
-
-  .tt-status-row {
-    left: 7%;
-    width: 86%;
-    font-size: clamp(8px, calc(var(--card-size) * .12), 12px);
-  }
-
-  .tt-opponent-row {
-    left: 7%;
-    width: 86%;
-    gap: 3%;
-    font-size: clamp(8px, calc(var(--card-size) * .10), 11px);
-  }
-
-  .tt-opponent-row select {
-    min-width: calc(var(--card-size) * 1.0);
-    font-size: clamp(8px, calc(var(--card-size) * .10), 11px);
-  }
-
-  .tt-hand-shell :is(.tt-hand-cards, .hand-cards, .cards-row, .tt-cards-row) {
-    gap: calc(var(--card-size) * 0.10) !important;
-    max-width: 88% !important;
-  }
-
-  .tt-hand-shell :is(.tt-hand-label, .hand-label, h2, h3) {
-    font-size: clamp(7px, calc(var(--card-size) * .11), 11px) !important;
-    padding: 0 calc(var(--card-size) * .10) !important;
-  }
+.tt-opponent-label select,
+.tt-difficulty-label select {
+  background: rgba(30, 26, 32, 0.8);
+  color: #e8dcc8;
+  border: 1px solid rgba(232, 220, 200, 0.25);
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 13px;
 }
 
-/* ============================================================
-   WIDESCREEN LAYOUT
-   Triggered on foldable/tablet/desktop (wider than 2:3).
-   Uses the wide-v5 backdrop (1672×941, aspect ≈ 16:9).
+/* ── Gameplay sections ── */
 
-   2:3 → 16:9 range: stage fills viewport, backdrop cropped
-   via object-fit: cover.  JS sets --wide-board-left,
-   --wide-board-width, --wide-tray-left, --wide-tray-width
-   to dynamically track the visible portion of the backdrop.
-
-   ≥ 16:9: stage fixed at 16:9, exact backdrop alignment.
-   ============================================================ */
-
-/* --- Shared widescreen base (≥ 2:3) --- */
-@media (min-aspect-ratio: 2/3) {
-  .tt-backdrop-portrait { display: none; }
-  .tt-backdrop-wide { display: block; object-fit: cover; }
-
-  .tt-hand-shell :is(.tt-hand-label, .hand-label, h2, h3) {
-    display: none !important;
-  }
-
-  .tt-hand-shell :is(.tt-hand-cards, .hand-cards, .cards-row, .tt-cards-row) {
-    gap: calc(var(--card-size) * 0.32) !important;
-    max-width: 100% !important;
-  }
-
-  .tt-board-area :is(.tt-board, .board) {
-    column-gap: 8.8%;
-    row-gap: 4.7%;
-  }
-
-  .tt-hint { top: 96%; }
-
-  .tt-help-btn  { top: 14%; width: 3%;  height: 3.5%; }
-  .tt-new-game  { top: 14%; width: 8%;  height: 3.5%; }
-  .tt-rules     { top: 19.5%; }
-  .tt-status-row   { top: 15%; height: 3.5%; }
-  .tt-opponent-row { top: 19.5%; height: 3%; }
-  .tt-hand-shell-b { top: 25%; height: 16%; }
-  .tt-hand-shell-a { top: 76%; height: 16%; }
-  .tt-board-area   { top: 41.3%; height: 40.3%; }
+.tt-hand-shell {
+  flex: none;
 }
 
-/* --- Intermediate: foldable / tablet (2:3 → 16:9) --- */
-@media (min-aspect-ratio: 2/3) and (max-aspect-ratio: 16/9) {
-  .tt-app {
-    aspect-ratio: unset;
-    width: 100%;
-    height: 100%;
-    max-width: none;
-    max-height: none;
-  }
-
-  .tt-board-area {
-    left: var(--wide-board-left, 37.5%);
-    width: var(--wide-board-width, 25%);
-  }
-
-  .tt-hand-shell-b,
-  .tt-hand-shell-a {
-    left: var(--wide-tray-left, 22%);
-    width: var(--wide-tray-width, 56%);
-  }
-
-  .tt-help-btn { left: var(--wide-tray-left, 22%); }
-  .tt-new-game { right: var(--wide-tray-left, 22%); }
-  .tt-rules    { left: var(--wide-tray-left, 22%); }
-
-  .tt-status-row {
-    left: calc(var(--wide-tray-left, 22%) + 5%);
-    width: calc(var(--wide-tray-width, 56%) - 10%);
-  }
-
-  .tt-opponent-row {
-    left: calc(var(--wide-tray-left, 22%) + 5%);
-    width: calc(var(--wide-tray-width, 56%) - 10%);
-  }
+.tt-board-area {
+  flex: none;
 }
-
-/* --- Full widescreen (≥ 16:9) — fixed 16:9 stage --- */
-@media (min-aspect-ratio: 16/9) {
-  .tt-app {
-    aspect-ratio: 16 / 9;
-    width: min(
-      calc(100vw - max(8px, env(safe-area-inset-left)) - max(8px, env(safe-area-inset-right))),
-      calc((100dvh - max(8px, env(safe-area-inset-top)) - max(8px, env(safe-area-inset-bottom))) * 16 / 9)
-    );
-    max-width: 1920px;
-    max-height: 1080px;
-  }
-
-  .tt-board-area   { left: 37.5%; width: 25%; }
-  .tt-hand-shell-b { left: 22%; width: 56%; }
-  .tt-hand-shell-a { left: 22%; width: 56%; }
-  .tt-help-btn     { left: 22%; }
-  .tt-new-game     { right: 22%; }
-  .tt-rules        { left: 22%; }
-  .tt-status-row   { left: 27%; width: 46%; }
-  .tt-opponent-row { left: 27%; width: 46%; }
-}
-

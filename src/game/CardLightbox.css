@@ -1,3 +1,5 @@
+/* CardLightbox — to be rebuilt from wireframes */
+
 .tt-lightbox {
   position: fixed;
   inset: 0;
@@ -9,44 +11,13 @@
   z-index: 50;
   padding: 24px;
   box-sizing: border-box;
-  animation: tt-lightbox-in 0.15s ease;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .tt-lightbox {
-    animation: none;
-  }
-}
-
-@keyframes tt-lightbox-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
 }
 
 .tt-lightbox-card {
   position: relative;
-  border-radius: 10px;
-  border: 2px solid rgba(201, 148, 62, 0.25);
   overflow: hidden;
-  background: var(--card-bg);
-  box-shadow:
-    0 0 0 1px rgba(0, 0, 0, 0.4),
-    0 0 0 3px rgba(40, 34, 28, 0.8),
-    0 24px 60px rgba(0, 0, 0, 0.6),
-    0 0 40px rgba(0, 0, 0, 0.3);
+  background: #1e1a20;
   line-height: 0;
-}
-
-.tt-lightbox-card.owner-a {
-  border-color: var(--player-a);
-}
-
-.tt-lightbox-card.owner-b {
-  border-color: var(--player-b);
 }
 
 .tt-lightbox-card img {
@@ -87,7 +58,6 @@
 .tt-lightbox-name {
   font-size: 20px;
   font-weight: 700;
-  color: var(--text-h);
 }
 
 .tt-lightbox-ranks {
@@ -96,5 +66,4 @@
   gap: 10px;
   font-size: 24px;
   font-weight: 700;
-  color: var(--text-h);
 }
