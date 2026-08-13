@@ -295,7 +295,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1.0% 2.2%;
+  padding: 0.3% 1.5%;
   background: transparent !important;
   border: 0 !important;
   box-shadow: none !important;
@@ -303,16 +303,16 @@
 
 .tt-hand-shell-b {
   left: 8%;
-  top: 19%;
+  top: 19.5%;
   width: 84%;
-  height: 11%;
+  height: 10.5%;
 }
 
 .tt-hand-shell-a {
   left: 8%;
-  top: 65%;
+  top: 65.5%;
   width: 84%;
-  height: 10.5%;
+  height: 10%;
 }
 
 .tt-hand-shell::before {
@@ -330,7 +330,7 @@
 
 .tt-hand-shell :is(.tt-hand-cards, .hand-cards, .cards-row, .tt-cards-row) {
   justify-content: center !important;
-  gap: 8px !important;
+  gap: 4px !important;
 }
 
 .tt-hand-shell :is(.tt-hand-label, .hand-label, h2, h3) {
@@ -342,6 +342,7 @@
   text-shadow: 0 1px 3px #000, 0 0 6px rgba(0,0,0,.6);
   background: transparent !important;
   padding: 0 !important;
+  margin-bottom: 2px !important;
 }
 
 /* ------------------------------------------------------------
@@ -398,7 +399,7 @@
 
 .tt-hint {
   left: 20%;
-  top: 76%;
+  top: 77%;
   width: 60%;
   margin: 0;
   color: #c7aa7c;
