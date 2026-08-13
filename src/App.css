@@ -303,16 +303,16 @@
 
 .tt-hand-shell-b {
   left: 8%;
-  top: 20%;
+  top: 19%;
   width: 84%;
-  height: 12.5%;
+  height: 11%;
 }
 
 .tt-hand-shell-a {
   left: 8%;
-  top: 66.5%;
+  top: 65%;
   width: 84%;
-  height: 11%;
+  height: 10.5%;
 }
 
 .tt-hand-shell::before {
@@ -351,9 +351,9 @@
    ------------------------------------------------------------ */
 
 .tt-board-area {
-  left: 25%;
-  top: 34%;
-  width: 50%;
+  left: 24%;
+  top: 32%;
+  width: 52%;
   height: 32%;
   display: grid;
   place-items: center;
@@ -398,7 +398,7 @@
 
 .tt-hint {
   left: 20%;
-  top: 77.5%;
+  top: 76%;
   width: 60%;
   margin: 0;
   color: #c7aa7c;
