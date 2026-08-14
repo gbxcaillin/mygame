@@ -13,7 +13,7 @@ import titleLogo from "./assets/title.png";
 import bgLandscape from "./assets/bg-landscape.png";
 import bgPortrait from "./assets/bg-portrait.png";
 import {
-  armAudio,
+  startMusic,
   getAudioSettings,
   playFlip,
   playWin,
@@ -42,11 +42,7 @@ function App() {
   const [tutorialOpen, setTutorialOpen] = useState(false);
   const [audio, setAudio] = useState(getAudioSettings);
   const [bannerDismissed, setBannerDismissed] = useState(false);
-
-  // Start background music on the first user interaction.
-  useEffect(() => {
-    armAudio();
-  }, []);
+  const [started, setStarted] = useState(false);
 
   // Card-flip sound whenever a move captures one or more cards.
   useEffect(() => {
@@ -118,6 +114,12 @@ function App() {
     const next = !audio.sfx;
     setSfxEnabled(next);
     setAudio((a) => ({ ...a, sfx: next }));
+  }
+
+  // Press Start: a direct user gesture that reliably kicks off music.
+  function handleStart() {
+    startMusic();
+    setStarted(true);
   }
 
   const player2Label = opponentType === "ai" ? "Computer" : "Player 2";
@@ -298,6 +300,27 @@ function App() {
         </div>
       )}
       </div>
+
+      {!started && (
+        <div className="tt-start-veil">
+          <div className="tt-start">
+            <img className="tt-start-logo" src={titleLogo} alt="Clash of Beasts" />
+            <button type="button" className="tt-start-btn" onClick={handleStart} autoFocus>
+              Press Start
+            </button>
+            <div className="tt-start-sound">
+              <label>
+                <input type="checkbox" checked={audio.music} onChange={toggleMusic} />
+                Music
+              </label>
+              <label>
+                <input type="checkbox" checked={audio.sfx} onChange={toggleSfx} />
+                Effects
+              </label>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

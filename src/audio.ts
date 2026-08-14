@@ -44,10 +44,10 @@ export function getAudioSettings(): AudioSettings {
   return { ...settings };
 }
 
-function startMusic() {
+export function startMusic() {
   if (!settings.music) return;
   music.play().catch(() => {
-    /* autoplay blocked until a user gesture; armAudio() retries */
+    /* blocked until a user gesture — call from a click handler */
   });
 }
 
