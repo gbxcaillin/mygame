@@ -5,7 +5,22 @@
      WIDTH so a hand of five fits across.
    The whole board fits with no scrolling in every ratio. */
 
+/* Pixel-art backdrop sits behind everything; kept outside .tt-app so the
+   4:3 scale transform doesn't shrink it away from the edges. */
+.tt-backdrop {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100dvh;
+  object-fit: cover;
+  image-rendering: pixelated;
+  z-index: 0;
+  pointer-events: none;
+}
+
 .tt-app {
+  position: relative;
+  z-index: 1;
   width: 100vw;
   height: 100dvh;
   overflow: hidden;
@@ -48,10 +63,12 @@
   justify-content: space-between;
   gap: 12px;
   padding: 6px 10px;
-  border: 1px solid #bbb;
+  border: 1px solid rgba(214, 196, 150, 0.35);
   border-radius: 6px;
   font-weight: 600;
   font-size: 14px;
+  background: rgba(10, 7, 18, 0.72);
+  backdrop-filter: blur(2px);
 }
 
 .tt-status.turn-A {
@@ -116,10 +133,12 @@
   display: flex;
   flex-wrap: wrap;
   gap: 6px 14px;
-  border: 1px solid #bbb;
+  border: 1px solid rgba(214, 196, 150, 0.35);
   border-radius: 6px;
   padding: 6px 10px;
   margin: 0;
+  background: rgba(10, 7, 18, 0.72);
+  backdrop-filter: blur(2px);
 }
 
 .tt-rules legend {

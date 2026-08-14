@@ -1,8 +1,8 @@
 :root {
-  --player-a: #2563eb;
-  --player-b: #dc2626;
+  --player-a: #4d8ce8;
+  --player-b: #e04a3a;
 
-  color-scheme: light dark;
+  color-scheme: dark;
   font-family: system-ui, -apple-system, sans-serif;
 }
 
@@ -17,15 +17,8 @@ body {
 }
 
 body {
-  background: #f4f4f5;
-  color: #1a1a1a;
-}
-
-@media (prefers-color-scheme: dark) {
-  body {
-    background: #18181b;
-    color: #e4e4e7;
-  }
+  background: #0b0816;
+  color: #e6ddc8;
 }
 
 #root {

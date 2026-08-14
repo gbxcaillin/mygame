@@ -10,6 +10,8 @@ import type { Difficulty } from "./game/ai";
 import { DEFAULT_RULES } from "./game/types";
 import type { Card, GameState, PlayerId, RuleSet } from "./game/types";
 import titleLogo from "./assets/title.png";
+import bgLandscape from "./assets/bg-landscape.png";
+import bgPortrait from "./assets/bg-portrait.png";
 import "./App.css";
 
 type OpponentType = "human" | "ai";
@@ -94,7 +96,13 @@ function App() {
       : `${state.turn === "A" ? "Player 1" : player2Label}'s turn`;
 
   return (
-    <div className="tt-app">
+    <>
+      <picture>
+        <source srcSet={bgPortrait} media="(orientation: portrait)" />
+        <img src={bgLandscape} className="tt-backdrop" alt="" aria-hidden="true" />
+      </picture>
+
+      <div className="tt-app">
       <h1 className="tt-title">
         <img src={titleLogo} alt="Clash of Beasts" />
       </h1>
@@ -203,7 +211,8 @@ function App() {
         <CardLightbox card={inspecting.card} owner={inspecting.owner} onClose={() => setInspecting(null)} />
       )}
       {tutorialOpen && <TutorialModal onClose={() => setTutorialOpen(false)} />}
-    </div>
+      </div>
+    </>
   );
 }
 
