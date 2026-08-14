@@ -115,8 +115,10 @@
 
 .tt-score {
   display: flex;
-  gap: 12px;
+  gap: 14px;
   white-space: nowrap;
+  font-size: 1.35em;
+  font-weight: 800;
 }
 
 .score-a {
