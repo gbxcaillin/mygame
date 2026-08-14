@@ -15,7 +15,7 @@ import bgPortrait from "./assets/bg-portrait.png";
 import "./App.css";
 
 type OpponentType = "human" | "ai";
-const AI_THINK_DELAY_MS = 550;
+const AI_THINK_DELAY_MS = 1400;
 
 function newGame(rules: RuleSet): GameState {
   const { handA, handB } = dealHands();
