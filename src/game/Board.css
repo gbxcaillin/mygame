@@ -107,8 +107,12 @@
 
 /* Placed cards get an intense, pulsing ownership glow so it's obvious
    at a glance who controls each card, even on a packed board. Raised
-   above the gold frame so the colored halo isn't dampened by it. */
-.tt-cell .tt-card {
+   above the gold frame so the colored halo isn't dampened by it.
+   NOTE: scope to the cell's direct child only — the flip faces are also
+   .tt-card, and setting position on them would break their absolute
+   overlap (causing a phantom card to flow below the board). */
+.tt-cell > .tt-card,
+.tt-cell > .tt-card-flip-container {
   position: relative;
   z-index: 5;
 }
