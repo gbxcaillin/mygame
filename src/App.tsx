@@ -130,7 +130,9 @@ function App() {
             <button type="button" className="tt-new-game" onClick={() => handleNewGame()}>
               New Game
             </button>
+          </div>
 
+          <div className="tt-settings-bar">
             <details
               className="tt-rules"
               open={rulesOpen}
@@ -156,9 +158,6 @@ function App() {
                 </label>
               </div>
             </details>
-          </div>
-
-          <div className="tt-settings-bar">
             <label className="tt-opponent-label">
               Opponent
               <select value={opponentType} onChange={(e) => setOpponentType(e.target.value as OpponentType)}>

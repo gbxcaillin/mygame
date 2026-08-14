@@ -285,14 +285,12 @@
 
   .tt-status-bar {
     display: flex;
-    flex-wrap: wrap;
     align-items: center;
-    justify-content: center;
-    gap: 1.5vw 3vw;
-    padding: 1.5vw 3vw;
-    background: rgba(20, 18, 24, 0.7);
-    backdrop-filter: blur(6px);
-    border-radius: 1.5vw;
+    gap: 2vw;
+    padding: 0;
+    background: none;
+    backdrop-filter: none;
+    border-radius: 0;
     width: 100%;
     box-sizing: border-box;
   }
@@ -315,13 +313,18 @@
   }
 
   .tt-hand-shell-b {
-    margin-top: 4vw;
+    margin-top: 8vw;
+  }
+
+  .tt-hand-shell-a {
+    margin-top: 10vw;
   }
 
   .tt-help-btn {
     width: 7vw;
     height: 7vw;
     font-size: 3.5vw;
+    margin-right: auto;
   }
 
   .tt-turn-indicator {
@@ -337,11 +340,19 @@
   .tt-new-game {
     font-size: 3vw;
     padding: 1.2vw 3vw;
+    margin-left: auto;
   }
 
   .tt-rules summary {
     font-size: 3vw;
     padding: 1.2vw 3vw;
+  }
+
+  .tt-rules-content {
+    top: auto;
+    bottom: 100%;
+    margin-top: 0;
+    margin-bottom: 4px;
   }
 
   .tt-opponent-label,
