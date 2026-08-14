@@ -1,16 +1,17 @@
-/* Basic hand row */
+/* Hand — single row of cards */
 
 .tt-hand {
   width: 100%;
 }
 
 .tt-hand-label {
-  margin: 0 0 6px;
-  font-size: 13px;
+  margin: 0 0 4px;
+  font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   opacity: 0.6;
+  text-align: center;
 }
 
 .tt-hand.active .tt-hand-label {
@@ -19,7 +20,8 @@
 
 .tt-hand-cards {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  justify-content: center;
   gap: var(--card-gap, 6px);
 }
 

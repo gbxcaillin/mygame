@@ -1,52 +1,51 @@
-/* Basic functional layout — no backdrop art */
-
-:root {
-  --card-size: 88px;
-  --cell-size: 96px;
-  --grid-gap: 6px;
-  --card-gap: 6px;
-}
+/* Responsive layout tuned for three ratios: 16:9, 4:3, 9:19.5
+   - Landscape (16:9, 4:3): game column on the left, control panel on the
+     right. Cards sized by viewport HEIGHT so the stack always fits.
+   - Portrait (9:19.5): single vertical column. Cards sized by viewport
+     WIDTH so a hand of five fits across.
+   The whole board fits with no scrolling in every ratio. */
 
 .tt-app {
-  max-width: 640px;
-  margin: 0 auto;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  align-items: center;
+  width: 100vw;
+  height: 100dvh;
+  overflow: hidden;
+  box-sizing: border-box;
+  display: grid;
+  color: inherit;
 }
 
-.tt-header {
-  width: 100%;
+/* ── Shared section chrome ── */
+
+.tt-title {
+  margin: 0;
+  font-size: var(--title-size, 20px);
+  white-space: nowrap;
+}
+
+.tt-title-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-}
-
-.tt-header h1 {
-  margin: 0;
-  font-size: 22px;
 }
 
 .tt-help-btn {
-  padding: 6px 12px;
+  padding: 5px 10px;
+  font-size: 13px;
   cursor: pointer;
+  white-space: nowrap;
 }
 
-/* Status / turn + score */
-
 .tt-status {
-  width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 8px 12px;
-  border: 1px solid #ccc;
+  padding: 6px 10px;
+  border: 1px solid #bbb;
   border-radius: 6px;
   font-weight: 600;
+  font-size: 14px;
 }
 
 .tt-status.turn-A {
@@ -59,8 +58,8 @@
 
 .tt-score {
   display: flex;
-  gap: 14px;
-  font-size: 14px;
+  gap: 12px;
+  white-space: nowrap;
 }
 
 .score-a {
@@ -71,38 +70,50 @@
   color: var(--player-b);
 }
 
-/* Controls */
+/* ── Game column: opponent hand, board, player hand ── */
+
+.tt-game {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--section-gap, 12px);
+}
+
+.tt-board-area {
+  flex: none;
+}
+
+/* ── Controls + rules ── */
 
 .tt-controls {
-  width: 100%;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 .tt-new-game {
-  padding: 6px 14px;
+  padding: 6px 12px;
   cursor: pointer;
+  white-space: nowrap;
 }
 
 .tt-field {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 14px;
+  gap: 5px;
+  font-size: 13px;
 }
 
-/* Rules */
-
 .tt-rules {
-  width: 100%;
   display: flex;
   flex-wrap: wrap;
-  gap: 8px 16px;
-  border: 1px solid #ccc;
+  gap: 6px 14px;
+  border: 1px solid #bbb;
   border-radius: 6px;
-  padding: 8px 12px;
+  padding: 6px 10px;
+  margin: 0;
 }
 
 .tt-rules legend {
@@ -114,5 +125,143 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  font-size: 14px;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+/* ═══════════════ PORTRAIT (9:19.5) ═══════════════ */
+
+@media (orientation: portrait) {
+  :root {
+    --card-size: 17.5vw;
+    --cell-size: 17.5vw;
+    --grid-gap: 1.3vw;
+    --card-gap: 1.3vw;
+    --section-gap: 4vw;
+    --title-size: 4.6vw;
+  }
+
+  .tt-app {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr auto;
+    grid-template-areas:
+      "top"
+      "game"
+      "bottom";
+    gap: 2vw;
+    padding: 3vw;
+  }
+
+  .tt-topbar {
+    grid-area: top;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5vw;
+  }
+
+  /* Fill the tall column: hands hug the board's top and bottom, the
+     whole group biased toward the upper-middle where thumbs can reach. */
+  .tt-game {
+    grid-area: game;
+    height: 100%;
+    justify-content: center;
+    gap: min(var(--section-gap), 8vw);
+  }
+
+  .tt-bottombar {
+    grid-area: bottom;
+    display: flex;
+    flex-direction: column;
+    gap: 2.5vw;
+  }
+
+  .tt-title {
+    font-size: 4.6vw;
+  }
+
+  .tt-status {
+    font-size: 3.2vw;
+    padding: 1.4vw 2.4vw;
+  }
+
+  .tt-help-btn {
+    font-size: 3vw;
+    padding: 1.4vw 2.6vw;
+  }
+
+  .tt-hand-label {
+    font-size: 2.6vw;
+  }
+
+  .tt-controls {
+    justify-content: center;
+    gap: 3vw;
+  }
+
+  .tt-new-game,
+  .tt-field,
+  .tt-rules label,
+  .tt-rules legend {
+    font-size: 3vw;
+  }
+
+  .tt-new-game {
+    padding: 1.6vw 4vw;
+  }
+}
+
+/* ═══════════════ LANDSCAPE (16:9, 4:3) ═══════════════ */
+
+@media (orientation: landscape) {
+  :root {
+    --card-size: min(15.5vh, 15vw);
+    --cell-size: min(15.5vh, 15vw);
+    --grid-gap: 0.7vh;
+    --card-gap: 0.7vh;
+    --section-gap: 1.2vh;
+    --title-size: clamp(16px, 2.6vh, 26px);
+  }
+
+  .tt-app {
+    grid-template-columns: auto minmax(220px, auto);
+    grid-template-rows: auto auto;
+    grid-template-areas:
+      "game top"
+      "game bottom";
+    align-content: center;
+    justify-content: center;
+    gap: 2vh 3vw;
+    padding: 2vh 3vw;
+  }
+
+  .tt-topbar {
+    grid-area: top;
+    align-self: end;
+    display: flex;
+    flex-direction: column;
+    gap: 1vh;
+  }
+
+  .tt-game {
+    grid-area: game;
+    align-self: center;
+  }
+
+  .tt-bottombar {
+    grid-area: bottom;
+    align-self: start;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5vh;
+  }
+
+  /* Stack controls vertically in the side panel */
+  .tt-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .tt-field {
+    justify-content: space-between;
+  }
 }
