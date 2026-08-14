@@ -95,15 +95,14 @@ function App() {
 
   return (
     <div className="tt-app">
+      <h1 className="tt-title">
+        <img src={titleLogo} alt="Clash of Beasts" />
+      </h1>
+
       <div className="tt-topbar">
-        <div className="tt-title-row">
-          <h1 className="tt-title">
-            <img src={titleLogo} alt="Clash of Beasts" />
-          </h1>
-          <button type="button" className="tt-help-btn" onClick={() => setTutorialOpen(true)}>
-            How to play
-          </button>
-        </div>
+        <button type="button" className="tt-help-btn" onClick={() => setTutorialOpen(true)}>
+          How to play
+        </button>
         <div className={`tt-status ${!state.winner ? `turn-${state.turn}` : ""}`}>
           <span className="tt-status-text">{status}</span>
           <span className="tt-score">

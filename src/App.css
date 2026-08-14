@@ -29,10 +29,9 @@
   max-width: 100%;
 }
 
-.tt-title-row {
+.tt-topbar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 12px;
 }
 
@@ -150,8 +149,9 @@
 
   .tt-app {
     grid-template-columns: 1fr;
-    grid-template-rows: auto 1fr auto;
+    grid-template-rows: auto auto 1fr auto;
     grid-template-areas:
+      "title"
       "top"
       "game"
       "bottom";
@@ -159,11 +159,23 @@
     padding: 3vw;
   }
 
+  .tt-title {
+    grid-area: title;
+    display: flex;
+    justify-content: center;
+  }
+
+  .tt-title img {
+    width: min(90vw, 820px);
+  }
+
   .tt-topbar {
     grid-area: top;
     display: flex;
-    flex-direction: column;
-    gap: 1.5vw;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 3vw;
   }
 
   /* Fill the tall column: hands hug the board's top and bottom, the
@@ -180,11 +192,6 @@
     display: flex;
     flex-direction: column;
     gap: 2.5vw;
-  }
-
-  .tt-title {
-    flex: 1 1 auto;
-    max-width: 74vw;
   }
 
   .tt-status {
@@ -236,14 +243,31 @@
      everything sizes off height so nothing scrolls. */
   .tt-app {
     grid-template-columns: auto clamp(168px, 23vw, 320px);
-    grid-template-rows: 1fr 1fr;
+    grid-template-rows: auto 1fr;
     grid-template-areas:
-      "game top"
-      "game bottom";
+      "title top"
+      "game  bottom";
     justify-content: center;
     align-content: stretch;
     column-gap: 3vw;
+    row-gap: 1.4vh;
     padding: 2vh clamp(16px, 4vw, 48px);
+  }
+
+  /* Title sits above the game on the left, pushing the field down */
+  .tt-title {
+    grid-area: title;
+    align-self: center;
+    justify-self: center;
+    display: flex;
+    justify-content: center;
+  }
+
+  .tt-title img {
+    width: auto;
+    height: auto;
+    max-width: 46vw;
+    max-height: 15vh;
   }
 
   .tt-game {
@@ -260,13 +284,6 @@
     gap: 1.4vh;
   }
 
-  /* Stack the panel header: large logo, then How to play, then scores */
-  .tt-title-row {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 1.2vh;
-  }
-
   .tt-help-btn {
     width: 100%;
   }
@@ -278,13 +295,6 @@
     display: flex;
     flex-direction: column;
     gap: 1.4vh;
-  }
-
-  .tt-title img {
-    width: 100%;
-    height: auto;
-    max-width: 100%;
-    max-height: 14vh;
   }
 
   /* Narrow panel: stack turn text over score, and controls in a column */
