@@ -108,8 +108,8 @@ function App() {
       </h1>
 
       <div className="tt-topbar">
-        <button type="button" className="tt-help-btn" onClick={() => setTutorialOpen(true)}>
-          How to play
+        <button type="button" className="tt-new-game" onClick={() => handleNewGame()}>
+          New Game
         </button>
         <div className={`tt-status ${!state.winner ? `turn-${state.turn}` : ""}`}>
           <span className="tt-status-text">{status}</span>
@@ -160,8 +160,8 @@ function App() {
 
       <div className="tt-bottombar">
         <div className="tt-controls">
-          <button type="button" className="tt-new-game" onClick={() => handleNewGame()}>
-            New Game
+          <button type="button" className="tt-help-btn" onClick={() => setTutorialOpen(true)}>
+            How to play
           </button>
 
           <label className="tt-field">
