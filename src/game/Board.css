@@ -105,17 +105,74 @@
   height: 100%;
 }
 
-/* Placed cards need an obvious ownership glow inside the socket */
+/* Placed cards get an intense, pulsing ownership glow so it's obvious
+   at a glance who controls each card, even on a packed board. Raised
+   above the gold frame so the colored halo isn't dampened by it. */
+.tt-cell .tt-card {
+  position: relative;
+  z-index: 5;
+}
+
 .tt-cell .tt-card.owner-a {
-  box-shadow:
-    0 0 6px 2px var(--player-a),
-    0 0 18px 6px rgba(77, 140, 232, 0.85),
-    inset 0 0 14px 2px rgba(77, 140, 232, 0.55);
+  animation: own-glow-a 1.7s ease-in-out infinite;
 }
 
 .tt-cell .tt-card.owner-b {
-  box-shadow:
-    0 0 6px 2px var(--player-b),
-    0 0 18px 6px rgba(224, 74, 58, 0.85),
-    inset 0 0 14px 2px rgba(224, 74, 58, 0.55);
+  animation: own-glow-b 1.7s ease-in-out infinite;
+}
+
+@keyframes own-glow-a {
+  0%, 100% {
+    box-shadow:
+      0 0 0 2px #cfe0ff,
+      0 0 12px 5px var(--player-a),
+      0 0 26px 12px rgba(77, 140, 232, 0.85),
+      inset 0 0 20px 5px rgba(77, 140, 232, 0.6);
+  }
+  50% {
+    box-shadow:
+      0 0 0 2px #eaf3ff,
+      0 0 18px 8px var(--player-a),
+      0 0 42px 20px rgba(77, 140, 232, 1),
+      inset 0 0 26px 7px rgba(77, 140, 232, 0.8);
+  }
+}
+
+@keyframes own-glow-b {
+  0%, 100% {
+    box-shadow:
+      0 0 0 2px #ffd6cf,
+      0 0 12px 5px var(--player-b),
+      0 0 26px 12px rgba(224, 74, 58, 0.85),
+      inset 0 0 20px 5px rgba(224, 74, 58, 0.6);
+  }
+  50% {
+    box-shadow:
+      0 0 0 2px #ffece8,
+      0 0 18px 8px var(--player-b),
+      0 0 42px 20px rgba(224, 74, 58, 1),
+      inset 0 0 26px 7px rgba(224, 74, 58, 0.8);
+  }
+}
+
+/* Steady (still intense) glow when motion is reduced */
+@media (prefers-reduced-motion: reduce) {
+  .tt-cell .tt-card.owner-a,
+  .tt-cell .tt-card.owner-b {
+    animation: none;
+  }
+  .tt-cell .tt-card.owner-a {
+    box-shadow:
+      0 0 0 2px #eaf3ff,
+      0 0 16px 7px var(--player-a),
+      0 0 38px 18px rgba(77, 140, 232, 0.95),
+      inset 0 0 24px 6px rgba(77, 140, 232, 0.75);
+  }
+  .tt-cell .tt-card.owner-b {
+    box-shadow:
+      0 0 0 2px #ffece8,
+      0 0 16px 7px var(--player-b),
+      0 0 38px 18px rgba(224, 74, 58, 0.95),
+      inset 0 0 24px 6px rgba(224, 74, 58, 0.75);
+  }
 }
