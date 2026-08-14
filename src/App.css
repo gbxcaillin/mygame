@@ -222,8 +222,8 @@
 
 @media (orientation: landscape) {
   :root {
-    --card-size: min(14vh, 15vw);
-    --cell-size: min(14vh, 15vw);
+    --card-size: min(13.5vh, 14vw);
+    --cell-size: min(13.5vh, 14vw);
     --grid-gap: 0.7vh;
     --card-gap: 0.7vh;
     --section-gap: 1.1vh;
@@ -231,10 +231,11 @@
 
   /* Game column on the left; a bounded, full-height control panel on the
      right with its groups pinned to the top and bottom edges. The panel
-     width is capped so the game + panel always fit the viewport (fixes
-     4:3 overflow), and everything sizes off height so nothing scrolls. */
+     width is capped so the game + panel always fit the viewport with a
+     clear margin on both sides (fixes 4:3 overflow / edge-hugging), and
+     everything sizes off height so nothing scrolls. */
   .tt-app {
-    grid-template-columns: auto clamp(200px, 26vw, 340px);
+    grid-template-columns: auto clamp(168px, 23vw, 320px);
     grid-template-rows: 1fr 1fr;
     grid-template-areas:
       "game top"
@@ -242,7 +243,7 @@
     justify-content: center;
     align-content: stretch;
     column-gap: 3vw;
-    padding: 2vh 3vw;
+    padding: 2vh clamp(16px, 4vw, 48px);
   }
 
   .tt-game {
@@ -285,7 +286,14 @@
     align-items: stretch;
   }
 
+  /* Label above dropdown, tight gap, full-width select */
   .tt-field {
-    justify-content: space-between;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2px;
+  }
+
+  .tt-field select {
+    width: 100%;
   }
 }
