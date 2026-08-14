@@ -227,6 +227,11 @@
     padding: 3vw;
   }
 
+  /* Flatten the panel wrapper so title/topbar/game/bottombar place directly */
+  .tt-panel {
+    display: contents;
+  }
+
   .tt-title {
     grid-area: title;
     display: flex;
@@ -314,13 +319,25 @@
     grid-template-columns: auto clamp(168px, 23vw, 320px);
     grid-template-rows: auto 1fr;
     grid-template-areas:
-      "title top"
-      "game  bottom";
+      "title panel"
+      "game  panel";
     justify-content: center;
     align-content: stretch;
     column-gap: 3vw;
     row-gap: 0.8vh;
     padding: 0.8vh clamp(16px, 4vw, 48px);
+  }
+
+  /* The panel spans both rows as its own full-height column, so its
+     content height never pushes the title/game rows (score size etc.). */
+  .tt-panel {
+    grid-area: panel;
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 1.4vh;
+    min-height: 0;
   }
 
   /* Title sits above the game on the left, pushing the field down */
@@ -345,8 +362,7 @@
   }
 
   .tt-topbar {
-    grid-area: top;
-    align-self: start;
+    flex: none;
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -358,8 +374,7 @@
   }
 
   .tt-bottombar {
-    grid-area: bottom;
-    align-self: end;
+    flex: none;
     width: 100%;
     display: flex;
     flex-direction: column;

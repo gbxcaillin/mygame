@@ -107,21 +107,6 @@ function App() {
         <img src={titleLogo} alt="Clash of Beasts" />
       </h1>
 
-      <div className="tt-topbar">
-        <button type="button" className="tt-new-game" onClick={() => handleNewGame()}>
-          New Game
-        </button>
-        <div className={`tt-status ${!state.winner ? `turn-${state.turn}` : ""}`}>
-          <span className="tt-status-text">{status}</span>
-          <span className="tt-score">
-            <span className="score-a">P1: {counts.a}</span>
-            <span className="score-b">
-              {opponentType === "ai" ? "CPU" : "P2"}: {counts.b}
-            </span>
-          </span>
-        </div>
-      </div>
-
       <div className="tt-game">
         <section className="tt-hand-shell">
           <Hand
@@ -156,6 +141,22 @@ function App() {
             label="Player 1"
           />
         </section>
+      </div>
+
+      <div className="tt-panel">
+      <div className="tt-topbar">
+        <button type="button" className="tt-new-game" onClick={() => handleNewGame()}>
+          New Game
+        </button>
+        <div className={`tt-status ${!state.winner ? `turn-${state.turn}` : ""}`}>
+          <span className="tt-status-text">{status}</span>
+          <span className="tt-score">
+            <span className="score-a">P1: {counts.a}</span>
+            <span className="score-b">
+              {opponentType === "ai" ? "CPU" : "P2"}: {counts.b}
+            </span>
+          </span>
+        </div>
       </div>
 
       <div className="tt-bottombar">
@@ -205,6 +206,7 @@ function App() {
             Same Wall
           </label>
         </fieldset>
+      </div>
       </div>
 
       {inspecting && (
