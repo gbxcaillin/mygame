@@ -14,11 +14,12 @@
 
 .tt-lightbox-card {
   position: relative;
-  background: #ffffff;
+  background: #0e0c10;
   color: #1a1a1a;
-  border: 2px solid #999;
+  border: 3px solid #999;
   border-radius: 6px;
-  min-width: 220px;
+  overflow: hidden;
+  line-height: 0;
 }
 
 .tt-lightbox-card.owner-a {
@@ -27,6 +28,15 @@
 
 .tt-lightbox-card.owner-b {
   border-color: var(--player-b);
+}
+
+.tt-lightbox-card img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: min(85vw, 420px);
+  max-height: 80vh;
+  object-fit: contain;
 }
 
 .tt-lightbox-close {
