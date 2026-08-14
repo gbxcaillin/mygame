@@ -381,6 +381,15 @@
   stroke: #5c636d;
 }
 
+/* Recessed inlay lines (e.g. the shield's cross) */
+.coin-relief-inlay {
+  fill: none;
+  stroke: #5c636d;
+  stroke-width: 3;
+  stroke-linecap: round;
+  opacity: 0.55;
+}
+
 .tt-coin-caption {
   margin: 0;
   min-height: 1.2em;

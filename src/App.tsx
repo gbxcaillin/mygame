@@ -448,18 +448,11 @@ function App() {
                   <circle className="coin-rim" cx="50" cy="50" r="45" />
                   <circle className="coin-rim-inner" cx="50" cy="50" r="39" />
                   <g className="coin-relief coin-relief-fill">
-                    <g transform="rotate(38 50 50)">
-                      <polygon points="50,16 53,27 52,52 48,52 47,27" />
-                      <rect x="38" y="51" width="24" height="5" rx="1.5" />
-                      <rect x="47.5" y="56" width="5" height="16" rx="1.8" />
-                      <circle cx="50" cy="75" r="4" />
-                    </g>
-                    <g transform="rotate(-38 50 50)">
-                      <polygon points="50,16 53,27 52,52 48,52 47,27" />
-                      <rect x="38" y="51" width="24" height="5" rx="1.5" />
-                      <rect x="47.5" y="56" width="5" height="16" rx="1.8" />
-                      <circle cx="50" cy="75" r="4" />
-                    </g>
+                    <path d="M26 24 L74 24 L74 50 C74 73 50 84 50 84 C50 84 26 73 26 50 Z" />
+                    <path
+                      className="coin-relief-inlay"
+                      d="M50 30 L50 78 M32 34 L68 34"
+                    />
                   </g>
                 </svg>
               </span>
