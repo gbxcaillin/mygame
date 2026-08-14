@@ -104,3 +104,18 @@
   width: 100%;
   height: 100%;
 }
+
+/* Placed cards need an obvious ownership glow inside the socket */
+.tt-cell .tt-card.owner-a {
+  box-shadow:
+    0 0 6px 2px var(--player-a),
+    0 0 18px 6px rgba(77, 140, 232, 0.85),
+    inset 0 0 14px 2px rgba(77, 140, 232, 0.55);
+}
+
+.tt-cell .tt-card.owner-b {
+  box-shadow:
+    0 0 6px 2px var(--player-b),
+    0 0 18px 6px rgba(224, 74, 58, 0.85),
+    inset 0 0 14px 2px rgba(224, 74, 58, 0.55);
+}
