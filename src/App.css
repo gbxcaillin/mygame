@@ -297,3 +297,12 @@
     width: 100%;
   }
 }
+
+/* On 4:3-range landscape (aspect ≤ 3:2), scale the whole layout to 90%
+   so it sits more comfortably with extra margin. 16:9 is unaffected. */
+@media (orientation: landscape) and (max-aspect-ratio: 3/2) {
+  .tt-app {
+    transform: scale(0.9);
+    transform-origin: center center;
+  }
+}
