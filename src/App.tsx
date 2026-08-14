@@ -447,15 +447,19 @@ function App() {
                 <svg viewBox="0 0 100 100" className="tt-coin-emblem" aria-hidden="true">
                   <circle className="coin-rim" cx="50" cy="50" r="45" />
                   <circle className="coin-rim-inner" cx="50" cy="50" r="39" />
-                  <g className="coin-relief coin-relief-stroke">
-                    <line x1="50" y1="38" x2="50" y2="83" />
-                    <line x1="35" y1="40" x2="65" y2="40" />
-                    <line x1="50" y1="40" x2="50" y2="12" />
-                    <path d="M50 12 L44 21 M50 12 L56 21" />
-                    <path d="M36 41 C33 27 34 19 39 13" />
-                    <path d="M64 41 C67 27 66 19 61 13" />
-                    <path d="M36 13 L41 21 M64 13 L59 21" />
-                    <line x1="43" y1="83" x2="57" y2="83" />
+                  <g className="coin-relief coin-relief-fill">
+                    <g transform="rotate(38 50 50)">
+                      <polygon points="50,16 53,27 52,52 48,52 47,27" />
+                      <rect x="38" y="51" width="24" height="5" rx="1.5" />
+                      <rect x="47.5" y="56" width="5" height="16" rx="1.8" />
+                      <circle cx="50" cy="75" r="4" />
+                    </g>
+                    <g transform="rotate(-38 50 50)">
+                      <polygon points="50,16 53,27 52,52 48,52 47,27" />
+                      <rect x="38" y="51" width="24" height="5" rx="1.5" />
+                      <rect x="47.5" y="56" width="5" height="16" rx="1.8" />
+                      <circle cx="50" cy="75" r="4" />
+                    </g>
                   </g>
                 </svg>
               </span>

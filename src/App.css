@@ -367,18 +367,18 @@
 }
 
 .coin-relief-fill {
-  fill: #ecce6c;
-  stroke: #6e5513;
   stroke-width: 1;
   stroke-linejoin: round;
 }
 
-.coin-relief-stroke {
-  fill: none;
-  stroke: #eaeef3;
-  stroke-width: 5;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+.tt-coin-front .coin-relief-fill {
+  fill: #ecce6c;
+  stroke: #6e5513;
+}
+
+.tt-coin-back .coin-relief-fill {
+  fill: #e8ecf1;
+  stroke: #5c636d;
 }
 
 .tt-coin-caption {
