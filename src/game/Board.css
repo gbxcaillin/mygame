@@ -124,38 +124,38 @@
 @keyframes own-glow-a {
   0%, 100% {
     box-shadow:
-      0 0 0 2px #cfe0ff,
-      0 0 12px 5px var(--player-a),
-      0 0 26px 12px rgba(77, 140, 232, 0.85),
-      inset 0 0 20px 5px rgba(77, 140, 232, 0.6);
+      0 0 0 1px rgba(207, 224, 255, 0.7),
+      0 0 6px 2px var(--player-a),
+      0 0 13px 6px rgba(77, 140, 232, 0.45),
+      inset 0 0 11px 3px rgba(77, 140, 232, 0.38);
   }
   50% {
     box-shadow:
-      0 0 0 2px #eaf3ff,
-      0 0 18px 8px var(--player-a),
-      0 0 42px 20px rgba(77, 140, 232, 1),
-      inset 0 0 26px 7px rgba(77, 140, 232, 0.8);
+      0 0 0 1px rgba(234, 243, 255, 0.85),
+      0 0 9px 4px var(--player-a),
+      0 0 21px 10px rgba(77, 140, 232, 0.6),
+      inset 0 0 15px 4px rgba(77, 140, 232, 0.5);
   }
 }
 
 @keyframes own-glow-b {
   0%, 100% {
     box-shadow:
-      0 0 0 2px #ffd6cf,
-      0 0 12px 5px var(--player-b),
-      0 0 26px 12px rgba(224, 74, 58, 0.85),
-      inset 0 0 20px 5px rgba(224, 74, 58, 0.6);
+      0 0 0 1px rgba(255, 214, 207, 0.7),
+      0 0 6px 2px var(--player-b),
+      0 0 13px 6px rgba(224, 74, 58, 0.45),
+      inset 0 0 11px 3px rgba(224, 74, 58, 0.38);
   }
   50% {
     box-shadow:
-      0 0 0 2px #ffece8,
-      0 0 18px 8px var(--player-b),
-      0 0 42px 20px rgba(224, 74, 58, 1),
-      inset 0 0 26px 7px rgba(224, 74, 58, 0.8);
+      0 0 0 1px rgba(255, 236, 232, 0.85),
+      0 0 9px 4px var(--player-b),
+      0 0 21px 10px rgba(224, 74, 58, 0.6),
+      inset 0 0 15px 4px rgba(224, 74, 58, 0.5);
   }
 }
 
-/* Steady (still intense) glow when motion is reduced */
+/* Steady glow when motion is reduced */
 @media (prefers-reduced-motion: reduce) {
   .tt-cell .tt-card.owner-a,
   .tt-cell .tt-card.owner-b {
@@ -163,16 +163,16 @@
   }
   .tt-cell .tt-card.owner-a {
     box-shadow:
-      0 0 0 2px #eaf3ff,
-      0 0 16px 7px var(--player-a),
-      0 0 38px 18px rgba(77, 140, 232, 0.95),
-      inset 0 0 24px 6px rgba(77, 140, 232, 0.75);
+      0 0 0 1px rgba(234, 243, 255, 0.8),
+      0 0 8px 3px var(--player-a),
+      0 0 18px 8px rgba(77, 140, 232, 0.55),
+      inset 0 0 13px 4px rgba(77, 140, 232, 0.5);
   }
   .tt-cell .tt-card.owner-b {
     box-shadow:
-      0 0 0 2px #ffece8,
-      0 0 16px 7px var(--player-b),
-      0 0 38px 18px rgba(224, 74, 58, 0.95),
-      inset 0 0 24px 6px rgba(224, 74, 58, 0.75);
+      0 0 0 1px rgba(255, 236, 232, 0.8),
+      0 0 8px 3px var(--player-b),
+      0 0 18px 8px rgba(224, 74, 58, 0.55),
+      inset 0 0 13px 4px rgba(224, 74, 58, 0.5);
   }
 }

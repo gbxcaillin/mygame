@@ -137,11 +137,11 @@
     transform: rotateY(0deg) scale(1);
   }
   50% {
-    transform: rotateY(630deg) scale(1.14);
+    transform: rotateY(270deg) scale(1.06);
   }
   100% {
-    /* 1260deg = 3.5 turns -> ends showing the back (new owner) */
-    transform: rotateY(1260deg) scale(1);
+    /* 540deg = 1.5 turns -> ends showing the back (new owner) */
+    transform: rotateY(540deg) scale(1);
   }
 }
 
