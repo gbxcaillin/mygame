@@ -1,39 +1,30 @@
-/* Hand styling — backdrop art provides slot frames */
+/* Basic hand row */
 
 .tt-hand {
-  position: relative;
-  display: flex;
-  align-items: center;
+  width: 100%;
 }
 
 .tt-hand-label {
-  position: absolute;
-  top: 4px;
-  left: 4px;
-  font-size: 11px;
+  margin: 0 0 6px;
+  font-size: 13px;
   font-weight: 600;
-  color: rgba(232, 220, 200, 0.3);
   text-transform: uppercase;
-  letter-spacing: 1px;
-  margin: 0;
-  z-index: 1;
-  pointer-events: none;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+  letter-spacing: 0.5px;
+  opacity: 0.6;
 }
 
 .tt-hand.active .tt-hand-label {
-  color: rgba(232, 220, 200, 0.7);
+  opacity: 1;
 }
 
 .tt-hand-cards {
   display: flex;
-  gap: var(--card-gap, 10px);
-  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--card-gap, 6px);
 }
 
 .tt-hand-empty {
   font-size: 13px;
-  color: #5a5050;
+  opacity: 0.6;
   margin: 0;
-  padding: 60px 0;
 }

@@ -1,383 +1,118 @@
-/* App layout — viewport-relative units to match backdrop scaling
-   Landscape: vh-based (170px cards at 1080px height = 15.74vh)
-   Portrait:  vw-based (195px cards at 1080px width  = 18vw)
-   Ultra-wide: fixed px (stage capped at 1120px)
-*/
+/* Basic functional layout — no backdrop art */
 
 :root {
-  --card-size: 15.74vh;
-  --cell-size: 15.74vh;
-  --grid-gap: 0.74vh;
-  --card-gap: 0.93vh;
-  --section-gap: 0.74vh;
-  --title-height: 7.96vh;
-  --controls-height: 5.74vh;
-  --bottom-pad: 1.48vh;
+  --card-size: 88px;
+  --cell-size: 96px;
+  --grid-gap: 6px;
+  --card-gap: 6px;
 }
-
-@media (min-aspect-ratio: 3/2) {
-  :root {
-    --section-gap: 0.56vh;
-  }
-}
-
-@media (min-aspect-ratio: 2/1) {
-  :root {
-    --card-size: 178px;
-    --cell-size: 178px;
-    --grid-gap: 6px;
-    --card-gap: 8px;
-    --section-gap: 6px;
-    --title-height: 74px;
-    --controls-height: 54px;
-    --bottom-pad: 12px;
-  }
-}
-
-@media (orientation: portrait) {
-  :root {
-    --card-size: 18vw;
-    --cell-size: 18vw;
-    --grid-gap: 1.11vw;
-    --card-gap: 1.11vw;
-    --section-gap: 2.22vw;
-    --title-height: 23.15vw;
-    --controls-height: 17.59vw;
-    --bottom-pad: 0px;
-  }
-}
-
-/* ── Utility ── */
-
-.visually-hidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-}
-
-/* ── App shell ── */
 
 .tt-app {
-  position: relative;
-  width: 100%;
-  height: 100dvh;
-  overflow: hidden;
-  display: flex;
-  justify-content: center;
-}
-
-.tt-backdrop {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center 0%;
-  z-index: 0;
-  pointer-events: none;
-}
-
-.tt-stage {
-  position: relative;
-  z-index: 1;
-  width: 96vw;
-  height: 100dvh;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 16px;
   display: flex;
   flex-direction: column;
+  gap: 16px;
   align-items: center;
-  justify-content: flex-end;
-  gap: var(--section-gap);
-  padding-bottom: var(--bottom-pad);
-  box-sizing: border-box;
 }
 
-@media (min-aspect-ratio: 3/2) {
-  .tt-stage {
-    width: 93vw;
-  }
-}
-
-@media (min-aspect-ratio: 2/1) {
-  .tt-stage {
-    width: 1120px;
-  }
-}
-
-@media (orientation: portrait) {
-  .tt-stage {
-    width: 95vw;
-    justify-content: flex-start;
-    padding-top: 1.67vw;
-    padding-bottom: 0;
-  }
-
-  .tt-backdrop {
-    object-position: center;
-  }
-}
-
-/* ── Title (visual handled by backdrop art) ── */
-
-.tt-title-area {
-  flex: none;
-  height: var(--title-height);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* ── Controls ── */
-
-.tt-controls-wrap {
-  flex: none;
-  min-height: var(--controls-height);
+.tt-header {
   width: 100%;
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  justify-content: center;
-  gap: 6px 14px;
-  padding: 0 16px;
-  box-sizing: border-box;
+  justify-content: space-between;
+  gap: 12px;
 }
 
-.tt-status-bar,
-.tt-settings-bar {
-  display: contents;
+.tt-header h1 {
+  margin: 0;
+  font-size: 22px;
 }
 
 .tt-help-btn {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  border: 1px solid rgba(232, 220, 200, 0.25);
-  background: rgba(20, 18, 24, 0.6);
-  color: #e8dcc8;
-  font-size: 15px;
-  font-weight: 700;
+  padding: 6px 12px;
   cursor: pointer;
-  flex: none;
-  backdrop-filter: blur(4px);
 }
 
-.tt-help-btn:hover {
-  background: rgba(50, 44, 56, 0.8);
-}
+/* Status / turn + score */
 
-.tt-turn-indicator {
-  font-size: 15px;
-  font-weight: 600;
-  color: #e8dcc8;
-  padding: 5px 14px;
+.tt-status {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
   border-radius: 6px;
-  background: rgba(20, 18, 24, 0.5);
-  backdrop-filter: blur(4px);
+  font-weight: 600;
 }
 
-.tt-turn-indicator.turn-A {
-  border-left: 3px solid var(--player-a);
+.tt-status.turn-A {
+  border-left: 4px solid var(--player-a);
 }
 
-.tt-turn-indicator.turn-B {
-  border-left: 3px solid var(--player-b);
+.tt-status.turn-B {
+  border-left: 4px solid var(--player-b);
 }
 
 .tt-score {
   display: flex;
-  gap: 10px;
+  gap: 14px;
   font-size: 14px;
-  font-weight: 600;
 }
 
-.score-a { color: var(--player-a); }
-.score-b { color: var(--player-b); }
+.score-a {
+  color: var(--player-a);
+}
+
+.score-b {
+  color: var(--player-b);
+}
+
+/* Controls */
+
+.tt-controls {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
 
 .tt-new-game {
-  padding: 5px 14px;
-  border-radius: 6px;
-  border: 1px solid rgba(232, 220, 200, 0.2);
-  background: rgba(20, 18, 24, 0.6);
-  color: #e8dcc8;
-  font-size: 13px;
-  font-weight: 600;
+  padding: 6px 14px;
   cursor: pointer;
-  backdrop-filter: blur(4px);
 }
 
-.tt-new-game:hover {
-  background: rgba(50, 44, 56, 0.8);
+.tt-field {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
 }
+
+/* Rules */
 
 .tt-rules {
-  position: relative;
-}
-
-.tt-rules summary {
-  font-size: 13px;
-  color: #e8dcc8;
-  cursor: pointer;
-  padding: 5px 12px;
-  border-radius: 6px;
-  background: rgba(20, 18, 24, 0.6);
-  border: 1px solid rgba(232, 220, 200, 0.2);
-  list-style: none;
-  backdrop-filter: blur(4px);
-}
-
-.tt-rules summary::-webkit-details-marker {
-  display: none;
-}
-
-.tt-rules-content {
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  margin-top: 4px;
-  background: rgba(20, 18, 24, 0.95);
-  border: 1px solid rgba(232, 220, 200, 0.15);
-  border-radius: 6px;
-  padding: 8px 14px;
+  width: 100%;
   display: flex;
-  flex-direction: column;
-  gap: 6px;
-  font-size: 13px;
-  z-index: 10;
-  white-space: nowrap;
-  backdrop-filter: blur(8px);
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 8px 12px;
 }
 
-.tt-rules-content label {
+.tt-rules legend {
+  font-weight: 600;
+  padding: 0 4px;
+}
+
+.tt-rules label {
   display: flex;
   align-items: center;
-  gap: 6px;
-  color: #b8a99a;
-  cursor: pointer;
-}
-
-.tt-opponent-label,
-.tt-difficulty-label {
-  font-size: 13px;
-  color: #b8a99a;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.tt-opponent-label select,
-.tt-difficulty-label select {
-  background: rgba(20, 18, 24, 0.7);
-  color: #e8dcc8;
-  border: 1px solid rgba(232, 220, 200, 0.2);
-  border-radius: 4px;
-  padding: 4px 8px;
-  font-size: 13px;
-  backdrop-filter: blur(4px);
-}
-
-/* ── Portrait controls: status below title, settings at bottom ── */
-
-@media (orientation: portrait) {
-  .tt-controls-wrap {
-    display: contents;
-  }
-
-  .tt-status-bar {
-    display: flex;
-    align-items: center;
-    gap: 2vw;
-    padding: 0;
-    background: none;
-    backdrop-filter: none;
-    border-radius: 0;
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  .tt-settings-bar {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1.5vw 2vw;
-    order: 5;
-    margin-top: auto;
-    width: 100%;
-    box-sizing: border-box;
-    background: rgba(20, 18, 24, 0.85);
-    backdrop-filter: blur(8px);
-    border-radius: 1.5vw 1.5vw 0 0;
-    padding: 2vw 3vw;
-    padding-bottom: max(2vw, env(safe-area-inset-bottom, 0px));
-  }
-
-  .tt-hand-shell-b {
-    margin-top: 8vw;
-  }
-
-  .tt-hand-shell-a {
-    margin-top: 10vw;
-  }
-
-  .tt-help-btn {
-    width: 7vw;
-    height: 7vw;
-    font-size: 3.5vw;
-    margin-right: auto;
-  }
-
-  .tt-turn-indicator {
-    font-size: 3.2vw;
-    padding: 1.2vw 3vw;
-  }
-
-  .tt-score {
-    font-size: 3vw;
-    gap: 2vw;
-  }
-
-  .tt-new-game {
-    font-size: 3vw;
-    padding: 1.2vw 3vw;
-    margin-left: auto;
-  }
-
-  .tt-rules summary {
-    font-size: 3vw;
-    padding: 1.2vw 3vw;
-  }
-
-  .tt-rules-content {
-    top: auto;
-    bottom: 100%;
-    margin-top: 0;
-    margin-bottom: 4px;
-  }
-
-  .tt-opponent-label,
-  .tt-difficulty-label {
-    font-size: 3vw;
-  }
-
-  .tt-opponent-label select,
-  .tt-difficulty-label select {
-    font-size: 3vw;
-    padding: 1vw 2vw;
-  }
-}
-
-/* ── Gameplay sections ── */
-
-.tt-hand-shell {
-  flex: none;
-}
-
-.tt-board-area {
-  flex: none;
+  gap: 4px;
+  font-size: 14px;
 }

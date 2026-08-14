@@ -1,0 +1,34 @@
+:root {
+  --player-a: #4d8ce8;
+  --player-a-bg: rgba(77, 140, 232, 0.1);
+  --player-b: #d44a3e;
+  --player-b-bg: rgba(212, 74, 62, 0.1);
+
+  color-scheme: dark;
+  color: #b8a99a;
+  background: #111015;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  overscroll-behavior: none;
+  background: #111015;
+}
+
+#root {
+  width: 100%;
+  height: 100dvh;
+  margin: 0;
+  overflow: hidden;
+}

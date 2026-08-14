@@ -1,9 +1,10 @@
-/* Basic card inspect overlay */
+/* CardLightbox — to be rebuilt from wireframes */
 
 .tt-lightbox {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(8, 6, 10, 0.8);
+  backdrop-filter: blur(3px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -14,19 +15,18 @@
 
 .tt-lightbox-card {
   position: relative;
-  background: #ffffff;
-  color: #1a1a1a;
-  border: 2px solid #999;
-  border-radius: 6px;
-  min-width: 220px;
+  overflow: hidden;
+  background: #1e1a20;
+  line-height: 0;
 }
 
-.tt-lightbox-card.owner-a {
-  border-color: var(--player-a);
-}
-
-.tt-lightbox-card.owner-b {
-  border-color: var(--player-b);
+.tt-lightbox-card img {
+  display: block;
+  max-width: min(85vw, 380px);
+  max-height: 78dvh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
 }
 
 .tt-lightbox-close {
@@ -35,10 +35,10 @@
   right: 8px;
   width: 30px;
   height: 30px;
-  border-radius: 4px;
-  background: #f4f4f5;
-  border: 1px solid #ccc;
-  color: #1a1a1a;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  border: none;
+  color: #1a1a1f;
   font-size: 18px;
   line-height: 1;
   cursor: pointer;
@@ -51,6 +51,8 @@
   flex-direction: column;
   align-items: center;
   gap: 16px;
+  min-width: 220px;
+  line-height: normal;
 }
 
 .tt-lightbox-name {
@@ -64,5 +66,4 @@
   gap: 10px;
   font-size: 24px;
   font-weight: 700;
-  text-align: center;
 }

@@ -1,0 +1,38 @@
+/* Board grid — backdrop art provides ornate grid frames */
+
+.tt-board {
+  display: grid;
+  grid-template-columns: repeat(3, var(--cell-size, 170px));
+  grid-template-rows: repeat(3, var(--cell-size, 170px));
+  gap: var(--grid-gap, 8px);
+}
+
+.tt-cell {
+  width: var(--cell-size, 170px);
+  height: var(--cell-size, 170px);
+  position: relative;
+}
+
+.tt-empty-cell {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.tt-empty-cell:hover:not(:disabled) {
+  background: rgba(232, 220, 200, 0.06);
+}
+
+.tt-empty-cell:disabled {
+  cursor: default;
+}
+
+.tt-cell .tt-card,
+.tt-cell .tt-card-flip-container {
+  width: 100%;
+  height: 100%;
+}
