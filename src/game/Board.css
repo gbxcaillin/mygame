@@ -125,6 +125,39 @@
   animation: own-glow-b 1.7s ease-in-out infinite;
 }
 
+/* Pop-in when a card is played (runs alongside the glow) */
+.tt-cell.placing > .tt-card.owner-a {
+  animation: own-glow-a 1.7s ease-in-out infinite, place-pop 0.26s ease-out;
+}
+
+.tt-cell.placing > .tt-card.owner-b {
+  animation: own-glow-b 1.7s ease-in-out infinite, place-pop 0.26s ease-out;
+}
+
+@keyframes place-pop {
+  0% {
+    transform: scale(0.55) translateY(-8px);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.07);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tt-cell.placing > .tt-card.owner-a {
+    animation: own-glow-a 1.7s ease-in-out infinite;
+  }
+  .tt-cell.placing > .tt-card.owner-b {
+    animation: own-glow-b 1.7s ease-in-out infinite;
+  }
+}
+
 @keyframes own-glow-a {
   0%, 100% {
     box-shadow:

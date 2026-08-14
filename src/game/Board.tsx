@@ -8,13 +8,35 @@ interface BoardProps {
   onCellClick: (index: number) => void;
   canPlace: boolean;
   justCaptured: number[];
+  justPlaced?: number | null;
+  placeNonce?: number;
   onInspect: (cell: PlacedCard) => void;
 }
 
-export function Board({ board, onCellClick, canPlace, justCaptured, onInspect }: BoardProps) {
+export function Board({
+  board,
+  onCellClick,
+  canPlace,
+  justCaptured,
+  justPlaced = null,
+  placeNonce = 0,
+  onInspect,
+}: BoardProps) {
   const prevBoardRef = useRef<Cell[]>(board);
   const [flipping, setFlipping] = useState<Set<number>>(new Set());
   const [prevOwners, setPrevOwners] = useState<Map<number, PlayerId>>(new Map());
+  const [placing, setPlacing] = useState<number | null>(null);
+
+  // Pop-in animation on the cell that was just played.
+  useEffect(() => {
+    if (justPlaced == null) return;
+    setPlacing(justPlaced);
+    const timer = setTimeout(() => setPlacing(null), 300);
+    return () => clearTimeout(timer);
+    // placeNonce advances every placement so the effect re-fires even when
+    // the same cell index is reused across a new game.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [placeNonce]);
 
   useEffect(() => {
     if (justCaptured.length === 0) {
@@ -42,7 +64,7 @@ export function Board({ board, onCellClick, canPlace, justCaptured, onInspect }:
   return (
     <div className="tt-board">
       {board.map((cell, i) => (
-        <div key={i} className="tt-cell">
+        <div key={i} className={`tt-cell ${placing === i ? "placing" : ""}`}>
           {cell ? (
             <CardView
               card={cell.card}

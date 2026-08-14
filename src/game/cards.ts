@@ -108,12 +108,25 @@ function shuffle<T>(items: T[]): T[] {
   return copy;
 }
 
+const clone = (c: Card): Card => ({ ...c, ranks: { ...c.ranks } });
+
 /** Deals two disjoint 5-card hands from the pool, cloning each card so board/hand instances are independent. */
 export function dealHands(): { handA: Card[]; handB: Card[] } {
   const shuffled = shuffle(CARD_POOL);
-  const clone = (c: Card): Card => ({ ...c, ranks: { ...c.ranks } });
   return {
     handA: shuffled.slice(0, 5).map(clone),
     handB: shuffled.slice(5, 10).map(clone),
   };
+}
+
+/** Fresh independent clones of the given cards (for a player-chosen hand). */
+export function cloneHand(cards: Card[]): Card[] {
+  return cards.map(clone);
+}
+
+/** Deals a 5-card hand from the pool excluding the given card ids. */
+export function dealHandExcluding(excludeIds: Set<string>): Card[] {
+  return shuffle(CARD_POOL.filter((c) => !excludeIds.has(c.id)))
+    .slice(0, 5)
+    .map(clone);
 }

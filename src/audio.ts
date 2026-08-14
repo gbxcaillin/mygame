@@ -83,6 +83,16 @@ export function playLose() {
   playSfx("lose");
 }
 
+// Haptic feedback (mobile), gated on the Effects toggle.
+export function vibrate(pattern: number | number[]) {
+  if (!settings.sfx) return;
+  try {
+    navigator.vibrate?.(pattern);
+  } catch {
+    /* unsupported */
+  }
+}
+
 // Browsers block audio until the first user gesture. Arm a one-time
 // listener that starts the music once the player interacts.
 let armed = false;

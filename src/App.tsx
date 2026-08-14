@@ -1,10 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Board } from "./game/Board";
 import { Hand } from "./game/Hand";
 import { CardLightbox } from "./game/CardLightbox";
 import { TutorialModal } from "./game/TutorialModal";
 import { createInitialState, placeCard } from "./game/engine";
-import { dealHands } from "./game/cards";
+import { dealHands, cloneHand, dealHandExcluding, CARD_POOL } from "./game/cards";
 import { chooseAiMove, DIFFICULTY_LABELS } from "./game/ai";
 import type { Difficulty } from "./game/ai";
 import { DEFAULT_RULES } from "./game/types";
@@ -20,15 +20,25 @@ import {
   playLose,
   setMusicEnabled,
   setSfxEnabled,
+  vibrate,
 } from "./audio";
 import "./App.css";
 
 type OpponentType = "human" | "ai";
 const AI_THINK_DELAY_MS = 1400;
 
-function newGame(rules: RuleSet): GameState {
-  const { handA, handB } = dealHands();
-  return createInitialState(handA, handB, "A", rules);
+function newGame(rules: RuleSet, chosenHandA?: Card[]): GameState {
+  let handA: Card[];
+  let handB: Card[];
+  if (chosenHandA) {
+    handA = cloneHand(chosenHandA);
+    handB = dealHandExcluding(new Set(chosenHandA.map((c) => c.id)));
+  } else {
+    ({ handA, handB } = dealHands());
+  }
+  // Coin flip: randomize who moves first.
+  const starter: PlayerId = Math.random() < 0.5 ? "A" : "B";
+  return createInitialState(handA, handB, starter, rules);
 }
 
 function App() {
@@ -43,17 +53,32 @@ function App() {
   const [audio, setAudio] = useState(getAudioSettings);
   const [bannerDismissed, setBannerDismissed] = useState(false);
   const [started, setStarted] = useState(false);
+  const [pickHand, setPickHand] = useState(false);
+  const [deckOpen, setDeckOpen] = useState(false);
+  const [picked, setPicked] = useState<Card[]>([]);
+  const [coinToast, setCoinToast] = useState<string | null>(null);
+  const coinTimer = useRef<number | undefined>(undefined);
 
-  // Card-flip sound whenever a move captures one or more cards.
+  // Flip sound + haptics on capture; light haptic on a plain placement.
   useEffect(() => {
-    if (state.lastMove && state.lastMove.captured.length > 0) playFlip();
+    if (!state.lastMove) return;
+    if (state.lastMove.captured.length > 0) {
+      playFlip();
+      vibrate(35);
+    } else {
+      vibrate(12);
+    }
   }, [state.lastMove]);
 
-  // Win / lose stinger + reset the banner when a match ends or restarts.
+  // Win / lose stinger + haptics; reset the banner when a match ends/restarts.
   useEffect(() => {
-    if (state.winner === "A") playWin();
-    else if (state.winner === "B") playLose();
-    else if (state.winner === "draw") playLose();
+    if (state.winner === "A") {
+      playWin();
+      vibrate([50, 40, 70]);
+    } else if (state.winner === "B" || state.winner === "draw") {
+      playLose();
+      vibrate(160);
+    }
     if (!state.winner) setBannerDismissed(false);
   }, [state.winner]);
 
@@ -93,15 +118,61 @@ function App() {
     setSelectedCard(null);
   }
 
-  function handleNewGame(nextRules: RuleSet = rules) {
-    setState(newGame(nextRules));
+  function showCoin(starter: PlayerId) {
+    const first =
+      starter === "A"
+        ? opponentType === "ai"
+          ? "You go first!"
+          : "Player 1 goes first!"
+        : opponentType === "ai"
+          ? "Computer goes first!"
+          : "Player 2 goes first!";
+    setCoinToast(`🪙 ${first}`);
+    window.clearTimeout(coinTimer.current);
+    coinTimer.current = window.setTimeout(() => setCoinToast(null), 1900);
+  }
+
+  function startGame(chosenHandA?: Card[], nextRules: RuleSet = rules) {
+    const next = newGame(nextRules, chosenHandA);
+    setState(next);
     setSelectedCard(null);
+    setBannerDismissed(false);
+    showCoin(next.turn);
+  }
+
+  // "New Game": open the card picker if enabled, else deal a fresh game.
+  function handleNewGame() {
+    if (pickHand) {
+      setPicked([]);
+      setDeckOpen(true);
+    } else {
+      startGame();
+    }
   }
 
   function toggleRule(key: keyof RuleSet) {
     const nextRules = { ...rules, [key]: !rules[key] };
     setRules(nextRules);
-    handleNewGame(nextRules);
+    startGame(undefined, nextRules);
+  }
+
+  function togglePick(card: Card) {
+    setPicked((prev) => {
+      if (prev.some((c) => c.id === card.id)) return prev.filter((c) => c.id !== card.id);
+      if (prev.length >= 5) return prev;
+      return [...prev, card];
+    });
+  }
+
+  function randomFill() {
+    const shuffled = [...CARD_POOL].sort(() => Math.random() - 0.5);
+    setPicked(shuffled.slice(0, 5));
+  }
+
+  function confirmDeck() {
+    if (picked.length !== 5) return;
+    startGame(picked);
+    setDeckOpen(false);
   }
 
   function toggleMusic() {
@@ -120,6 +191,10 @@ function App() {
   function handleStart() {
     startMusic();
     setStarted(true);
+    if (pickHand) {
+      setPicked([]);
+      setDeckOpen(true);
+    }
   }
 
   const player2Label = opponentType === "ai" ? "Computer" : "Player 2";
@@ -158,6 +233,8 @@ function App() {
         <source srcSet={bgPortrait} media="(orientation: portrait)" />
         <img src={bgLandscape} className="tt-backdrop" alt="" aria-hidden="true" />
       </picture>
+      <div className="tt-flame tt-flame-left" aria-hidden="true" />
+      <div className="tt-flame tt-flame-right" aria-hidden="true" />
 
       <div className="tt-app">
       <h1 className="tt-title">
@@ -183,6 +260,8 @@ function App() {
             onCellClick={handleCellClick}
             canPlace={!!selectedCard && !state.winner}
             justCaptured={state.lastMove?.captured ?? []}
+            justPlaced={state.lastMove?.cellIndex ?? null}
+            placeNonce={state.board.reduce((n, c) => n + (c ? 1 : 0), 0)}
             onInspect={(cell) => setInspecting({ card: cell.card, owner: cell.owner })}
           />
         </div>
@@ -274,6 +353,10 @@ function App() {
             <input type="checkbox" checked={audio.sfx} onChange={toggleSfx} />
             Effects
           </label>
+          <label>
+            <input type="checkbox" checked={pickHand} onChange={() => setPickHand((v) => !v)} />
+            Choose my hand
+          </label>
         </fieldset>
       </div>
       </div>
@@ -317,6 +400,57 @@ function App() {
                 <input type="checkbox" checked={audio.sfx} onChange={toggleSfx} />
                 Effects
               </label>
+              <label>
+                <input type="checkbox" checked={pickHand} onChange={() => setPickHand((v) => !v)} />
+                Choose cards
+              </label>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {coinToast && <div className="tt-coin-toast">{coinToast}</div>}
+
+      {deckOpen && (
+        <div className="tt-deck-veil">
+          <div className="tt-deck">
+            <div className="tt-deck-head">
+              <h2>Choose your hand</h2>
+              <span className="tt-deck-count">{picked.length} / 5</span>
+            </div>
+            <div className="tt-deck-grid">
+              {CARD_POOL.map((card) => {
+                const sel = picked.some((c) => c.id === card.id);
+                return (
+                  <button
+                    key={card.id}
+                    type="button"
+                    className={`tt-deck-card ${sel ? "sel" : ""}`}
+                    onClick={() => togglePick(card)}
+                    disabled={!sel && picked.length >= 5}
+                    title={card.name}
+                  >
+                    {card.image ? (
+                      <img src={card.image} alt={card.name} draggable={false} />
+                    ) : (
+                      <span className="tt-deck-name">{card.name}</span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+            <div className="tt-deck-actions">
+              <button type="button" className="tt-new-game" onClick={randomFill}>
+                Random
+              </button>
+              <button
+                type="button"
+                className="tt-new-game tt-deck-start"
+                onClick={confirmDeck}
+                disabled={picked.length !== 5}
+              >
+                Start Battle
+              </button>
             </div>
           </div>
         </div>

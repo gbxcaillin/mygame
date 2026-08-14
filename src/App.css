@@ -203,6 +203,192 @@
   accent-color: var(--gold);
 }
 
+/* ── Animated brazier flames (ambient light over the backdrop) ── */
+
+.tt-flame {
+  position: fixed;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: 50%;
+  filter: blur(7px);
+  mix-blend-mode: screen;
+  width: 9vmin;
+  height: 15vmin;
+  bottom: 26vh;
+  will-change: opacity, transform;
+}
+
+.tt-flame-left {
+  left: 4vw;
+  background: radial-gradient(circle, rgba(255, 170, 70, 0.6), rgba(255, 90, 30, 0.22) 55%, transparent 72%);
+  animation: flame-flicker-a 0.26s ease-in-out infinite alternate;
+}
+
+.tt-flame-right {
+  right: 4vw;
+  background: radial-gradient(circle, rgba(90, 170, 255, 0.6), rgba(60, 110, 255, 0.22) 55%, transparent 72%);
+  animation: flame-flicker-b 0.3s ease-in-out infinite alternate;
+}
+
+@keyframes flame-flicker-a {
+  from { opacity: 0.5; transform: scaleY(1) translateY(0); }
+  to { opacity: 0.9; transform: scaleY(1.14) translateY(-3px); }
+}
+
+@keyframes flame-flicker-b {
+  from { opacity: 0.55; transform: scaleY(1.05) translateY(-1px); }
+  to { opacity: 0.85; transform: scaleY(1.2) translateY(-4px); }
+}
+
+@media (orientation: portrait) {
+  .tt-flame {
+    bottom: 33vh;
+    width: 7vmin;
+    height: 13vmin;
+  }
+  .tt-flame-left { left: 3vw; }
+  .tt-flame-right { right: 3vw; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tt-flame {
+    animation: none;
+    opacity: 0.7;
+  }
+}
+
+/* ── Coin-flip toast ── */
+
+.tt-coin-toast {
+  position: fixed;
+  top: 12vh;
+  left: 50%;
+  z-index: 75;
+  padding: 10px 22px;
+  border-radius: 8px;
+  background: rgba(10, 7, 18, 0.9);
+  border: 2px solid var(--gold);
+  color: var(--gold-bright);
+  font-weight: 800;
+  font-size: clamp(16px, 4vw, 22px);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+  white-space: nowrap;
+  pointer-events: none;
+  animation: coin-toast 1.9s ease-in-out both;
+}
+
+@keyframes coin-toast {
+  0% { opacity: 0; transform: translateX(-50%) translateY(-10px) scale(0.9); }
+  12%, 80% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-8px) scale(0.95); }
+}
+
+/* ── Deck / hand picker ── */
+
+.tt-deck-veil {
+  position: fixed;
+  inset: 0;
+  z-index: 82;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  box-sizing: border-box;
+  background: rgba(4, 3, 8, 0.9);
+  backdrop-filter: blur(4px);
+}
+
+.tt-deck {
+  width: min(96vw, 760px);
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  padding: 14px;
+  border-radius: 12px;
+  border: 2px solid var(--gold);
+  background: linear-gradient(180deg, #14101c, #0a0712);
+}
+
+.tt-deck-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.tt-deck-head h2 {
+  margin: 0;
+  color: var(--gold-bright);
+  font-size: clamp(18px, 4vw, 24px);
+}
+
+.tt-deck-count {
+  color: var(--gold);
+  font-weight: 800;
+  font-size: 16px;
+}
+
+.tt-deck-grid {
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(62px, 1fr));
+  gap: 8px;
+  padding: 4px;
+}
+
+.tt-deck-card {
+  aspect-ratio: 1;
+  padding: 0;
+  border: 2px solid rgba(20, 16, 12, 0.9);
+  border-radius: 4px;
+  background: #0e0c10;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.tt-deck-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.tt-deck-card.sel {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 2px var(--gold), 0 0 10px 2px rgba(232, 198, 90, 0.6);
+}
+
+.tt-deck-card:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.tt-deck-name {
+  display: block;
+  padding: 4px;
+  font-size: 10px;
+  color: #cdc2aa;
+}
+
+.tt-deck-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.tt-deck-actions .tt-new-game {
+  flex: 1;
+  font-size: 15px;
+  padding: 10px;
+}
+
+.tt-deck-start:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
 /* ── Start screen ── */
 
 .tt-start-veil {
