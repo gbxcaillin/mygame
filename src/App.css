@@ -512,6 +512,10 @@
   display: block;
 }
 
+.tt-deck-card {
+  position: relative;
+}
+
 .tt-deck-card.sel {
   border-color: var(--gold);
   box-shadow: 0 0 0 2px var(--gold), 0 0 12px 3px rgba(232, 198, 90, 0.65);
@@ -519,6 +523,56 @@
 
 .tt-deck-card.maxed {
   opacity: 0.45;
+}
+
+/* Selected tick */
+.tt-deck-tick {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: clamp(20px, 4vw, 26px);
+  height: clamp(20px, 4vw, 26px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--gold);
+  color: #16110a;
+  font-weight: 900;
+  font-size: clamp(13px, 2.6vw, 17px);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+}
+
+/* Magnify button — tap to enlarge without selecting */
+.tt-deck-zoom {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: clamp(28px, 6vw, 40px);
+  height: clamp(28px, 6vw, 40px);
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 2px solid var(--gold);
+  background: rgba(10, 7, 18, 0.82);
+  cursor: pointer;
+}
+
+.tt-deck-zoom:hover {
+  background: #1a1220;
+  border-color: var(--gold-bright);
+}
+
+.tt-deck-zoom svg {
+  width: 58%;
+  height: 58%;
+  fill: none;
+  stroke: var(--gold-bright);
+  stroke-width: 2.4;
+  stroke-linecap: round;
 }
 
 .tt-deck-name {
