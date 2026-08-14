@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Board } from "./game/Board";
 import { Hand } from "./game/Hand";
 import { CardLightbox } from "./game/CardLightbox";
@@ -56,8 +56,7 @@ function App() {
   const [pickHand, setPickHand] = useState(false);
   const [deckOpen, setDeckOpen] = useState(false);
   const [picked, setPicked] = useState<Card[]>([]);
-  const [coinToast, setCoinToast] = useState<string | null>(null);
-  const coinTimer = useRef<number | undefined>(undefined);
+  const [coin, setCoin] = useState<{ pending: GameState; phase: "ready" | "flipping" | "done" } | null>(null);
 
   // Flip sound + haptics on capture; light haptic on a plain placement.
   useEffect(() => {
@@ -83,7 +82,7 @@ function App() {
   }, [state.winner]);
 
   useEffect(() => {
-    if (opponentType !== "ai" || state.turn !== "B" || state.winner) {
+    if (!started || coin || opponentType !== "ai" || state.turn !== "B" || state.winner) {
       setAiThinking(false);
       return;
     }
@@ -96,7 +95,7 @@ function App() {
       setAiThinking(false);
     }, AI_THINK_DELAY_MS);
     return () => clearTimeout(timer);
-  }, [state, opponentType, difficulty]);
+  }, [state, opponentType, difficulty, started, coin]);
 
   const counts = useMemo(() => {
     let a = 0;
@@ -118,26 +117,32 @@ function App() {
     setSelectedCard(null);
   }
 
-  function showCoin(starter: PlayerId) {
-    const first =
-      starter === "A"
-        ? opponentType === "ai"
-          ? "You go first!"
-          : "Player 1 goes first!"
-        : opponentType === "ai"
-          ? "Computer goes first!"
-          : "Player 2 goes first!";
-    setCoinToast(`🪙 ${first}`);
-    window.clearTimeout(coinTimer.current);
-    coinTimer.current = window.setTimeout(() => setCoinToast(null), 1900);
-  }
-
-  function startGame(chosenHandA?: Card[], nextRules: RuleSet = rules) {
-    const next = newGame(nextRules, chosenHandA);
-    setState(next);
+  function commitMatch(pending: GameState) {
+    setState(pending);
     setSelectedCard(null);
     setBannerDismissed(false);
-    showCoin(next.turn);
+  }
+
+  // Deal a new match. withCoin opens the interactive coin toss (which
+  // commits the match when the flip lands); otherwise commit immediately.
+  function startGame(chosenHandA?: Card[], nextRules: RuleSet = rules, withCoin = true) {
+    const pending = newGame(nextRules, chosenHandA);
+    if (withCoin) setCoin({ pending, phase: "ready" });
+    else commitMatch(pending);
+  }
+
+  // Tap the coin to flip: spin, reveal who goes first, then start the match.
+  function flipCoin() {
+    if (!coin || coin.phase !== "ready") return;
+    const pending = coin.pending;
+    vibrate(25);
+    setCoin({ pending, phase: "flipping" });
+    window.setTimeout(() => setCoin((c) => (c ? { ...c, phase: "done" } : c)), 1500);
+    window.setTimeout(() => {
+      commitMatch(pending);
+      setCoin(null);
+      vibrate(pending.turn === "A" ? [40, 40, 60] : 90);
+    }, 2500);
   }
 
   // "New Game": open the card picker if enabled, else deal a fresh game.
@@ -153,7 +158,7 @@ function App() {
   function toggleRule(key: keyof RuleSet) {
     const nextRules = { ...rules, [key]: !rules[key] };
     setRules(nextRules);
-    startGame(undefined, nextRules);
+    startGame(undefined, nextRules, false); // rule tweaks re-deal without the coin ceremony
   }
 
   function togglePick(card: Card) {
@@ -171,8 +176,8 @@ function App() {
 
   function confirmDeck() {
     if (picked.length !== 5) return;
-    startGame(picked);
     setDeckOpen(false);
+    startGame(picked);
   }
 
   function toggleMusic() {
@@ -194,6 +199,8 @@ function App() {
     if (pickHand) {
       setPicked([]);
       setDeckOpen(true);
+    } else {
+      startGame();
     }
   }
 
@@ -226,6 +233,16 @@ function App() {
           ? "Player 1 Wins!"
           : "Player 2 Wins!";
   const showBanner = !!state.winner && !bannerDismissed;
+
+  const coinStarter = coin?.pending.turn ?? "A";
+  const coinResult =
+    coinStarter === "A"
+      ? opponentType === "ai"
+        ? "You go first!"
+        : "Player 1 goes first!"
+      : opponentType === "ai"
+        ? "Computer goes first!"
+        : "Player 2 goes first!";
 
   return (
     <>
@@ -409,7 +426,28 @@ function App() {
         </div>
       )}
 
-      {coinToast && <div className="tt-coin-toast">{coinToast}</div>}
+      {coin && (
+        <div className="tt-coin-veil">
+          <div className="tt-coin-stage">
+            <button
+              type="button"
+              className={`tt-coin ${coin.phase === "ready" ? "ready" : "spun"} ${coinStarter === "A" ? "land-a" : "land-b"}`}
+              onClick={flipCoin}
+              aria-label="Flip the coin to decide who goes first"
+            >
+              <span className="tt-coin-face tt-coin-front">P1</span>
+              <span className="tt-coin-face tt-coin-back">{opponentType === "ai" ? "CPU" : "P2"}</span>
+            </button>
+            <p className="tt-coin-caption">
+              {coin.phase === "ready"
+                ? "Tap the coin to flip"
+                : coin.phase === "done"
+                  ? coinResult
+                  : "Flipping…"}
+            </p>
+          </div>
+        </div>
+      )}
 
       {deckOpen && (
         <div className="tt-deck-veil">

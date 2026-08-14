@@ -257,31 +257,112 @@
   }
 }
 
-/* ── Coin-flip toast ── */
+/* ── Interactive coin toss ── */
 
-.tt-coin-toast {
+.tt-coin-veil {
   position: fixed;
-  top: 12vh;
-  left: 50%;
-  z-index: 75;
-  padding: 10px 22px;
-  border-radius: 8px;
-  background: rgba(10, 7, 18, 0.9);
-  border: 2px solid var(--gold);
-  color: var(--gold-bright);
-  font-weight: 800;
-  font-size: clamp(16px, 4vw, 22px);
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
-  white-space: nowrap;
-  pointer-events: none;
-  animation: coin-toast 1.9s ease-in-out both;
+  inset: 0;
+  z-index: 78;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  box-sizing: border-box;
+  background: rgba(4, 3, 8, 0.82);
+  backdrop-filter: blur(4px);
 }
 
-@keyframes coin-toast {
-  0% { opacity: 0; transform: translateX(-50%) translateY(-10px) scale(0.9); }
-  12%, 80% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
-  100% { opacity: 0; transform: translateX(-50%) translateY(-8px) scale(0.95); }
+.tt-coin-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+  perspective: 900px;
+}
+
+.tt-coin {
+  position: relative;
+  width: min(46vw, 220px);
+  height: min(46vw, 220px);
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  transform-style: preserve-3d;
+  transform: rotateX(0deg);
+}
+
+.tt-coin.ready {
+  animation: coin-idle 2.4s ease-in-out infinite;
+}
+
+.tt-coin.spun.land-a {
+  animation: coin-flip-a 1.5s cubic-bezier(0.15, 0.6, 0.25, 1) forwards;
+}
+
+.tt-coin.spun.land-b {
+  animation: coin-flip-b 1.5s cubic-bezier(0.15, 0.6, 0.25, 1) forwards;
+}
+
+.tt-coin-face {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: min(15vw, 68px);
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border: 6px solid var(--gold);
+  box-shadow: inset 0 0 0 3px rgba(20, 14, 6, 0.6), 0 10px 26px rgba(0, 0, 0, 0.6);
+  text-shadow: 0 2px 3px rgba(0, 0, 0, 0.7);
+}
+
+.tt-coin-front {
+  transform: rotateX(0deg);
+  background: radial-gradient(circle at 40% 35%, #2f5293, #10254f);
+  color: #d6e6ff;
+}
+
+.tt-coin-back {
+  transform: rotateX(180deg);
+  background: radial-gradient(circle at 40% 35%, #862a2c, #3a1013);
+  color: #ffd8d1;
+}
+
+.tt-coin-caption {
+  margin: 0;
+  min-height: 1.2em;
+  color: var(--gold-bright);
+  font-weight: 800;
+  font-size: clamp(18px, 5vw, 26px);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+}
+
+@keyframes coin-idle {
+  0%, 100% { transform: rotateX(0deg) translateY(0); }
+  50% { transform: rotateX(16deg) translateY(-6px); }
+}
+
+@keyframes coin-flip-a {
+  0% { transform: translateY(0) rotateX(0deg); }
+  45% { transform: translateY(-150px) rotateX(720deg); }
+  100% { transform: translateY(0) rotateX(1440deg); }
+}
+
+@keyframes coin-flip-b {
+  0% { transform: translateY(0) rotateX(0deg); }
+  45% { transform: translateY(-150px) rotateX(810deg); }
+  100% { transform: translateY(0) rotateX(1620deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tt-coin.ready { animation: none; }
+  .tt-coin.spun.land-a { animation: none; transform: rotateX(0deg); }
+  .tt-coin.spun.land-b { animation: none; transform: rotateX(180deg); }
 }
 
 /* ── Deck / hand picker ── */
