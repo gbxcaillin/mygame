@@ -50,11 +50,45 @@
   gap: 12px;
 }
 
+/* ── Gold controls: black fill, golden border + text (matches title) ── */
+
+.tt-help-btn,
+.tt-new-game,
+.tt-field select {
+  background: var(--btn-bg);
+  color: var(--gold-bright);
+  border: 2px solid var(--gold);
+  border-radius: 6px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.tt-help-btn:hover,
+.tt-new-game:hover,
+.tt-field select:hover {
+  background: #1a1220;
+  border-color: var(--gold-bright);
+  color: #fff0c0;
+}
+
+.tt-help-btn:focus-visible,
+.tt-new-game:focus-visible,
+.tt-field select:focus-visible {
+  outline: 2px solid var(--gold-bright);
+  outline-offset: 2px;
+}
+
+.tt-field select option {
+  background: #0a0712;
+  color: var(--gold-bright);
+}
+
 .tt-help-btn {
   padding: 5px 10px;
   font-size: 13px;
-  cursor: pointer;
-  white-space: nowrap;
 }
 
 .tt-status {
@@ -117,15 +151,21 @@
 }
 
 .tt-new-game {
-  padding: 6px 12px;
-  cursor: pointer;
-  white-space: nowrap;
+  padding: 7px 14px;
+  font-size: 14px;
 }
 
 .tt-field {
   display: flex;
   align-items: center;
   gap: 5px;
+  font-size: 13px;
+  color: var(--gold);
+  font-weight: 600;
+}
+
+.tt-field select {
+  padding: 5px 8px;
   font-size: 13px;
 }
 
@@ -142,8 +182,10 @@
 }
 
 .tt-rules legend {
-  font-weight: 600;
+  font-weight: 700;
   padding: 0 4px;
+  color: var(--gold-bright);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
 }
 
 .tt-rules label {
@@ -152,6 +194,11 @@
   gap: 4px;
   font-size: 13px;
   white-space: nowrap;
+  color: var(--gold);
+}
+
+.tt-rules input[type="checkbox"] {
+  accent-color: var(--gold);
 }
 
 /* ═══════════════ PORTRAIT (9:19.5) ═══════════════ */

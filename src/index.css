@@ -2,6 +2,12 @@
   --player-a: #4d8ce8;
   --player-b: #e04a3a;
 
+  /* Gold theme to match the title plaque */
+  --gold: #e8c65a;
+  --gold-bright: #f6de8a;
+  --gold-dim: #a9842c;
+  --btn-bg: #0a0712;
+
   color-scheme: dark;
   font-family: system-ui, -apple-system, sans-serif;
 }
