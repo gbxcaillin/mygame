@@ -229,8 +229,8 @@
 
 @media (orientation: landscape) {
   :root {
-    --card-size: min(13.5vh, 14vw);
-    --cell-size: min(13.5vh, 14vw);
+    --card-size: min(13vh, 14vw);
+    --cell-size: min(13vh, 14vw);
     --grid-gap: 0.7vh;
     --card-gap: 0.7vh;
     --section-gap: 1.1vh;
@@ -240,7 +240,8 @@
      right with its groups pinned to the top and bottom edges. The panel
      width is capped so the game + panel always fit the viewport with a
      clear margin on both sides (fixes 4:3 overflow / edge-hugging), and
-     everything sizes off height so nothing scrolls. */
+     everything sizes off height so nothing scrolls. The left column packs
+     from the top so the title and field sit up high, not floating low. */
   .tt-app {
     grid-template-columns: auto clamp(168px, 23vw, 320px);
     grid-template-rows: auto 1fr;
@@ -250,14 +251,14 @@
     justify-content: center;
     align-content: stretch;
     column-gap: 3vw;
-    row-gap: 1.4vh;
-    padding: 2vh clamp(16px, 4vw, 48px);
+    row-gap: 0.8vh;
+    padding: 0.8vh clamp(16px, 4vw, 48px);
   }
 
   /* Title sits above the game on the left, pushing the field down */
   .tt-title {
     grid-area: title;
-    align-self: center;
+    align-self: start;
     justify-self: center;
     display: flex;
     justify-content: center;
@@ -266,13 +267,13 @@
   .tt-title img {
     width: auto;
     height: auto;
-    max-width: 46vw;
-    max-height: 15vh;
+    max-width: 44vw;
+    max-height: 12vh;
   }
 
   .tt-game {
     grid-area: game;
-    align-self: center;
+    align-self: start;
   }
 
   .tt-topbar {
@@ -326,6 +327,6 @@
 @media (orientation: landscape) and (max-aspect-ratio: 3/2) {
   .tt-app {
     transform: scale(0.9);
-    transform-origin: center center;
+    transform-origin: center top;
   }
 }
