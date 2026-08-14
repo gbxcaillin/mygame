@@ -308,29 +308,77 @@
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: min(15vw, 68px);
-  font-weight: 900;
-  letter-spacing: 0.02em;
+  box-sizing: border-box;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
-  border: 6px solid var(--gold);
-  box-shadow: inset 0 0 0 3px rgba(20, 14, 6, 0.6), 0 10px 26px rgba(0, 0, 0, 0.6);
-  text-shadow: 0 2px 3px rgba(0, 0, 0, 0.7);
+  box-shadow:
+    inset 0 0 0 3px rgba(0, 0, 0, 0.28),
+    inset -7px -9px 16px rgba(0, 0, 0, 0.45),
+    inset 7px 9px 16px rgba(255, 255, 255, 0.18),
+    0 10px 26px rgba(0, 0, 0, 0.6);
 }
 
+/* Player 1: worn gold with a crown */
 .tt-coin-front {
   transform: rotateX(0deg);
-  background: radial-gradient(circle at 40% 35%, #2f5293, #10254f);
-  color: #d6e6ff;
+  border: 5px solid #7c611a;
+  background: radial-gradient(circle at 38% 30%, #ecd587, #b8942f 52%, #7d6015 100%);
 }
 
+/* Computer / Player 2: worn silver with a trident */
 .tt-coin-back {
   transform: rotateX(180deg);
-  background: radial-gradient(circle at 40% 35%, #862a2c, #3a1013);
-  color: #ffd8d1;
+  border: 5px solid #676e79;
+  background: radial-gradient(circle at 38% 30%, #f2f4f8, #9aa1ab 52%, #666d78 100%);
+}
+
+.tt-coin-emblem {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.coin-rim {
+  fill: none;
+  stroke-width: 2.4;
+  stroke-dasharray: 2 3.3;
+  opacity: 0.8;
+}
+
+.coin-rim-inner {
+  fill: none;
+  stroke-width: 1.3;
+  opacity: 0.5;
+}
+
+.tt-coin-front .coin-rim,
+.tt-coin-front .coin-rim-inner {
+  stroke: #6e5513;
+}
+
+.tt-coin-back .coin-rim,
+.tt-coin-back .coin-rim-inner {
+  stroke: #5c636d;
+}
+
+/* Embossed relief for the emblems */
+.coin-relief {
+  filter: drop-shadow(0 2px 1px rgba(0, 0, 0, 0.5)) drop-shadow(0 -1px 0 rgba(255, 255, 255, 0.3));
+}
+
+.coin-relief-fill {
+  fill: #ecce6c;
+  stroke: #6e5513;
+  stroke-width: 1;
+  stroke-linejoin: round;
+}
+
+.coin-relief-stroke {
+  fill: none;
+  stroke: #eaeef3;
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .tt-coin-caption {
@@ -417,6 +465,13 @@
   grid-template-columns: repeat(auto-fill, minmax(62px, 1fr));
   gap: 8px;
   padding: 4px;
+}
+
+/* Draft (Select mode) shows 10 cards, so they can be larger */
+.tt-deck-draft {
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 10px;
+  justify-content: center;
 }
 
 .tt-deck-card {

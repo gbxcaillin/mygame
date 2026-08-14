@@ -53,8 +53,9 @@ function App() {
   const [audio, setAudio] = useState(getAudioSettings);
   const [bannerDismissed, setBannerDismissed] = useState(false);
   const [started, setStarted] = useState(false);
-  const [pickHand, setPickHand] = useState(false);
+  const [deckMode, setDeckMode] = useState<"random" | "select">("random");
   const [deckOpen, setDeckOpen] = useState(false);
+  const [draftPool, setDraftPool] = useState<Card[]>([]);
   const [picked, setPicked] = useState<Card[]>([]);
   const [coin, setCoin] = useState<{ pending: GameState; phase: "ready" | "flipping" | "done" } | null>(null);
 
@@ -145,14 +146,17 @@ function App() {
     }, 2500);
   }
 
-  // "New Game": open the card picker if enabled, else deal a fresh game.
+  // Select mode: draft your 5 from a spread of 10 random cards.
+  function openDraft() {
+    setDraftPool([...CARD_POOL].sort(() => Math.random() - 0.5).slice(0, 10));
+    setPicked([]);
+    setDeckOpen(true);
+  }
+
+  // "New Game": draft in Select mode, else deal a fresh random game.
   function handleNewGame() {
-    if (pickHand) {
-      setPicked([]);
-      setDeckOpen(true);
-    } else {
-      startGame();
-    }
+    if (deckMode === "select") openDraft();
+    else startGame();
   }
 
   function toggleRule(key: keyof RuleSet) {
@@ -170,8 +174,7 @@ function App() {
   }
 
   function randomFill() {
-    const shuffled = [...CARD_POOL].sort(() => Math.random() - 0.5);
-    setPicked(shuffled.slice(0, 5));
+    setPicked([...draftPool].sort(() => Math.random() - 0.5).slice(0, 5));
   }
 
   function confirmDeck() {
@@ -196,12 +199,8 @@ function App() {
   function handleStart() {
     startMusic();
     setStarted(true);
-    if (pickHand) {
-      setPicked([]);
-      setDeckOpen(true);
-    } else {
-      startGame();
-    }
+    if (deckMode === "select") openDraft();
+    else startGame();
   }
 
   const player2Label = opponentType === "ai" ? "Computer" : "Player 2";
@@ -338,6 +337,14 @@ function App() {
               </select>
             </label>
           )}
+
+          <label className="tt-field">
+            Deck
+            <select value={deckMode} onChange={(e) => setDeckMode(e.target.value as "random" | "select")}>
+              <option value="random">Random</option>
+              <option value="select">Select</option>
+            </select>
+          </label>
         </div>
 
         <fieldset className="tt-rules">
@@ -369,10 +376,6 @@ function App() {
           <label>
             <input type="checkbox" checked={audio.sfx} onChange={toggleSfx} />
             Effects
-          </label>
-          <label>
-            <input type="checkbox" checked={pickHand} onChange={() => setPickHand((v) => !v)} />
-            Choose my hand
           </label>
         </fieldset>
       </div>
@@ -417,10 +420,6 @@ function App() {
                 <input type="checkbox" checked={audio.sfx} onChange={toggleSfx} />
                 Effects
               </label>
-              <label>
-                <input type="checkbox" checked={pickHand} onChange={() => setPickHand((v) => !v)} />
-                Choose cards
-              </label>
             </div>
           </div>
         </div>
@@ -435,8 +434,34 @@ function App() {
               onClick={flipCoin}
               aria-label="Flip the coin to decide who goes first"
             >
-              <span className="tt-coin-face tt-coin-front">P1</span>
-              <span className="tt-coin-face tt-coin-back">{opponentType === "ai" ? "CPU" : "P2"}</span>
+              <span className="tt-coin-face tt-coin-front">
+                <svg viewBox="0 0 100 100" className="tt-coin-emblem" aria-hidden="true">
+                  <circle className="coin-rim" cx="50" cy="50" r="45" />
+                  <circle className="coin-rim-inner" cx="50" cy="50" r="39" />
+                  <g className="coin-relief coin-relief-fill">
+                    <path d="M18 65 L22 37 L34 55 L50 29 L66 55 L78 37 L82 65 L80 76 L20 76 Z" />
+                    <circle cx="22" cy="35" r="3.4" />
+                    <circle cx="50" cy="27" r="3.9" />
+                    <circle cx="78" cy="35" r="3.4" />
+                  </g>
+                </svg>
+              </span>
+              <span className="tt-coin-face tt-coin-back">
+                <svg viewBox="0 0 100 100" className="tt-coin-emblem" aria-hidden="true">
+                  <circle className="coin-rim" cx="50" cy="50" r="45" />
+                  <circle className="coin-rim-inner" cx="50" cy="50" r="39" />
+                  <g className="coin-relief coin-relief-stroke">
+                    <line x1="50" y1="38" x2="50" y2="83" />
+                    <line x1="35" y1="40" x2="65" y2="40" />
+                    <line x1="50" y1="40" x2="50" y2="12" />
+                    <path d="M50 12 L44 21 M50 12 L56 21" />
+                    <path d="M36 41 C33 27 34 19 39 13" />
+                    <path d="M64 41 C67 27 66 19 61 13" />
+                    <path d="M36 13 L41 21 M64 13 L59 21" />
+                    <line x1="43" y1="83" x2="57" y2="83" />
+                  </g>
+                </svg>
+              </span>
             </button>
             <p className="tt-coin-caption">
               {coin.phase === "ready"
@@ -453,11 +478,11 @@ function App() {
         <div className="tt-deck-veil">
           <div className="tt-deck">
             <div className="tt-deck-head">
-              <h2>Choose your hand</h2>
+              <h2>Pick 5 of these 10</h2>
               <span className="tt-deck-count">{picked.length} / 5</span>
             </div>
-            <div className="tt-deck-grid">
-              {CARD_POOL.map((card) => {
+            <div className="tt-deck-grid tt-deck-draft">
+              {draftPool.map((card) => {
                 const sel = picked.some((c) => c.id === card.id);
                 return (
                   <button
