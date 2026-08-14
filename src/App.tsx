@@ -12,6 +12,15 @@ import type { Card, GameState, PlayerId, RuleSet } from "./game/types";
 import titleLogo from "./assets/title.png";
 import bgLandscape from "./assets/bg-landscape.png";
 import bgPortrait from "./assets/bg-portrait.png";
+import {
+  armAudio,
+  getAudioSettings,
+  playFlip,
+  playWin,
+  playLose,
+  setMusicEnabled,
+  setSfxEnabled,
+} from "./audio";
 import "./App.css";
 
 type OpponentType = "human" | "ai";
@@ -31,6 +40,26 @@ function App() {
   const [aiThinking, setAiThinking] = useState(false);
   const [inspecting, setInspecting] = useState<{ card: Card; owner?: PlayerId } | null>(null);
   const [tutorialOpen, setTutorialOpen] = useState(false);
+  const [audio, setAudio] = useState(getAudioSettings);
+  const [bannerDismissed, setBannerDismissed] = useState(false);
+
+  // Start background music on the first user interaction.
+  useEffect(() => {
+    armAudio();
+  }, []);
+
+  // Card-flip sound whenever a move captures one or more cards.
+  useEffect(() => {
+    if (state.lastMove && state.lastMove.captured.length > 0) playFlip();
+  }, [state.lastMove]);
+
+  // Win / lose stinger + reset the banner when a match ends or restarts.
+  useEffect(() => {
+    if (state.winner === "A") playWin();
+    else if (state.winner === "B") playLose();
+    else if (state.winner === "draw") playLose();
+    if (!state.winner) setBannerDismissed(false);
+  }, [state.winner]);
 
   useEffect(() => {
     if (opponentType !== "ai" || state.turn !== "B" || state.winner) {
@@ -79,6 +108,18 @@ function App() {
     handleNewGame(nextRules);
   }
 
+  function toggleMusic() {
+    const next = !audio.music;
+    setMusicEnabled(next);
+    setAudio((a) => ({ ...a, music: next }));
+  }
+
+  function toggleSfx() {
+    const next = !audio.sfx;
+    setSfxEnabled(next);
+    setAudio((a) => ({ ...a, sfx: next }));
+  }
+
   const player2Label = opponentType === "ai" ? "Computer" : "Player 2";
   const winnerLabel =
     state.winner === "A"
@@ -94,6 +135,20 @@ function App() {
     : aiThinking
       ? `${player2Label} is thinking…`
       : `${state.turn === "A" ? "Player 1" : player2Label}'s turn`;
+
+  const bannerKind =
+    state.winner === "A" ? "win" : state.winner === "B" ? "lose" : "draw";
+  const bannerTitle =
+    state.winner === "draw"
+      ? "Draw"
+      : opponentType === "ai"
+        ? state.winner === "A"
+          ? "You Won!"
+          : "You Lost…"
+        : state.winner === "A"
+          ? "Player 1 Wins!"
+          : "Player 2 Wins!";
+  const showBanner = !!state.winner && !bannerDismissed;
 
   return (
     <>
@@ -206,6 +261,18 @@ function App() {
             Same Wall
           </label>
         </fieldset>
+
+        <fieldset className="tt-rules tt-sound">
+          <legend>Sound</legend>
+          <label>
+            <input type="checkbox" checked={audio.music} onChange={toggleMusic} />
+            Music
+          </label>
+          <label>
+            <input type="checkbox" checked={audio.sfx} onChange={toggleSfx} />
+            Effects
+          </label>
+        </fieldset>
       </div>
       </div>
 
@@ -213,6 +280,23 @@ function App() {
         <CardLightbox card={inspecting.card} owner={inspecting.owner} onClose={() => setInspecting(null)} />
       )}
       {tutorialOpen && <TutorialModal onClose={() => setTutorialOpen(false)} />}
+
+      {showBanner && (
+        <div className="tt-winbanner-veil" onClick={() => setBannerDismissed(true)}>
+          <div className={`tt-winbanner ${bannerKind}`} onClick={(e) => e.stopPropagation()}>
+            <h2 className="tt-winbanner-title">{bannerTitle}</h2>
+            <p className="tt-winbanner-score">
+              Player 1 {counts.a} — {counts.b} {opponentType === "ai" ? "Computer" : "Player 2"}
+            </p>
+            <button type="button" className="tt-new-game tt-winbanner-btn" onClick={() => handleNewGame()}>
+              New Game
+            </button>
+            <button type="button" className="tt-winbanner-dismiss" onClick={() => setBannerDismissed(true)}>
+              View board
+            </button>
+          </div>
+        </div>
+      )}
       </div>
     </>
   );
