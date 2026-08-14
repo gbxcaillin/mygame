@@ -5,7 +5,7 @@
   position: relative;
   width: var(--card-size, 88px);
   height: var(--card-size, 88px);
-  border: 3px solid #999;
+  border: 2px solid rgba(18, 14, 20, 0.9);
   border-radius: 4px;
   background: #0e0c10;
   color: #1a1a1a;
@@ -14,16 +14,20 @@
   flex: none;
   box-sizing: border-box;
   overflow: hidden;
+  transition: box-shadow 0.15s;
 }
 
+/* Owner shown as a soft glowing aura rather than a solid border */
 .tt-card.owner-a {
-  border-color: var(--player-a);
-  box-shadow: 0 0 0 1px var(--player-a);
+  box-shadow:
+    0 0 4px 1px var(--player-a),
+    0 0 11px 3px rgba(77, 140, 232, 0.6);
 }
 
 .tt-card.owner-b {
-  border-color: var(--player-b);
-  box-shadow: 0 0 0 1px var(--player-b);
+  box-shadow:
+    0 0 4px 1px var(--player-b),
+    0 0 11px 3px rgba(224, 74, 58, 0.6);
 }
 
 .tt-card.selected {
