@@ -97,19 +97,59 @@
   white-space: nowrap;
 }
 
-/* Flip container keeps card sizing; shows final owner face (no animation) */
+/* Capture: a 3D triple flip that lands on the new owner's face.
+   Front face = previous owner, back face = new owner. */
 
-.tt-card-flip-container,
-.tt-card-flipper {
+.tt-card-flip-container {
   width: 100%;
   height: 100%;
+  perspective: 640px;
+}
+
+.tt-card-flipper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
 }
 
 .tt-card-face {
   position: absolute;
   inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 .tt-card-front {
-  display: none;
+  transform: rotateY(0deg);
+}
+
+.tt-card-back {
+  transform: rotateY(180deg);
+}
+
+.tt-card-flip-container.flipping .tt-card-flipper {
+  animation: capture-triple-flip 0.9s ease-in-out forwards;
+}
+
+@keyframes capture-triple-flip {
+  0% {
+    transform: rotateY(0deg) scale(1);
+  }
+  50% {
+    transform: rotateY(630deg) scale(1.14);
+  }
+  100% {
+    /* 1260deg = 3.5 turns -> ends showing the back (new owner) */
+    transform: rotateY(1260deg) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tt-card-flip-container.flipping .tt-card-flipper {
+    animation: none;
+  }
+  .tt-card-front {
+    display: none;
+  }
 }
