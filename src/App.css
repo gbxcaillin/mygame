@@ -420,65 +420,69 @@
   inset: 0;
   z-index: 82;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 16px;
-  box-sizing: border-box;
-  background: rgba(4, 3, 8, 0.9);
+  background: rgba(4, 3, 8, 0.92);
   backdrop-filter: blur(4px);
 }
 
+/* Full-screen draft: the grid fills between the header and the actions */
 .tt-deck {
-  width: min(96vw, 760px);
-  max-height: 92vh;
+  width: 100vw;
+  height: 100dvh;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
-  padding: 14px;
-  border-radius: 12px;
-  border: 2px solid var(--gold);
+  padding: max(2vmin, 10px) 3vw;
   background: linear-gradient(180deg, #14101c, #0a0712);
 }
 
 .tt-deck-head {
+  flex: none;
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  margin-bottom: 10px;
+  margin-bottom: 1.5vmin;
 }
 
 .tt-deck-head h2 {
   margin: 0;
   color: var(--gold-bright);
-  font-size: clamp(18px, 4vw, 24px);
+  font-size: clamp(18px, 4vw, 26px);
 }
 
 .tt-deck-count {
   color: var(--gold);
   font-weight: 800;
-  font-size: 16px;
+  font-size: clamp(15px, 4vw, 20px);
 }
 
 .tt-deck-grid {
-  overflow-y: auto;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(62px, 1fr));
-  gap: 8px;
-  padding: 4px;
+  gap: 1.6vmin;
 }
 
-/* Draft (Select mode) shows 10 cards, so they can be larger */
+/* Draft (Select mode): fill the screen — 5x2 landscape, 2x5 portrait */
 .tt-deck-draft {
-  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
-  gap: 10px;
-  justify-content: center;
+  flex: 1;
+  min-height: 0;
+  place-items: center;
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+}
+
+@media (orientation: portrait) {
+  .tt-deck-draft {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(5, 1fr);
+  }
 }
 
 .tt-deck-card {
   aspect-ratio: 1;
+  height: 100%;
+  max-width: 100%;
   padding: 0;
-  border: 2px solid rgba(20, 16, 12, 0.9);
-  border-radius: 4px;
+  border: 3px solid rgba(20, 16, 12, 0.9);
+  border-radius: 6px;
   background: #0e0c10;
   overflow: hidden;
   cursor: pointer;
