@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Board } from "./game/Board";
 import { Hand } from "./game/Hand";
 import { CardLightbox } from "./game/CardLightbox";
@@ -171,6 +171,20 @@ function App() {
       if (prev.length >= 5) return prev;
       return [...prev, card];
     });
+  }
+
+  // Deck card: single tap selects, double tap inspects (without selecting).
+  const lastDeckTap = useRef<{ id: string; t: number }>({ id: "", t: 0 });
+  function handleDeckTap(card: Card) {
+    const now = Date.now();
+    if (lastDeckTap.current.id === card.id && now - lastDeckTap.current.t < 320) {
+      lastDeckTap.current = { id: "", t: 0 };
+      togglePick(card); // undo the select from the first tap
+      setInspecting({ card });
+      return;
+    }
+    lastDeckTap.current = { id: card.id, t: now };
+    togglePick(card);
   }
 
   function randomFill() {
@@ -478,20 +492,23 @@ function App() {
         <div className="tt-deck-veil">
           <div className="tt-deck">
             <div className="tt-deck-head">
-              <h2>Pick 5 of these 10</h2>
+              <h2>
+                Pick 5 of these 10
+                <span className="tt-deck-hint"> · double-tap to enlarge</span>
+              </h2>
               <span className="tt-deck-count">{picked.length} / 5</span>
             </div>
             <div className="tt-deck-grid tt-deck-draft">
               {draftPool.map((card) => {
                 const sel = picked.some((c) => c.id === card.id);
+                const maxed = !sel && picked.length >= 5;
                 return (
                   <button
                     key={card.id}
                     type="button"
-                    className={`tt-deck-card ${sel ? "sel" : ""}`}
-                    onClick={() => togglePick(card)}
-                    disabled={!sel && picked.length >= 5}
-                    title={card.name}
+                    className={`tt-deck-card ${sel ? "sel" : ""} ${maxed ? "maxed" : ""}`}
+                    onClick={() => handleDeckTap(card)}
+                    title={`${card.name} — double-tap to enlarge`}
                   >
                     {card.image ? (
                       <img src={card.image} alt={card.name} draggable={false} />

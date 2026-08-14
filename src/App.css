@@ -455,31 +455,48 @@
   font-size: clamp(15px, 4vw, 20px);
 }
 
+.tt-deck-hint {
+  color: rgba(214, 196, 150, 0.6);
+  font-size: 0.6em;
+  font-weight: 600;
+}
+
+@media (orientation: portrait) {
+  .tt-deck-hint {
+    display: block;
+    font-size: 0.72em;
+  }
+}
+
 .tt-deck-grid {
   display: grid;
   gap: 1.6vmin;
 }
 
-/* Draft (Select mode): fill the screen — 5x2 landscape, 2x5 portrait */
+/* Draft (Select mode): fill the screen. Mobile-first 2x5 (portrait);
+   switch to 5x2 only in landscape so the grid never leaks into portrait. */
 .tt-deck-draft {
   flex: 1;
   min-height: 0;
-  place-items: center;
-  grid-template-columns: repeat(5, 1fr);
-  grid-template-rows: repeat(2, 1fr);
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(5, 1fr);
 }
 
-@media (orientation: portrait) {
+@media (orientation: landscape) {
   .tt-deck-draft {
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(5, 1fr);
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: repeat(2, 1fr);
   }
 }
 
+/* Cards fill their grid cell exactly, so they can never overlap. The
+   full square card art is shown with object-fit: contain (ranks stay
+   visible, no cropping). */
 .tt-deck-card {
-  aspect-ratio: 1;
+  width: 100%;
   height: 100%;
-  max-width: 100%;
+  min-width: 0;
+  min-height: 0;
   padding: 0;
   border: 3px solid rgba(20, 16, 12, 0.9);
   border-radius: 6px;
@@ -491,18 +508,17 @@
 .tt-deck-card img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   display: block;
 }
 
 .tt-deck-card.sel {
   border-color: var(--gold);
-  box-shadow: 0 0 0 2px var(--gold), 0 0 10px 2px rgba(232, 198, 90, 0.6);
+  box-shadow: 0 0 0 2px var(--gold), 0 0 12px 3px rgba(232, 198, 90, 0.65);
 }
 
-.tt-deck-card:disabled {
-  opacity: 0.4;
-  cursor: default;
+.tt-deck-card.maxed {
+  opacity: 0.45;
 }
 
 .tt-deck-name {
