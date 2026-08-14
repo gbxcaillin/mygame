@@ -9,6 +9,7 @@ import { chooseAiMove, DIFFICULTY_LABELS } from "./game/ai";
 import type { Difficulty } from "./game/ai";
 import { DEFAULT_RULES } from "./game/types";
 import type { Card, GameState, PlayerId, RuleSet } from "./game/types";
+import titleLogo from "./assets/title.png";
 import "./App.css";
 
 type OpponentType = "human" | "ai";
@@ -96,7 +97,9 @@ function App() {
     <div className="tt-app">
       <div className="tt-topbar">
         <div className="tt-title-row">
-          <h1 className="tt-title">Clash of Beasts</h1>
+          <h1 className="tt-title">
+            <img src={titleLogo} alt="Clash of Beasts" />
+          </h1>
           <button type="button" className="tt-help-btn" onClick={() => setTutorialOpen(true)}>
             How to play
           </button>

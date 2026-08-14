@@ -18,8 +18,15 @@
 
 .tt-title {
   margin: 0;
-  font-size: var(--title-size, 20px);
-  white-space: nowrap;
+  line-height: 0;
+  min-width: 0;
+}
+
+.tt-title img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
 }
 
 .tt-title-row {
@@ -176,7 +183,8 @@
   }
 
   .tt-title {
-    font-size: 4.6vw;
+    flex: 1 1 auto;
+    max-width: 74vw;
   }
 
   .tt-status {
@@ -240,6 +248,10 @@
     display: flex;
     flex-direction: column;
     gap: 1vh;
+  }
+
+  .tt-title img {
+    height: clamp(24px, 4.4vh, 48px);
   }
 
   .tt-game {
