@@ -99,23 +99,44 @@ export const CARD_POOL: Card[] = CREATURES.map((c) => {
   };
 });
 
-function shuffle<T>(items: T[]): T[] {
-  const copy = [...items];
-  for (let i = copy.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [copy[i], copy[j]] = [copy[j], copy[i]];
-  }
-  return copy;
-}
-
 const clone = (c: Card): Card => ({ ...c, ranks: { ...c.ranks } });
 
-/** Deals two disjoint 5-card hands from the pool, cloning each card so board/hand instances are independent. */
+/* Pyramid rarity: relative deal weight per tier. Low tiers dominate the
+   draw and the strongest creatures are genuinely rare. With 10 cards per
+   tier these are effectively percentages of each dealt card:
+   Common 35%, Uncommon 25%, Rare 18%, Epic 12%, Legendary 7%, Mythic 3%. */
+const TIER_WEIGHTS: Record<number, number> = { 1: 35, 2: 25, 3: 18, 4: 12, 5: 7, 6: 3 };
+
+function cardWeight(card: Card): number {
+  return TIER_WEIGHTS[card.tier] ?? 1;
+}
+
+/** Draws `count` distinct cards from `pool`, biased by tier weight. */
+function weightedSample(pool: Card[], count: number): Card[] {
+  const items = [...pool];
+  const out: Card[] = [];
+  while (out.length < count && items.length > 0) {
+    const total = items.reduce((sum, c) => sum + cardWeight(c), 0);
+    let r = Math.random() * total;
+    let idx = items.length - 1;
+    for (let i = 0; i < items.length; i++) {
+      r -= cardWeight(items[i]);
+      if (r <= 0) {
+        idx = i;
+        break;
+      }
+    }
+    out.push(items.splice(idx, 1)[0]);
+  }
+  return out;
+}
+
+/** Deals two disjoint 5-card hands from the pool (pyramid-weighted), cloning each card so board/hand instances are independent. */
 export function dealHands(): { handA: Card[]; handB: Card[] } {
-  const shuffled = shuffle(CARD_POOL);
+  const drawn = weightedSample(CARD_POOL, 10);
   return {
-    handA: shuffled.slice(0, 5).map(clone),
-    handB: shuffled.slice(5, 10).map(clone),
+    handA: drawn.slice(0, 5).map(clone),
+    handB: drawn.slice(5, 10).map(clone),
   };
 }
 
@@ -124,9 +145,15 @@ export function cloneHand(cards: Card[]): Card[] {
   return cards.map(clone);
 }
 
-/** Deals a 5-card hand from the pool excluding the given card ids. */
+/** Deals a 5-card hand from the pool excluding the given card ids (pyramid-weighted). */
 export function dealHandExcluding(excludeIds: Set<string>): Card[] {
-  return shuffle(CARD_POOL.filter((c) => !excludeIds.has(c.id)))
-    .slice(0, 5)
-    .map(clone);
+  return weightedSample(
+    CARD_POOL.filter((c) => !excludeIds.has(c.id)),
+    5
+  ).map(clone);
+}
+
+/** Draws the Select-mode draft spread (distinct, pyramid-weighted). */
+export function dealDraftPool(size = 10): Card[] {
+  return weightedSample(CARD_POOL, size).map(clone);
 }

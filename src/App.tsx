@@ -4,7 +4,7 @@ import { Hand } from "./game/Hand";
 import { CardLightbox } from "./game/CardLightbox";
 import { TutorialModal } from "./game/TutorialModal";
 import { createInitialState, placeCard } from "./game/engine";
-import { dealHands, cloneHand, dealHandExcluding, CARD_POOL } from "./game/cards";
+import { dealHands, cloneHand, dealHandExcluding, dealDraftPool } from "./game/cards";
 import { chooseAiMove, DIFFICULTY_LABELS } from "./game/ai";
 import type { Difficulty } from "./game/ai";
 import { DEFAULT_RULES } from "./game/types";
@@ -146,9 +146,9 @@ function App() {
     }, 2500);
   }
 
-  // Select mode: draft your 5 from a spread of 10 random cards.
+  // Select mode: draft your 5 from a spread of 10 pyramid-weighted cards.
   function openDraft() {
-    setDraftPool([...CARD_POOL].sort(() => Math.random() - 0.5).slice(0, 10));
+    setDraftPool(dealDraftPool(10));
     setPicked([]);
     setDeckOpen(true);
   }
