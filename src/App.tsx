@@ -12,6 +12,8 @@ import type { Card, GameState, PlayerId, RuleSet } from "./game/types";
 import titleLogo from "./assets/title.png";
 import bgLandscape from "./assets/bg-landscape.png";
 import bgPortrait from "./assets/bg-portrait.png";
+import coinCrown from "./assets/coin-crown.png";
+import coinShield from "./assets/coin-shield.png";
 import {
   startMusic,
   getAudioSettings,
@@ -432,29 +434,10 @@ function App() {
               aria-label="Flip the coin to decide who goes first"
             >
               <span className="tt-coin-face tt-coin-front">
-                <svg viewBox="0 0 100 100" className="tt-coin-emblem" aria-hidden="true">
-                  <circle className="coin-rim" cx="50" cy="50" r="45" />
-                  <circle className="coin-rim-inner" cx="50" cy="50" r="39" />
-                  <g className="coin-relief coin-relief-fill">
-                    <path d="M18 65 L22 37 L34 55 L50 29 L66 55 L78 37 L82 65 L80 76 L20 76 Z" />
-                    <circle cx="22" cy="35" r="3.4" />
-                    <circle cx="50" cy="27" r="3.9" />
-                    <circle cx="78" cy="35" r="3.4" />
-                  </g>
-                </svg>
+                <img className="tt-coin-img" src={coinCrown} alt="" aria-hidden="true" />
               </span>
               <span className="tt-coin-face tt-coin-back">
-                <svg viewBox="0 0 100 100" className="tt-coin-emblem" aria-hidden="true">
-                  <circle className="coin-rim" cx="50" cy="50" r="45" />
-                  <circle className="coin-rim-inner" cx="50" cy="50" r="39" />
-                  <g className="coin-relief coin-relief-fill">
-                    <path d="M26 24 L74 24 L74 50 C74 73 50 84 50 84 C50 84 26 73 26 50 Z" />
-                    <path
-                      className="coin-relief-inlay"
-                      d="M50 30 L50 78 M32 34 L68 34"
-                    />
-                  </g>
-                </svg>
+                <img className="tt-coin-img" src={coinShield} alt="" aria-hidden="true" />
               </span>
             </button>
             <p className="tt-coin-caption">
