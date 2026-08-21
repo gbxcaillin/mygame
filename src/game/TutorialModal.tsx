@@ -30,8 +30,19 @@ export function TutorialModal({ onClose }: TutorialModalProps) {
           </section>
 
           <section>
+            <h3>The coin toss</h3>
+            <p>
+              Every match starts with a coin flip &mdash; tap the coin to toss it. The gold crown means you go
+              first; the silver shield means your opponent does.
+            </p>
+          </section>
+
+          <section>
             <h3>Playing a card</h3>
-            <p>Tap a card in your hand to select it, then tap an empty space on the board to place it there.</p>
+            <p>
+              Tap a card in your hand to select it, then tap an empty socket on the board to place it there. Your
+              cards glow <strong>blue</strong>; your opponent's glow <strong>red</strong>.
+            </p>
           </section>
 
           <section>
@@ -63,14 +74,35 @@ export function TutorialModal({ onClose }: TutorialModalProps) {
                 can help trigger it too.
               </li>
             </ul>
-            <p>Toggle these from the Rules panel below the board &mdash; changing one starts a new match.</p>
+            <p>Toggle these with the Rules checkboxes in the controls &mdash; changing one starts a new match.</p>
           </section>
 
           <section>
-            <h3>Playing the Computer</h3>
+            <h3>Your deck</h3>
+            <p>
+              The Deck dropdown sets how your hand is dealt. <strong>Random</strong> deals 5 cards;{" "}
+              <strong>Select</strong> shows a spread of 10 and lets you draft your favourite 5 (tap a card to pick
+              it, tap the magnifier to enlarge it).
+            </p>
+            <p>
+              Creatures follow a rarity pyramid &mdash; Commons and Uncommons appear often, while Legendary and
+              Mythic beasts like the Dragon or Kraken are rare finds.
+            </p>
+          </section>
+
+          <section>
+            <h3>Opponent &amp; difficulty</h3>
             <p>
               Pick Human for local pass-and-play, or Computer for an AI opponent with five difficulty levels, from
               Beginner (random moves) to Expert (plans several moves ahead).
+            </p>
+          </section>
+
+          <section>
+            <h3>Sound</h3>
+            <p>
+              The Sound checkboxes turn the music and the sound effects on or off independently &mdash; your choice
+              is remembered for next time.
             </p>
           </section>
 
