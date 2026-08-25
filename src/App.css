@@ -213,7 +213,8 @@
   mix-blend-mode: screen;
   width: 9vmin;
   height: 15vmin;
-  bottom: 26vh;
+  /* 16:9 art: flicker sits on the painted brazier bowls (~86% down) */
+  bottom: 14vh;
   will-change: opacity, transform;
 }
 
