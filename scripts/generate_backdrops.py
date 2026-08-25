@@ -198,6 +198,4 @@ if __name__ == "__main__":
     make_backdrop(1440, 1080, portrait=False, seed=63).save(
         "src/assets/bg-4x3.jpg", quality=87, optimize=True)
     print("wrote src/assets/bg-4x3.jpg")
-    make_backdrop(1080, 2340, portrait=True, seed=62).save(
-        "src/assets/bg-portrait.jpg", quality=87, optimize=True)
-    print("wrote src/assets/bg-portrait.jpg")
+    # bg-portrait.jpg is composed from supplied art by compose_portrait_backdrop.py
