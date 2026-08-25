@@ -29,6 +29,12 @@ import "./App.css";
 type OpponentType = "human" | "ai";
 const AI_THINK_DELAY_MS = 1400;
 
+// Chrome/Android fires this before showing its install banner; not yet in TS's DOM lib.
+interface BeforeInstallPromptEvent extends Event {
+  prompt(): Promise<void>;
+  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
+}
+
 function newGame(rules: RuleSet, chosenHandA?: Card[]): GameState {
   let handA: Card[];
   let handB: Card[];
@@ -60,6 +66,24 @@ function App() {
   const [draftPool, setDraftPool] = useState<Card[]>([]);
   const [picked, setPicked] = useState<Card[]>([]);
   const [coin, setCoin] = useState<{ pending: GameState; phase: "ready" | "flipping" | "done" } | null>(null);
+  const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+
+  // Capture the browser's install prompt so we can offer it from our own button.
+  useEffect(() => {
+    function onBeforeInstall(e: Event) {
+      e.preventDefault();
+      setInstallPrompt(e as BeforeInstallPromptEvent);
+    }
+    function onInstalled() {
+      setInstallPrompt(null);
+    }
+    window.addEventListener("beforeinstallprompt", onBeforeInstall);
+    window.addEventListener("appinstalled", onInstalled);
+    return () => {
+      window.removeEventListener("beforeinstallprompt", onBeforeInstall);
+      window.removeEventListener("appinstalled", onInstalled);
+    };
+  }, []);
 
   // Flip sound + haptics on capture; light haptic on a plain placement.
   useEffect(() => {
@@ -195,6 +219,15 @@ function App() {
     const next = !audio.sfx;
     setSfxEnabled(next);
     setAudio((a) => ({ ...a, sfx: next }));
+  }
+
+  // A captured prompt can only be shown once; clear it either way afterwards.
+  async function handleInstall() {
+    if (!installPrompt) return;
+    const prompt = installPrompt;
+    setInstallPrompt(null);
+    await prompt.prompt();
+    await prompt.userChoice.catch(() => undefined);
   }
 
   // Press Start: a direct user gesture that reliably kicks off music.
@@ -420,6 +453,15 @@ function App() {
                 Effects
               </label>
             </div>
+            {installPrompt && (
+              <button type="button" className="tt-install-btn" onClick={handleInstall}>
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 3v10.6l-3.8-3.8-1.4 1.4L12 17.4l5.2-5.2-1.4-1.4-3.8 3.8V3h-2z" />
+                  <path d="M5 19h14v2H5z" />
+                </svg>
+                Install App
+              </button>
+            )}
           </div>
         </div>
       )}
