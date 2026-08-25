@@ -240,7 +240,7 @@
   to { opacity: 0.85; transform: scaleY(1.2) translateY(-4px); }
 }
 
-@media (orientation: portrait) {
+@media (max-aspect-ratio: 7/10) {
   .tt-flame {
     bottom: 33vh;
     width: 7vmin;
@@ -414,7 +414,7 @@
   font-weight: 600;
 }
 
-@media (orientation: portrait) {
+@media (max-aspect-ratio: 7/10) {
   .tt-deck-hint {
     display: block;
     font-size: 0.72em;
@@ -435,7 +435,7 @@
   grid-template-rows: repeat(5, 1fr);
 }
 
-@media (orientation: landscape) {
+@media (min-aspect-ratio: 7/10) {
   .tt-deck-draft {
     grid-template-columns: repeat(5, 1fr);
     grid-template-rows: repeat(2, 1fr);
@@ -746,9 +746,13 @@
   color: var(--gold-bright);
 }
 
-/* ═══════════════ PORTRAIT (9:19.5) ═══════════════ */
+/* ═══════════════ PORTRAIT (9:19.5) ═══════════════
+   Keyed off aspect ratio, not orientation: the tall phone layout sizes
+   everything off vw, so it only fits genuinely tall screens. Squarish
+   portrait windows (iPad 3:4, resized desktop windows) get the
+   landscape layout below instead. */
 
-@media (orientation: portrait) {
+@media (max-aspect-ratio: 7/10) {
   :root {
     --card-size: 17.5vw;
     --cell-size: 17.5vw;
@@ -841,9 +845,9 @@
   }
 }
 
-/* ═══════════════ LANDSCAPE (16:9, 4:3) ═══════════════ */
+/* ═══════════════ LANDSCAPE (16:9, 4:3, squarish) ═══════════════ */
 
-@media (orientation: landscape) {
+@media (min-aspect-ratio: 7/10) {
   :root {
     --card-size: min(13vh, 14vw);
     --cell-size: min(13vh, 14vw);
@@ -950,7 +954,7 @@
 
 /* On 4:3-range landscape (aspect ≤ 3:2), scale the whole layout to 90%
    so it sits more comfortably with extra margin. 16:9 is unaffected. */
-@media (orientation: landscape) and (max-aspect-ratio: 3/2) {
+@media (min-aspect-ratio: 7/10) and (max-aspect-ratio: 3/2) {
   .tt-app {
     transform: scale(0.9);
     transform-origin: center top;

@@ -281,7 +281,7 @@ function App() {
   return (
     <>
       <picture>
-        <source srcSet={bgPortrait} media="(orientation: portrait)" />
+        <source srcSet={bgPortrait} media="(max-aspect-ratio: 7/10)" />
         <img src={bgLandscape} className="tt-backdrop" alt="" aria-hidden="true" />
       </picture>
       <div className="tt-flame tt-flame-left" aria-hidden="true" />
