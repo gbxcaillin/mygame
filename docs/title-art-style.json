@@ -1,0 +1,82 @@
+{
+  "$schema_note": "Art-style spec for the game's title banner. Feed 'prompt_template' (with {TITLE} replaced) to an image generator, or use the structured fields to rebuild the prompt in your own words. Values sampled from the original src/assets/title.png.",
+  "style_name": "Arcane Gold Fantasy Logotype",
+  "era_influence": [
+    "90s golden-age Sega / arcade cabinet marquee art",
+    "classic JRPG title screens (Final Fantasy, Golden Axe)",
+    "AAA fantasy game logos (ornate metal-and-gem crests)"
+  ],
+  "medium": "digital painting imitating embossed cast metal on carved stone",
+  "composition": {
+    "format": "wide horizontal banner plaque",
+    "aspect_ratio": "6.9:1 (original 756x110 px; generate at 1512x220 or larger)",
+    "layout": "single line of text centered on a rectangular plaque, ornamental frame around it, jewel finials centered on the top and bottom edges",
+    "background": "transparent or near-black; the plaque IS the artwork",
+    "margins": "frame flourishes may slightly overhang the plaque corners"
+  },
+  "typography": {
+    "case": "small caps (large initial capitals on each word, smaller capitals for the rest)",
+    "letterform": "classical Roman serif, wide proportions, sharp thin serifs",
+    "treatment": "thick beveled 3D faces like cast gold bullion",
+    "bevel": "hard center ridge down each stroke; top-lit so upper facets glow and lower facets fall to deep bronze",
+    "outline": "fine dark brown keyline around every letter to lift it off the plaque",
+    "spacing": "generous letter-spacing; words separated clearly",
+    "avoid": "modern sans-serifs, flat vector fills, chrome or silver lettering"
+  },
+  "palette": {
+    "gold_highlight": "#f5e9c0",
+    "gold_light": "#d3ba61",
+    "gold_mid": "#d79425",
+    "gold_deep": "#b77d2c",
+    "gold_shadow": "#603000",
+    "plaque_stone": "#181818",
+    "plaque_crack_warm": "#301800",
+    "background_black": "#000000",
+    "gem_sapphire_core": "#0753ba",
+    "gem_sapphire_glint": "#bfe3f3",
+    "gem_emerald_core": "#39835d",
+    "gem_emerald_glint": "#66d3b8"
+  },
+  "plaque": {
+    "material": "near-black cracked stone / aged dark iron",
+    "texture": "subtle fissures and chips catching faint warm light",
+    "finish": "matte, so the gold reads bright against it"
+  },
+  "frame": {
+    "style": "slim double-rule gold border tracing the plaque edge",
+    "corners": "ornate gold scroll flourishes / bracket filigree at all four corners",
+    "corner_gems": "small round emeralds set into the corner fittings",
+    "finials": "faceted sapphire diamond mounted in gold at top-center and bottom-center of the frame"
+  },
+  "lighting": {
+    "key": "single warm light from above",
+    "effects": [
+      "specular star glints on letter ridges and gem facets",
+      "soft warm bloom hugging the gold, no wide glow",
+      "deep occlusion where letters meet the plaque"
+    ],
+    "mood": "torch-lit treasure vault"
+  },
+  "rendering": {
+    "detail": "crisp, high micro-contrast; readable when scaled to 20% size",
+    "texture_on_gold": "faint hammered / worn patina, not mirror-clean",
+    "edges": "clean silhouette, no painterly spill outside the plaque"
+  },
+  "negative_prompt": [
+    "photorealistic photo",
+    "flat design, minimalism",
+    "neon, cyberpunk",
+    "silver, chrome, platinum lettering",
+    "white background",
+    "drop shadows floating on empty space",
+    "cartoon outlines, cel shading",
+    "text warping, curved baseline"
+  ],
+  "prompt_template": "Ornate fantasy game logo, the words '{TITLE}' in beveled cast-gold small-caps Roman serif lettering, top-lit with bright facets fading to deep bronze, fine dark keyline around each letter, mounted on a wide near-black cracked stone plaque, slim double gold border frame with ornate scroll filigree corners, small round emeralds in the corner fittings, a faceted sapphire diamond in a gold mount centered on the top and bottom edges, single warm torchlight from above, specular glints on letter ridges and gems, subtle worn patina on the gold, 90s golden-age arcade marquee and classic JRPG title-screen style, crisp high-detail digital painting, wide 7:1 banner, dark background",
+  "usage_notes": [
+    "Shorter titles read better: 1-3 words, roughly 8-16 characters total fills the plaque like the original.",
+    "Ask the generator for a transparent or plain-black background so the banner drops onto the game's backdrop.",
+    "Deliver at 1512x220 or any ~7:1 size; the game scales it down (crisp micro-contrast matters more than resolution).",
+    "The in-game icon/coin art is separate; only the banner needs to match this spec."
+  ]
+}
