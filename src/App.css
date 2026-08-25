@@ -961,3 +961,21 @@
     transform-origin: center top;
   }
 }
+
+/* Squarish screens (unfolded foldables, iPad portrait, aspect 0.7–1.1):
+   plenty of spare height, so pinning everything to the top leaves a dead
+   zone at the bottom. Center the field and the panel groups vertically. */
+@media (min-aspect-ratio: 7/10) and (max-aspect-ratio: 11/10) {
+  .tt-app {
+    transform-origin: center center;
+  }
+
+  .tt-game {
+    align-self: center;
+  }
+
+  .tt-panel {
+    justify-content: center;
+    gap: 5vh;
+  }
+}
