@@ -1,0 +1,189 @@
+{
+  "$schema_note": "Wireframe spec for generating Court of Beasts backdrop artwork at this aspect ratio. All zones measured from the live UI. px coordinates apply at canvas_px; pct values (fraction of width/height) let you rescale to any same-ratio canvas. The artwork sits BEHIND the UI - zones marked ui_occlusion are covered by interface elements.",
+  "aspect_ratio": "4:3 landscape (tablets, squarish windows)",
+  "canvas_px": {
+    "w": 1440,
+    "h": 1080
+  },
+  "style": [
+    "Painterly torch-lit dungeon vault: smooth ashlar stone wall, fine cracks, near-black exposure.",
+    "No creatures, characters, banners or text - the UI supplies all focal content; the art is atmosphere only.",
+    "Keep contrast LOW inside every ui_occlusion_zone; save texture interest for the space between zones.",
+    "A subtle gold hairline frame with sapphire diamond finials (top/bottom center) and emerald corner fittings echoes the title plaque.",
+    "Strong vignette toward edges; slightly darkened 'stage' behind the board zone so the gold grid pops."
+  ],
+  "palette": {
+    "reference": "docs/title-art-style.json (same gold/stone/gem palette as the title plaque)",
+    "stone_wall": "#131017",
+    "stone_mortar": "#0a080c",
+    "gold_frame": "#8a6a25",
+    "gold_bright": "#d79425",
+    "gem_sapphire": "#0753ba",
+    "gem_emerald": "#39835d",
+    "brazier_warm_glow": "#ff8c32",
+    "brazier_cool_glow": "#4682ff",
+    "faction_red_wash": "#961a1e",
+    "faction_blue_wash": "#2446c8"
+  },
+  "ui_occlusion_zones": {
+    "title": {
+      "px": {
+        "x": 408,
+        "y": 8,
+        "w": 296,
+        "h": 117
+      },
+      "pct": {
+        "x": 0.2833,
+        "y": 0.0074,
+        "w": 0.2056,
+        "h": 0.1083
+      },
+      "note": "Title plaque image overlays here (transparent PNG)."
+    },
+    "topbar": {
+      "px": {
+        "x": 925,
+        "y": 8,
+        "w": 288,
+        "h": 97
+      },
+      "pct": {
+        "x": 0.6424,
+        "y": 0.0074,
+        "w": 0.2,
+        "h": 0.0898
+      },
+      "note": "New Game button + turn/score readout."
+    },
+    "hand_opponent": {
+      "px": {
+        "x": 227,
+        "y": 132,
+        "w": 659,
+        "h": 143
+      },
+      "pct": {
+        "x": 0.1576,
+        "y": 0.1222,
+        "w": 0.4576,
+        "h": 0.1324
+      },
+      "note": "Opponent's 5 cards, red glow."
+    },
+    "hand_player": {
+      "px": {
+        "x": 227,
+        "y": 689,
+        "w": 659,
+        "h": 143
+      },
+      "pct": {
+        "x": 0.1576,
+        "y": 0.638,
+        "w": 0.4576,
+        "h": 0.1324
+      },
+      "note": "Player's 5 cards, blue glow."
+    },
+    "board": {
+      "px": {
+        "x": 360,
+        "y": 285,
+        "w": 393,
+        "h": 393
+      },
+      "pct": {
+        "x": 0.25,
+        "y": 0.2639,
+        "w": 0.2729,
+        "h": 0.3639
+      },
+      "note": "3x3 gold grid - keep this area darkest and least detailed."
+    },
+    "bottombar": {
+      "px": {
+        "x": 925,
+        "y": 640,
+        "w": 288,
+        "h": 324
+      },
+      "pct": {
+        "x": 0.6424,
+        "y": 0.5926,
+        "w": 0.2,
+        "h": 0.3
+      },
+      "note": "Controls: dropdowns, rules, sound checkboxes."
+    }
+  },
+  "light_sources": {
+    "flame_left": {
+      "px": {
+        "x": 58,
+        "y": 630,
+        "w": 97,
+        "h": 173
+      },
+      "pct": {
+        "x": 0.0403,
+        "y": 0.5833,
+        "w": 0.0674,
+        "h": 0.1602
+      },
+      "note": "Animated warm flame (DOM element) - paint a soft orange light pool on the wall behind it."
+    },
+    "flame_right": {
+      "px": {
+        "x": 1285,
+        "y": 623,
+        "w": 97,
+        "h": 185
+      },
+      "pct": {
+        "x": 0.8924,
+        "y": 0.5769,
+        "w": 0.0674,
+        "h": 0.1713
+      },
+      "note": "Animated cool blue flame (DOM element) - paint a soft sapphire light pool behind it."
+    }
+  },
+  "art_features": {
+    "gold_hairline_frame": {
+      "inset_px": 30,
+      "note": "Slim double gold rule tracing the canvas edge at this inset; keep alpha subtle (~50%)."
+    },
+    "gem_finials": {
+      "sapphire": [
+        {
+          "pct": {
+            "x": 0.5,
+            "y": 0.0278
+          }
+        },
+        {
+          "pct": {
+            "x": 0.5,
+            "y": 0.9722
+          }
+        }
+      ],
+      "emerald_corners": "small emerald fittings at all four frame corners"
+    },
+    "stage_darkening": {
+      "center_pct": {
+        "x": 0.3865,
+        "y": 0.4458
+      },
+      "note": "Soft elliptical darkening centered on the board zone (~15% darker)."
+    },
+    "faction_washes": "Faction washes: faint RED tint on the LEFT edge, faint BLUE on the RIGHT edge.",
+    "vignette": "Darken smoothly toward all edges; corners near-black."
+  },
+  "delivery": {
+    "format": "JPG or PNG, opaque, no transparency needed",
+    "min_size": "1440x1080",
+    "cropping_warning": "The game displays the art with cover-fit, so on odd window sizes the outermost ~5% may crop; keep nothing essential in the outer margin except the frame (which may crop gracefully)."
+  }
+}
