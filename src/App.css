@@ -243,12 +243,12 @@
 @media (max-aspect-ratio: 7/10) {
   /* sit the animated flicker on the backdrop's painted brazier bowls */
   .tt-flame {
-    bottom: 42vh;
+    bottom: 20vh;
     width: 8vmin;
     height: 14vmin;
   }
-  .tt-flame-left { left: 7vw; }
-  .tt-flame-right { right: 7vw; }
+  .tt-flame-left { left: 9vw; }
+  .tt-flame-right { right: 9vw; }
 }
 
 @media (prefers-reduced-motion: reduce) {
