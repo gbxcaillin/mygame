@@ -1,8 +1,39 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { VitePWA } from 'vite-plugin-pwa'
 
 // https://vite.dev/config/
 export default defineConfig({
   base: '/mygame/',
-  plugins: [react()],
+  plugins: [
+    react(),
+    VitePWA({
+      registerType: 'autoUpdate',
+      includeAssets: ['favicon.svg', 'icons/icon-180.png'],
+      manifest: {
+        name: 'Clash of Beasts',
+        short_name: 'Clash of Beasts',
+        description: 'A Triple Triad style card battle: capture the board with mythic beasts.',
+        id: '/mygame/',
+        start_url: '/mygame/',
+        scope: '/mygame/',
+        display: 'fullscreen',
+        display_override: ['fullscreen', 'standalone'],
+        orientation: 'any',
+        background_color: '#05030a',
+        theme_color: '#05030a',
+        icons: [
+          { src: 'icons/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+          { src: 'icons/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+          { src: 'icons/icon-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+        ],
+      },
+      workbox: {
+        // Precache everything the game needs so it plays fully offline:
+        // card art, backdrops, coins and sounds included.
+        globPatterns: ['**/*.{js,css,html,png,jpg,svg,wav}'],
+        maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
+      },
+    }),
+  ],
 })
