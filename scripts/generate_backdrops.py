@@ -195,7 +195,5 @@ if __name__ == "__main__":
     make_backdrop(1920, 1080, portrait=False, seed=61).save(
         "src/assets/bg-landscape.jpg", quality=87, optimize=True)
     print("wrote src/assets/bg-landscape.jpg")
-    make_backdrop(1440, 1080, portrait=False, seed=63).save(
-        "src/assets/bg-4x3.jpg", quality=87, optimize=True)
-    print("wrote src/assets/bg-4x3.jpg")
+    # bg-4x3.jpg is composed from supplied art by compose_4x3_backdrop.py
     # bg-portrait.jpg is composed from supplied art by compose_portrait_backdrop.py

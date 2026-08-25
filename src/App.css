@@ -961,6 +961,11 @@
     transform: scale(0.9);
     transform-origin: center top;
   }
+
+  /* sit the animated flicker on the 4:3 art's painted brazier bowls */
+  .tt-flame {
+    bottom: 20vh;
+  }
 }
 
 /* Squarish screens (unfolded foldables, iPad portrait, aspect 0.7–1.1):
