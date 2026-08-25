@@ -71,45 +71,16 @@ deco = Image.new("RGBA", (W, H), (0, 0, 0, 0))
 dd = ImageDraw.Draw(deco)
 glow = np.zeros((H, W, 3), np.float32)
 
-# ── ornamental board frame (the live gold grid renders inside it) ──
-bx0, by0, bx1, by1 = BOARD
-for inset, alpha, width in ((16, 110, 3), (9, 55, 1)):
-    dd.rectangle([bx0 - inset, by0 - inset, bx1 + inset, by1 + inset],
-                 outline=(*GOLD_DEEP, alpha), width=width)
-dd.rectangle([bx0 - 16, by0 - 16, bx1 + 16, by1 + 16], fill=(0, 0, 0, 40))
-for cx, cy in ((bx0 - 16, by0 - 16), (bx1 + 16, by0 - 16), (bx0 - 16, by1 + 16), (bx1 + 16, by1 + 16)):
-    draw_gem(dd, cx, cy, 7, EMERALD, EMERALD_GLINT)
-draw_gem(dd, (bx0 + bx1) // 2, by0 - 16, 8, SAPPHIRE, SAPPHIRE_GLINT)
-draw_gem(dd, (bx0 + bx1) // 2, by1 + 16, 8, SAPPHIRE, SAPPHIRE_GLINT)
-
-# ── card sockets ──
-def socket_row(zone, tone):
-    x0, y0, x1, y1 = zone
-    gap = (x1 - x0 - 5 * CARD) / 4
-    cy1 = y1  # cards sit at the bottom of the shell (label above)
-    cy0 = cy1 - CARD
-    for i in range(5):
-        sx = round(x0 + i * (CARD + gap))
-        box = [sx, cy0, sx + CARD, cy1]
-        dd.rounded_rectangle(box, radius=9, fill=(0, 0, 0, 42))
-        dd.rounded_rectangle(box, radius=9, outline=(*tone, 130), width=2)
-        dd.rounded_rectangle([box[0] + 4, box[1] + 4, box[2] - 4, box[3] - 4],
-                             radius=7, outline=(*tone, 45), width=1)
-        draw_gem(dd, sx + CARD // 2, cy0, 5, tone, tuple(min(255, c + 90) for c in tone))
-    return (x0 + x1) // 2, (cy0 + cy1) // 2
-
-ca = socket_row(HAND_A, RED_SOCKET)
-cb = socket_row(HAND_B, BLUE_SOCKET)
-glow += radial(W, H, *ca, 480, (150, 34, 26), 0.13)
-glow += radial(W, H, *cb, 480, (30, 70, 190), 0.13)
-
-# ── recessed panels behind the topbar and controls ──
-for (x0, y0, x1, y1) in (TOPBAR, BOTTOMBAR):
-    dd.rounded_rectangle([x0 - 8, y0 - 6, x1 + 8, y1 + 6], radius=10, fill=(0, 0, 0, 60))
-    dd.rounded_rectangle([x0 - 8, y0 - 6, x1 + 8, y1 + 6], radius=10,
-                         outline=(*GOLD_DEEP, 100), width=2)
-    dd.rounded_rectangle([x0 - 3, y0 - 1, x1 + 3, y1 + 1], radius=7,
-                         outline=(*GOLD_MID, 36), width=1)
+# NOTE: card sockets, recessed panels and the ornamental board frame are
+# deliberately NOT baked into the art any more — on real devices the
+# browser chrome changes the viewport aspect and cover-fit shifts the
+# painting, so anything position-locked ghosts against the live UI.
+# Those elements are DOM/CSS now (Hand.css, Board.css, App.css). Only
+# position-forgiving light washes are painted here.
+glow += radial(W, H, (HAND_A[0] + HAND_A[2]) // 2, (HAND_A[1] + HAND_A[3]) // 2,
+               480, (150, 34, 26), 0.13)
+glow += radial(W, H, (HAND_B[0] + HAND_B[2]) // 2, (HAND_B[1] + HAND_B[3]) // 2,
+               480, (30, 70, 190), 0.13)
 
 # warm glow cradling the title
 glow += radial(W, H, *TITLE_CENTER, 320, (108, 74, 26), 0.28)

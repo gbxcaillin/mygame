@@ -30,3 +30,40 @@
   opacity: 0.6;
   margin: 0;
 }
+
+/* Empty faction-toned sockets where played cards used to sit. Rendered
+   in the DOM (not the backdrop art) so they always align with the cards
+   regardless of viewport shape or browser chrome. */
+.tt-hand-socket {
+  position: relative;
+  width: var(--card-size, 96px);
+  height: var(--card-size, 96px);
+  flex: none;
+  box-sizing: border-box;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.34);
+}
+
+.tt-hand-socket::before {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border-radius: 7px;
+  pointer-events: none;
+}
+
+.tt-hand-socket.socket-b {
+  border: 2px solid rgba(168, 62, 48, 0.6);
+}
+
+.tt-hand-socket.socket-b::before {
+  border: 1px solid rgba(168, 62, 48, 0.25);
+}
+
+.tt-hand-socket.socket-a {
+  border: 2px solid rgba(66, 110, 220, 0.6);
+}
+
+.tt-hand-socket.socket-a::before {
+  border: 1px solid rgba(66, 110, 220, 0.25);
+}

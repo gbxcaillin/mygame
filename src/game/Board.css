@@ -1,10 +1,32 @@
 /* Basic 3x3 board grid */
 
 .tt-board {
+  position: relative;
   display: grid;
   grid-template-columns: repeat(3, var(--cell-size, 96px));
   grid-template-rows: repeat(3, var(--cell-size, 96px));
   gap: var(--grid-gap, 6px);
+}
+
+/* Ornamental double frame around the field — in the DOM rather than the
+   backdrop art so it tracks the board at every viewport shape. */
+.tt-board::before {
+  content: "";
+  position: absolute;
+  inset: -16px;
+  border: 3px solid rgba(138, 106, 37, 0.45);
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.16);
+  pointer-events: none;
+}
+
+.tt-board::after {
+  content: "";
+  position: absolute;
+  inset: -9px;
+  border: 1px solid rgba(215, 148, 37, 0.25);
+  border-radius: 3px;
+  pointer-events: none;
 }
 
 .tt-cell {

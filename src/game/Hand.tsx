@@ -14,7 +14,13 @@ interface HandProps {
   cardsRowRef?: Ref<HTMLDivElement>;
 }
 
+const HAND_SIZE = 5;
+
 export function Hand({ player, cards, isActive, selectedCardId, onSelect, onInspect, label, cardsRowRef }: HandProps) {
+  // Played cards leave an empty faction-toned socket, keeping the row's
+  // footprint stable (the sockets live in the DOM so they always align
+  // with the cards, unlike backdrop-painted ones).
+  const empties = Math.max(0, HAND_SIZE - cards.length);
   return (
     <div className={`tt-hand ${isActive ? "active" : ""}`}>
       <h3 className="tt-hand-label">{label}</h3>
@@ -30,7 +36,9 @@ export function Hand({ player, cards, isActive, selectedCardId, onSelect, onInsp
             onInspect={() => onInspect(card)}
           />
         ))}
-        {cards.length === 0 && <p className="tt-hand-empty">No cards left</p>}
+        {Array.from({ length: empties }, (_, i) => (
+          <div key={`socket-${i}`} className={`tt-hand-socket socket-${player === "A" ? "a" : "b"}`} aria-hidden="true" />
+        ))}
       </div>
     </div>
   );
