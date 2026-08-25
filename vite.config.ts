@@ -9,7 +9,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'icons/icon-180.png'],
+      includeAssets: ['favicon.png', 'icons/icon-180.png'],
       manifest: {
         name: 'Court of Beasts',
         short_name: 'Court of Beasts',
