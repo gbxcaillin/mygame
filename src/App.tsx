@@ -10,8 +10,8 @@ import type { Difficulty } from "./game/ai";
 import { DEFAULT_RULES } from "./game/types";
 import type { Card, GameState, PlayerId, RuleSet } from "./game/types";
 import titleLogo from "./assets/title.png";
-import bgLandscape from "./assets/bg-landscape.png";
-import bgPortrait from "./assets/bg-portrait.png";
+import bgLandscape from "./assets/bg-landscape.jpg";
+import bgPortrait from "./assets/bg-portrait.jpg";
 import coinCrown from "./assets/coin-crown.png";
 import coinShield from "./assets/coin-shield.png";
 import {

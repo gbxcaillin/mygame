@@ -1,289 +1,198 @@
-"""Pixel-art (16-bit console style) dungeon backdrops replicating the
-game's original ornate art: dark stone dungeon walls, red/blue heraldic
-banners with dragon crests, metal dragon statues on pedestals, Gothic
-arch pillars, and flaming braziers. Rendered low-res and upscaled
-nearest-neighbour. Card-slot frames and title are handled in CSS, so
-they are intentionally omitted here.
+#!/usr/bin/env python3
+"""Painterly dungeon-vault backdrops for Court of Beasts.
+
+Follows docs/title-art-style.json: torch-lit near-black ashlar stone,
+fine cracks, a subtle gold hairline frame with sapphire finials and
+emerald corner fittings (echoing the title plaque), warm/cool light
+pools under the DOM brazier flames, and faint red/blue faction washes
+on the opponent/player sides. Smooth high-res rendering — the old
+pixel-art dragons, banners and chunky bricks are intentionally gone.
+
+Outputs src/assets/bg-landscape.jpg (1920x1080, red left / blue right)
+and src/assets/bg-portrait.jpg (1080x2340, red top / blue bottom).
+
+Run from the repo root:  python3 scripts/generate_backdrops.py
 """
-from PIL import Image, ImageDraw
-import math, random
 
-BAYER = [[0, 8, 2, 10], [12, 4, 14, 6], [3, 11, 1, 9], [15, 7, 13, 5]]
+import math
+import random
 
-# ── palettes ──
-STONE = [(10, 9, 12), (16, 14, 18), (22, 19, 24), (30, 26, 32)]
-MORTAR = (5, 4, 6)
-GOLD = (200, 162, 74)
-GOLD_HI = (238, 206, 120)
-RED = dict(cloth=(146, 30, 34), dark=(84, 14, 20), rim=(206, 60, 46),
-           eye=(255, 96, 60), f1=(255, 150, 50), f2=(226, 70, 34), f3=(255, 220, 150))
-BLUE = dict(cloth=(38, 66, 158), dark=(18, 30, 96), rim=(70, 128, 232),
-            eye=(120, 190, 255), f1=(96, 168, 255), f2=(58, 96, 230), f3=(190, 224, 255))
+import numpy as np
+from PIL import Image, ImageDraw, ImageFilter
 
-
-def lerp(a, b, t):
-    return tuple(int(a[i] + (b[i] - a[i]) * t) for i in range(3))
+# palette (docs/title-art-style.json)
+STONE_BASE = np.array([15.0, 12.5, 17.0])
+GOLD_MID = (215, 148, 37)
+GOLD_DEEP = (138, 106, 37)
+SAPPHIRE = (7, 83, 186)
+SAPPHIRE_GLINT = (191, 227, 243)
+EMERALD = (57, 131, 93)
+EMERALD_GLINT = (102, 211, 184)
+CRACK_WARM = (48, 24, 0)
 
 
-def clampc(c):
-    return tuple(max(0, min(255, int(v))) for v in c)
+def fbm(w: int, h: int, rng: np.random.Generator) -> np.ndarray:
+    """Multi-octave value noise in ~[-0.5, 0.5]."""
+    acc = np.zeros((h, w), np.float32)
+    for cells, amp in ((6, 0.42), (14, 0.26), (30, 0.16), (64, 0.10), (140, 0.06)):
+        sx = max(2, round(cells * w / max(w, h)))
+        sy = max(2, round(cells * h / max(w, h)))
+        grid = (rng.random((sy, sx)) * 255).astype(np.uint8)
+        up = Image.fromarray(grid, "L").resize((w, h), Image.BICUBIC)
+        acc += (np.asarray(up, np.float32) / 255.0 - 0.5) * amp
+    return acc
 
 
-# ── dungeon stone wall with brick courses ──
-def stone_wall(img, x0, y0, x1, y1, rnd, bw=21, bh=12):
-    d = ImageDraw.Draw(img)
-    d.rectangle([x0, y0, x1, y1], fill=MORTAR)
-    for by in range(y0, y1, bh):
-        row = by // bh
-        xoff = (bw // 2) if row % 2 else 0
-        for bx in range(x0 - xoff, x1, bw):
-            shade = STONE[rnd.randrange(len(STONE))]
-            x2, y2 = min(bx + bw - 2, x1), min(by + bh - 2, y1)
-            if bx + 1 > x1 or by + 1 > y1:
-                continue
-            d.rectangle([max(bx + 1, x0), by + 1, x2, y2], fill=shade)
-            # top bevel highlight, occasional crack
-            d.line([max(bx + 1, x0), by + 1, x2, by + 1], fill=lerp(shade, (60, 54, 60), 0.5))
-            if rnd.random() < 0.12:
-                cx = rnd.randrange(bx + 2, max(bx + 3, x2))
-                d.line([cx, by + 2, cx + rnd.randrange(-2, 3), y2 - 1], fill=MORTAR)
+def screen(base: np.ndarray, light: np.ndarray) -> np.ndarray:
+    return 255.0 - (255.0 - base) * (255.0 - light) / 255.0
 
 
-def warm_glow(img, cx, cy, r, tint, strength=0.5):
-    px = img.load()
-    W, H = img.size
-    for y in range(max(0, cy - r), min(H, cy + r)):
-        for x in range(max(0, cx - r), min(W, cx + r)):
-            d = math.hypot(x - cx, y - cy) / r
-            if d < 1.0:
-                th = (BAYER[y % 4][x % 4] + 0.5) / 16.0
-                f = (1 - d) * strength
-                if f > th * 0.25:
-                    r0, g0, b0 = px[x, y][:3]
-                    px[x, y] = clampc((r0 + tint[0] * f, g0 + tint[1] * f, b0 + tint[2] * f))
+def radial_light(w, h, cx, cy, radius, color, strength) -> np.ndarray:
+    """Soft radial glow layer (float RGB) for screen-blending."""
+    ys, xs = np.mgrid[0:h, 0:w].astype(np.float32)
+    d = np.sqrt((xs - cx) ** 2 + (ys - cy) ** 2) / radius
+    fall = np.clip(1.0 - d, 0.0, 1.0) ** 2 * strength
+    return fall[..., None] * np.array(color, np.float32)
 
 
-# ── heraldic banner: pole, cloth with notched base, gold trim, crest ──
-def crest(d, cx, cy, s, col):
-    # stylised double-headed dragon emblem (dark silhouette)
-    d.polygon([(cx, cy - 3 * s), (cx + s, cy), (cx, cy + 4 * s), (cx - s, cy)], fill=col)  # body
-    for sgn in (-1, 1):
-        d.polygon([(cx, cy - s), (cx + sgn * 3 * s, cy - 3 * s), (cx + sgn * s, cy)], fill=col)  # head
-        d.polygon([(cx, cy + s), (cx + sgn * 4 * s, cy), (cx + sgn * s, cy + 2 * s)], fill=col)  # wing
+def draw_gem(d: ImageDraw.ImageDraw, x, y, r, core, glint):
+    """Faceted diamond gem in a gold mount."""
+    m = r * 1.55
+    d.polygon([(x, y - m), (x + m * 0.72, y), (x, y + m), (x - m * 0.72, y)],
+              fill=(*GOLD_DEEP, 200), outline=(*GOLD_MID, 230))
+    d.polygon([(x, y - r), (x + r * 0.66, y), (x, y + r), (x - r * 0.66, y)],
+              fill=(*core, 255))
+    dark = tuple(int(c * 0.55) for c in core)
+    d.polygon([(x, y), (x + r * 0.66, y), (x, y + r)], fill=(*dark, 255))
+    d.line([(x, y - r), (x, y + r)], fill=(*glint, 120), width=1)
+    d.ellipse([x - r * 0.28 - 1, y - r * 0.55 - 1, x - r * 0.28 + 1, y - r * 0.55 + 1],
+              fill=(*glint, 255))
 
 
-def banner(img, x, y, w, h, pal):
-    d = ImageDraw.Draw(img)
-    # pole across top
-    d.rectangle([x - 5, y - 4, x + w + 5, y - 1], fill=(58, 50, 40))
-    d.rectangle([x - 5, y - 4, x + w + 5, y - 3], fill=GOLD)
-    for fx in (x - 5, x + w + 3):
-        d.polygon([(fx, y - 6), (fx + 3, y - 6), (fx + 1, y - 10)], fill=GOLD_HI)  # spear finial
-    # cloth with notched bottom
-    cloth = [(x, y), (x + w, y), (x + w, y + h - 7), (x + w // 2, y + h), (x, y + h - 7)]
-    d.polygon(cloth, fill=pal["cloth"])
-    # vertical shading bands
-    d.rectangle([x, y, x + 3, y + h - 8], fill=pal["dark"])
-    d.rectangle([x + w - 3, y, x + w, y + h - 8], fill=pal["dark"])
-    # gold top + fringe
-    d.rectangle([x, y, x + w, y + 2], fill=GOLD)
-    crest(d, x + w // 2, y + h // 2 - 2, max(1, w // 8), (12, 10, 12))
+def make_backdrop(w: int, h: int, portrait: bool, seed: int) -> Image.Image:
+    rng = np.random.default_rng(seed)
+    prnd = random.Random(seed)
 
+    # ── stone wall: fbm texture + ashlar block courses ──
+    tex = fbm(w, h, rng)
+    img = STONE_BASE[None, None, :] * (1.0 + tex[..., None] * 0.9)
+    img += tex[..., None] * np.array([6.0, 3.5, 0.0])  # warm flecks in the grain
 
-# ── Gothic arch pillar ──
-def arch_pillar(img, x, y0, y1, w, rnd):
-    d = ImageDraw.Draw(img)
-    stone_wall(img, x, y0, x + w, y1, rnd, bw=10, bh=9)
-    d.rectangle([x, y0, x + w, y1], outline=(40, 34, 40))
-    # pointed arch alcove (dark)
-    ax0, ax1 = x + 3, x + w - 3
-    ay = y0 + w
-    apex = y0 + 4
-    d.polygon([(ax0, y1), (ax0, ay), ((ax0 + ax1) // 2, apex), (ax1, ay), (ax1, y1)], fill=(4, 4, 7))
-    d.line([ax0, ay, (ax0 + ax1) // 2, apex], fill=(46, 40, 46))
-    d.line([ax1, ay, (ax0 + ax1) // 2, apex], fill=(46, 40, 46))
+    block_h = round(h * (0.075 if portrait else 0.115))
+    block_w = round(block_h * 2.05)
+    bevel = np.zeros((h, w), np.float32)
+    row = 0
+    y = 0
+    while y < h:
+        y2 = min(h, y + block_h)
+        xoff = -(block_w // 2) if row % 2 else 0
+        x = xoff
+        while x < w:
+            x2 = min(w, x + block_w)
+            if x2 > 0:
+                x0 = max(0, x)
+                bevel[y:y2, x0:x2] += float(rng.uniform(-7.0, 7.0))  # per-block value
+                bevel[y:min(y + 3, h), x0:x2] += 7.0                  # top edge catches light
+                bevel[max(0, y2 - 3):y2, x0:x2] -= 6.0                # bottom edge in shadow
+            x += block_w
+        # mortar between courses
+        bevel[max(0, y - 2):min(y + 1, h), :] -= 13.0
+        row += 1
+        y += block_h
+    # vertical mortar joints (redrawn with jitter so courses read hand-laid)
+    row = 0
+    y = 0
+    while y < h:
+        y2 = min(h, y + block_h)
+        xoff = -(block_w // 2) if row % 2 else 0
+        x = xoff
+        while x < w:
+            xj = x + prnd.randint(-3, 3)
+            if 1 <= xj < w - 1:
+                bevel[y:y2, xj - 1:xj + 2] -= 11.0
+            x += block_w
+        row += 1
+        y += block_h
+    img += bevel[..., None]
 
+    # ── cracks: dark random walks, a few with a warm scorched tint ──
+    crack = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    cd = ImageDraw.Draw(crack)
+    for _ in range(round(14 * (w * h) / (1920 * 1080))):
+        x = prnd.uniform(0.05 * w, 0.95 * w)
+        y = prnd.uniform(0.05 * h, 0.95 * h)
+        ang = prnd.uniform(0, math.tau)
+        warm = prnd.random() < 0.3
+        col = (*CRACK_WARM, 70) if warm else (4, 3, 6, 110)
+        for _ in range(prnd.randint(14, 40)):
+            ang += prnd.uniform(-0.7, 0.7)
+            nx = x + math.cos(ang) * prnd.uniform(4, 14)
+            ny = y + math.sin(ang) * prnd.uniform(4, 14)
+            cd.line([(x, y), (nx, ny)], fill=col, width=prnd.choice((1, 1, 2)))
+            x, y = nx, ny
 
-# ── brazier: goblet on stand with layered flame + glow ──
-def brazier(img, x, ybase, pal, fh=16):
-    d = ImageDraw.Draw(img)
-    d.polygon([(x - 3, ybase), (x + 3, ybase), (x + 5, ybase - 9), (x - 5, ybase - 9)], fill=(46, 40, 40))
-    d.rectangle([x - 7, ybase - 13, x + 7, ybase - 9], fill=(58, 52, 52))
-    d.rectangle([x - 7, ybase - 13, x + 7, ybase - 12], fill=(96, 88, 80))
-    top = ybase - 13
-    rnd = random.Random(x * 7 + ybase)
-    for k in range(fh):
-        t = k / fh
-        half = max(1, int((1 - t) * 6) + rnd.randrange(-1, 2))
-        yy = top - k
-        col = pal["f2"] if t < 0.4 else (pal["f1"] if t < 0.75 else pal["f3"])
-        d.line([x - half, yy, x + half, yy], fill=col)
-    warm_glow(img, x, top - fh // 2, fh + 14, (pal["f1"][0] // 3, pal["f1"][1] // 3, pal["f1"][2] // 3), 0.9)
+    base = Image.fromarray(np.clip(img, 0, 255).astype(np.uint8), "RGB")
+    base = base.filter(ImageFilter.GaussianBlur(0.5))
+    base = Image.alpha_composite(base.convert("RGBA"), crack).convert("RGB")
+    img = np.asarray(base, np.float32)
 
+    # ── lighting ──
+    light = radial_light(w, h, w * 0.5, h * 0.22, max(w, h) * 0.85, (52, 36, 16), 0.55)
+    if portrait:
+        pools = [(0.07, 0.635, (255, 140, 50), 0.30), (0.93, 0.635, (70, 130, 255), 0.30)]
+        washes = [((0.5, -0.05), 0.55, (150, 26, 30), 0.16),   # opponent red, top
+                  ((0.5, 1.05), 0.55, (36, 70, 200), 0.16)]    # player blue, bottom
+    else:
+        pools = [(0.055, 0.72, (255, 140, 50), 0.32), (0.945, 0.72, (70, 130, 255), 0.32)]
+        washes = [((-0.05, 0.35), 0.5, (150, 26, 30), 0.17),   # red, left
+                  ((1.05, 0.35), 0.5, (36, 70, 200), 0.17)]    # blue, right
+    for fx, fy, col, s in pools:
+        light += radial_light(w, h, w * fx, h * fy, max(w, h) * 0.24, col, s)
+    for (fx, fy), rad, col, s in washes:
+        light += radial_light(w, h, w * fx, h * fy, max(w, h) * rad, col, s)
+    img = screen(img, np.clip(light, 0, 255))
 
-# ── dragon statue (rim-lit dark metal), reuse silhouette ──
-DRAGON_BODY = [(12, 96), (20, 88), (28, 82), (34, 74), (36, 64), (40, 54), (44, 46), (50, 38),
-               (54, 28), (56, 20), (60, 14), (68, 12), (76, 15), (84, 18), (83, 22), (72, 23),
-               (78, 30), (70, 30), (64, 34), (60, 42), (58, 52), (54, 62), (50, 72), (52, 82),
-               (46, 92), (40, 90), (40, 96), (34, 96), (30, 90), (22, 94), (12, 100)]
-DRAGON_WING = [(44, 46), (34, 26), (22, 10), (28, 30), (16, 22), (26, 40), (12, 38), (26, 50),
-               (18, 56), (32, 56), (40, 54)]
-DRAGON_HORNS = [(60, 14), (52, 6), (58, 13), (56, 2), (62, 12), (68, 12)]
+    # ── gold hairline frame with gems (echoes the title plaque) ──
+    deco = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    dd = ImageDraw.Draw(deco)
+    inset = round(min(w, h) * 0.028)
+    dd.rectangle([inset, inset, w - inset, h - inset], outline=(*GOLD_DEEP, 120), width=3)
+    in2 = inset + 7
+    dd.rectangle([in2, in2, w - in2, h - in2], outline=(*GOLD_MID, 60), width=1)
+    gem_r = round(min(w, h) * 0.012)
+    draw_gem(dd, w // 2, inset, gem_r, SAPPHIRE, SAPPHIRE_GLINT)          # top finial
+    draw_gem(dd, w // 2, h - inset, gem_r, SAPPHIRE, SAPPHIRE_GLINT)      # bottom finial
+    for cx, cy in ((inset, inset), (w - inset, inset), (inset, h - inset), (w - inset, h - inset)):
+        draw_gem(dd, cx, cy, round(gem_r * 0.8), EMERALD, EMERALD_GLINT)  # corner emeralds
+    img_pil = Image.fromarray(np.clip(img, 0, 255).astype(np.uint8), "RGB")
+    img_pil = Image.alpha_composite(img_pil.convert("RGBA"), deco).convert("RGB")
+    img = np.asarray(img_pil, np.float32)
 
+    # gem glows so the fittings read as lit jewels
+    glow = radial_light(w, h, w * 0.5, inset, min(w, h) * 0.06, SAPPHIRE, 0.5)
+    glow += radial_light(w, h, w * 0.5, h - inset, min(w, h) * 0.06, SAPPHIRE, 0.5)
+    for cx, cy in ((inset, inset), (w - inset, inset), (inset, h - inset), (w - inset, h - inset)):
+        glow += radial_light(w, h, cx, cy, min(w, h) * 0.05, EMERALD, 0.45)
+    img = screen(img, np.clip(glow, 0, 255))
 
-def dragon_statue(img, ox, oy, scale, pal, flip=False):
-    def tx(p):
-        x, y = p
-        if flip:
-            x = 100 - x
-        return (ox + x * scale, oy + y * scale)
-    # team-coloured backlight halo so the silhouette reads off the brick
-    cx = ox + 50 * scale
-    cy = oy + 50 * scale
-    warm_glow(img, int(cx), int(cy), int(52 * scale),
-              (pal["rim"][0] // 4, pal["rim"][1] // 4, pal["rim"][2] // 4), 0.7)
-    d = ImageDraw.Draw(img)
-    metal = (40, 36, 46)
-    dark = (20, 18, 24)
-    d.polygon([tx(p) for p in DRAGON_WING], fill=dark)
-    d.polygon([tx(p) for p in DRAGON_BODY], fill=metal)
-    d.polygon([tx(p) for p in DRAGON_HORNS], fill=metal)
-    # wing membrane a touch of team tint
-    d.polygon([tx(p) for p in DRAGON_WING], outline=lerp(pal["rim"], dark, 0.5))
-    # rim light along back + neck + wing leading edge
-    rim = pal["rim"]
-    d.line([tx((44, 46)), tx((54, 28)), tx((60, 14)), tx((76, 15))], fill=rim, width=1)
-    d.line([tx((44, 46)), tx((34, 26)), tx((22, 10))], fill=rim, width=1)
-    d.line([tx((36, 64)), tx((44, 46))], fill=lerp(rim, metal, 0.3))
-    d.line([tx((50, 72)), tx((46, 92))], fill=lerp(rim, metal, 0.5))  # hind leg edge
-    ex, ey = tx((66, 18))
-    s = max(1, int(scale) + 1)
-    d.rectangle([ex, ey, ex + s, ey + s], fill=pal["eye"])
+    # ── stage: darken where the board sits so the gold grid pops ──
+    ys, xs = np.mgrid[0:h, 0:w].astype(np.float32)
+    scx, scy = (0.5, 0.47) if portrait else (0.40, 0.52)
+    sd = np.sqrt(((xs - w * scx) / (w * 0.42)) ** 2 + ((ys - h * scy) / (h * 0.34)) ** 2)
+    img *= (1.0 - 0.16 * np.clip(1.0 - sd, 0, 1)[..., None])
 
+    # ── vignette + grain ──
+    vd = np.sqrt(((xs - w / 2) / (w / 2)) ** 2 + ((ys - h / 2) / (h / 2)) ** 2)
+    img *= (1.0 - 0.46 * np.clip(vd - 0.5, 0, 1) ** 1.5)[..., None]
+    img += rng.normal(0.0, 2.4, (h, w, 1)).astype(np.float32)
 
-def pedestal(img, x0, ytop, x1, ybot, rnd):
-    d = ImageDraw.Draw(img)
-    # solid lighter stone block so the statue clearly stands on it
-    for yy in range(ytop, ybot):
-        t = (yy - ytop) / max(1, ybot - ytop)
-        d.line([x0, yy, x1, yy], fill=lerp((54, 48, 52), (26, 22, 26), t))
-    # mortar courses + cap
-    for yy in range(ytop + 8, ybot, 9):
-        d.line([x0, yy, x1, yy], fill=(14, 12, 14))
-    d.rectangle([x0 - 3, ytop, x1 + 3, ytop + 4], fill=(46, 42, 46))
-    d.rectangle([x0 - 3, ytop, x1 + 3, ytop + 1], fill=(84, 76, 72))
-    d.rectangle([x0, ytop, x1, ybot - 1], outline=(12, 10, 12))
-
-
-def spires(d, W, base_y, color, rnd, n=9):
-    x = 0
-    while x < W:
-        w = rnd.randrange(16, 34)
-        h = rnd.randrange(20, 70)
-        d.rectangle([x, base_y - h, x + w, base_y], fill=color)
-        d.polygon([(x, base_y - h), (x + w, base_y - h), (x + w // 2, base_y - h - rnd.randrange(4, 12))], fill=color)
-        x += w + rnd.randrange(4, 20)
-
-
-def floor(img, W, H, y0, rnd):
-    d = ImageDraw.Draw(img)
-    for y in range(y0, H):
-        t = (y - y0) / max(1, H - y0)
-        d.line([0, y, W, y], fill=lerp((20, 16, 16), (6, 5, 6), t))
-    cx = W // 2
-    for k in range(-8, 9):
-        d.line([cx + k * 12, y0, cx + k * 60, H], fill=(30, 24, 22))
-    yy = y0
-    step = 3
-    while yy < H:
-        d.line([0, yy, W, yy], fill=(30, 24, 22))
-        yy += step
-        step += 2
-
-
-def vignette(img, strength=0.6):
-    W, H = img.size
-    px = img.load()
-    for y in range(H):
-        for x in range(W):
-            dx = (x - W / 2) / (W / 2)
-            dy = (y - H / 2) / (H / 2)
-            dd = min(1.0, (dx * dx + dy * dy) ** 0.5)
-            f = 1.0 - strength * (dd ** 2.4)
-            r, g, b = px[x, y][:3]
-            px[x, y] = (int(r * f), int(g * f), int(b * f))
-
-
-# ═══════════════ LANDSCAPE ═══════════════
-def make_landscape():
-    W, H = 480, 270
-    img = Image.new("RGB", (W, H), (8, 7, 10))
-    d = ImageDraw.Draw(img)
-    rnd = random.Random(41)
-    stone_wall(img, 0, 0, W, H, rnd)
-    spires(d, W, 150, (12, 11, 15), random.Random(3))
-    warm_glow(img, W // 2, 150, 150, (26, 12, 6), 0.5)
-    FLOOR = 210
-    floor(img, W, H, FLOOR, rnd)
-
-    # side pillars
-    arch_pillar(img, 96, 150, FLOOR, 30, random.Random(11))
-    arch_pillar(img, W - 126, 150, FLOOR, 30, random.Random(12))
-
-    # pedestals + dragon statues
-    pedestal(img, 40, 150, 96, FLOOR, random.Random(21))
-    pedestal(img, W - 96, 150, W - 40, FLOOR, random.Random(22))
-    dragon_statue(img, 22, 66, 1.0, RED, flip=False)
-    dragon_statue(img, W - 122, 66, 1.0, BLUE, flip=True)
-
-    # banners (hang from top, over the pillars)
-    banner(img, 8, 12, 46, 96, RED)
-    banner(img, W - 54, 12, 46, 96, BLUE)
-
-    # braziers at pillar bases
-    brazier(img, 111, FLOOR - 2, RED, fh=18)
-    brazier(img, W - 111, FLOOR - 2, BLUE, fh=18)
-
-    vignette(img, 0.55)
-    return img.resize((1920, 1080), Image.NEAREST)
-
-
-# ═══════════════ PORTRAIT ═══════════════
-def make_portrait():
-    W, H = 270, 585
-    img = Image.new("RGB", (W, H), (8, 7, 10))
-    d = ImageDraw.Draw(img)
-    rnd = random.Random(51)
-    stone_wall(img, 0, 0, W, H, rnd)
-    spires(d, W, 110, (12, 11, 15), random.Random(7))
-    warm_glow(img, W // 2, 300, 220, (24, 11, 6), 0.4)
-    FLOOR = 470
-    floor(img, W, H, FLOOR, rnd)
-
-    # tall side pillars down both edges
-    arch_pillar(img, 0, 150, FLOOR, 30, random.Random(13))
-    arch_pillar(img, W - 30, 150, FLOOR, 30, random.Random(14))
-
-    # dragon statues on side pedestals below the banners
-    pedestal(img, 0, 300, 44, 360, random.Random(23))
-    pedestal(img, W - 44, 300, W, 360, random.Random(24))
-    dragon_statue(img, -6, 214, 0.9, RED, flip=False)
-    dragon_statue(img, W - 84, 214, 0.9, BLUE, flip=True)
-
-    # banners top corners
-    banner(img, 4, 16, 44, 92, RED)
-    banner(img, W - 48, 16, 44, 92, BLUE)
-
-    # braziers lower on the pillars
-    brazier(img, 15, FLOOR - 6, RED, fh=20)
-    brazier(img, W - 15, FLOOR - 6, BLUE, fh=20)
-
-    vignette(img, 0.5)
-    return img.resize((1080, 2340), Image.NEAREST)
+    return Image.fromarray(np.clip(img, 0, 255).astype(np.uint8), "RGB")
 
 
 if __name__ == "__main__":
-    out = "/tmp/claude-0/-home-user-mygame/b52cdc70-4740-5ae6-8457-a11a6b857399/scratchpad"
-    make_landscape().save(out + "/bg-landscape.png")
-    make_portrait().save(out + "/bg-portrait.png")
-    print("done")
+    make_backdrop(1920, 1080, portrait=False, seed=61).save(
+        "src/assets/bg-landscape.jpg", quality=87, optimize=True)
+    print("wrote src/assets/bg-landscape.jpg")
+    make_backdrop(1080, 2340, portrait=True, seed=62).save(
+        "src/assets/bg-portrait.jpg", quality=87, optimize=True)
+    print("wrote src/assets/bg-portrait.jpg")
