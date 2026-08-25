@@ -11,6 +11,7 @@ import { DEFAULT_RULES } from "./game/types";
 import type { Card, GameState, PlayerId, RuleSet } from "./game/types";
 import titleLogo from "./assets/title.png";
 import bgLandscape from "./assets/bg-landscape.jpg";
+import bg4x3 from "./assets/bg-4x3.jpg";
 import bgPortrait from "./assets/bg-portrait.jpg";
 import coinCrown from "./assets/coin-crown.png";
 import coinShield from "./assets/coin-shield.png";
@@ -281,7 +282,9 @@ function App() {
   return (
     <>
       <picture>
+        {/* first matching source wins: tall -> portrait art, squarish/4:3 -> 4:3 art, wider -> 16:9 art */}
         <source srcSet={bgPortrait} media="(max-aspect-ratio: 7/10)" />
+        <source srcSet={bg4x3} media="(max-aspect-ratio: 3/2)" />
         <img src={bgLandscape} className="tt-backdrop" alt="" aria-hidden="true" />
       </picture>
       <div className="tt-flame tt-flame-left" aria-hidden="true" />

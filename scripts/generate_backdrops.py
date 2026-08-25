@@ -8,8 +8,10 @@ pools under the DOM brazier flames, and faint red/blue faction washes
 on the opponent/player sides. Smooth high-res rendering — the old
 pixel-art dragons, banners and chunky bricks are intentionally gone.
 
-Outputs src/assets/bg-landscape.jpg (1920x1080, red left / blue right)
-and src/assets/bg-portrait.jpg (1080x2340, red top / blue bottom).
+Outputs src/assets/bg-landscape.jpg (1920x1080, red left / blue right),
+src/assets/bg-4x3.jpg (1440x1080, same composition at 4:3 so squarish
+windows don't crop the edge jewelry), and src/assets/bg-portrait.jpg
+(1080x2340, red top / blue bottom).
 
 Run from the repo root:  python3 scripts/generate_backdrops.py
 """
@@ -193,6 +195,9 @@ if __name__ == "__main__":
     make_backdrop(1920, 1080, portrait=False, seed=61).save(
         "src/assets/bg-landscape.jpg", quality=87, optimize=True)
     print("wrote src/assets/bg-landscape.jpg")
+    make_backdrop(1440, 1080, portrait=False, seed=63).save(
+        "src/assets/bg-4x3.jpg", quality=87, optimize=True)
+    print("wrote src/assets/bg-4x3.jpg")
     make_backdrop(1080, 2340, portrait=True, seed=62).save(
         "src/assets/bg-portrait.jpg", quality=87, optimize=True)
     print("wrote src/assets/bg-portrait.jpg")
