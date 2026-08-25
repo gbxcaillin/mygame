@@ -786,7 +786,9 @@
   }
 
   .tt-title img {
-    width: min(90vw, 820px);
+    /* the Court of Beasts plaque is ~2.5:1, so cap width to keep its
+       height close to the old slim banner's vertical budget */
+    width: min(52vw, 420px);
   }
 
   .tt-topbar {

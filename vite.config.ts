@@ -11,8 +11,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'icons/icon-180.png'],
       manifest: {
-        name: 'Clash of Beasts',
-        short_name: 'Clash of Beasts',
+        name: 'Court of Beasts',
+        short_name: 'Court of Beasts',
         description: 'A Triple Triad style card battle: capture the board with mythic beasts.',
         id: '/mygame/',
         start_url: '/mygame/',

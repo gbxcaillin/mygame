@@ -289,7 +289,7 @@ function App() {
 
       <div className="tt-app">
       <h1 className="tt-title">
-        <img src={titleLogo} alt="Clash of Beasts" />
+        <img src={titleLogo} alt="Court of Beasts" />
       </h1>
 
       <div className="tt-game">
@@ -439,7 +439,7 @@ function App() {
       {!started && (
         <div className="tt-start-veil">
           <div className="tt-start">
-            <img className="tt-start-logo" src={titleLogo} alt="Clash of Beasts" />
+            <img className="tt-start-logo" src={titleLogo} alt="Court of Beasts" />
             <button type="button" className="tt-start-btn" onClick={handleStart} autoFocus>
               Press Start
             </button>
