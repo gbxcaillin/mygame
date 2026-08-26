@@ -63,7 +63,7 @@ function App() {
   const [audio, setAudio] = useState(getAudioSettings);
   const [bannerDismissed, setBannerDismissed] = useState(false);
   const [started, setStarted] = useState(false);
-  const [deckMode, setDeckMode] = useState<"random" | "select">("random");
+  const [deckMode, setDeckMode] = useState<"random" | "select">("select");
   const [deckOpen, setDeckOpen] = useState(false);
   const [draftPool, setDraftPool] = useState<Card[]>([]);
   const [picked, setPicked] = useState<Card[]>([]);
