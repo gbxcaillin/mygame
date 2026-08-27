@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Board } from "./game/Board";
 import { Hand } from "./game/Hand";
 import { CardLightbox } from "./game/CardLightbox";
 import { TutorialModal } from "./game/TutorialModal";
 import { createInitialState, placeCard } from "./game/engine";
-import { dealHands, cloneHand, dealHandExcluding, dealDraftPool } from "./game/cards";
+import { dealHands, cloneHand, dealHandExcluding, dealDraftPool, CARD_POOL } from "./game/cards";
+import { NetSession } from "./net";
 import { chooseAiMove, DIFFICULTY_LABELS } from "./game/ai";
 import type { Difficulty } from "./game/ai";
 import { DEFAULT_RULES } from "./game/types";
@@ -30,8 +31,22 @@ import {
 } from "./audio";
 import "./App.css";
 
-type OpponentType = "human" | "ai";
+type OpponentType = "human" | "ai" | "online";
 const AI_THINK_DELAY_MS = 1400;
+
+interface OnlineState {
+  role: "host" | "guest" | null;
+  stage: "menu" | "connecting" | "hosting" | "connected";
+  code: string;
+  error: string | null;
+  peerLeft: boolean;
+}
+
+/** Messages exchanged between the two game clients (via the relay). */
+type NetData =
+  | { t: "setup"; a: string[]; b: string[]; starter: PlayerId; rules: RuleSet }
+  | { t: "flip" }
+  | { t: "move"; cell: number; cardId: string };
 
 // Chrome/Android fires this before showing its install banner; not yet in TS's DOM lib.
 interface BeforeInstallPromptEvent extends Event {
@@ -72,6 +87,26 @@ function App() {
   const [coin, setCoin] = useState<{ pending: GameState; phase: "ready" | "flipping" | "done" } | null>(null);
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [intro, setIntro] = useState(true);
+  const [online, setOnline] = useState<OnlineState | null>(null);
+  const [joinCode, setJoinCode] = useState("");
+
+  // Net callbacks are registered once and outlive renders, so anything they
+  // read must come through refs, and anything they write must use setters.
+  const netRef = useRef<NetSession | null>(null);
+  const coinRef = useRef(coin);
+  const rulesRef = useRef(rules);
+  const onlineRef = useRef(online);
+  useEffect(() => {
+    coinRef.current = coin;
+  }, [coin]);
+  useEffect(() => {
+    rulesRef.current = rules;
+  }, [rules]);
+  useEffect(() => {
+    onlineRef.current = online;
+  }, [online]);
+
+  const myPlayer: PlayerId = online?.role === "guest" ? "B" : "A";
 
   // If the intro can't load or decode (unsupported codec, offline cache
   // miss), skip it rather than sit on a black screen. Source-element
@@ -114,11 +149,13 @@ function App() {
   }, [state.lastMove]);
 
   // Win / lose stinger + haptics; reset the banner when a match ends/restarts.
+  // "Winning" is perspective-aware: online guests play as B.
   useEffect(() => {
-    if (state.winner === "A") {
+    const mine: PlayerId = onlineRef.current?.role === "guest" ? "B" : "A";
+    if (state.winner === mine) {
       playWin();
       vibrate([50, 40, 70]);
-    } else if (state.winner === "B" || state.winner === "draw") {
+    } else if (state.winner) {
       playLose();
       vibrate(160);
     }
@@ -157,7 +194,17 @@ function App() {
 
   function handleCellClick(index: number) {
     if (!selectedCard || state.winner) return;
-    setState(placeCard(state, index, selectedCard));
+    if (online && state.turn !== myPlayer) return;
+    let next: GameState;
+    try {
+      next = placeCard(state, index, selectedCard);
+    } catch {
+      return; // occupied cell / stale click
+    }
+    if (online) {
+      netRef.current?.send({ t: "move", cell: index, cardId: selectedCard.id } satisfies NetData);
+    }
+    setState(next);
     setSelectedCard(null);
   }
 
@@ -175,18 +222,140 @@ function App() {
     else commitMatch(pending);
   }
 
-  // Tap the coin to flip: spin, reveal who goes first, then start the match.
-  function flipCoin() {
-    if (!coin || coin.phase !== "ready") return;
-    const pending = coin.pending;
+  // Coin animation + commit; safe to call from net callbacks (reads the ref).
+  function performFlip() {
+    const c = coinRef.current;
+    if (!c || c.phase !== "ready") return;
+    const pending = c.pending;
     vibrate(25);
     setCoin({ pending, phase: "flipping" });
-    window.setTimeout(() => setCoin((c) => (c ? { ...c, phase: "done" } : c)), 1500);
+    window.setTimeout(() => setCoin((cc) => (cc ? { ...cc, phase: "done" } : cc)), 1500);
     window.setTimeout(() => {
       commitMatch(pending);
       setCoin(null);
       vibrate(pending.turn === "A" ? [40, 40, 60] : 90);
     }, 2500);
+  }
+
+  // Tap the coin to flip: spin, reveal who goes first, then start the match.
+  // Online, only the host flips; the guest's coin mirrors it.
+  function flipCoin() {
+    if (online?.role === "guest") return;
+    if (online) netRef.current?.send({ t: "flip" } satisfies NetData);
+    performFlip();
+  }
+
+  // ── Online play (see server/relay.js and src/net.ts) ──
+
+  // Host deals both hands, picks the starter, and mirrors it to the guest.
+  function hostDeal(nextRules?: RuleSet) {
+    const r = nextRules ?? rulesRef.current;
+    const pending = newGame(r);
+    netRef.current?.send({
+      t: "setup",
+      a: pending.hands.A.map((c) => c.id),
+      b: pending.hands.B.map((c) => c.id),
+      starter: pending.turn,
+      rules: r,
+    } satisfies NetData);
+    setSelectedCard(null);
+    setCoin({ pending, phase: "ready" });
+  }
+
+  function handleNetData(d: unknown) {
+    const msg = d as NetData;
+    if (!msg || typeof msg !== "object") return;
+    if (msg.t === "setup") {
+      const byId = new Map(CARD_POOL.map((c) => [c.id, c]));
+      const pick = (ids: string[]) =>
+        ids.flatMap((id) => {
+          const c = byId.get(id);
+          return c ? [{ ...c, ranks: { ...c.ranks } }] : [];
+        });
+      const handA = pick(msg.a);
+      const handB = pick(msg.b);
+      if (handA.length !== 5 || handB.length !== 5) return; // version mismatch
+      setRules(msg.rules);
+      setDeckOpen(false);
+      setSelectedCard(null);
+      setCoin({ pending: createInitialState(handA, handB, msg.starter, msg.rules), phase: "ready" });
+    } else if (msg.t === "flip") {
+      performFlip();
+    } else if (msg.t === "move") {
+      setState((prev) => {
+        if (prev.winner) return prev;
+        const card = prev.hands[prev.turn].find((c) => c.id === msg.cardId);
+        if (!card || prev.board[msg.cell] !== null) return prev;
+        return placeCard(prev, msg.cell, card);
+      });
+      setSelectedCard(null);
+    }
+  }
+
+  function makeNet(): NetSession {
+    netRef.current?.close();
+    const net = new NetSession({
+      onHosted: (code) => setOnline((o) => (o ? { ...o, stage: "hosting", code } : o)),
+      onJoined: (code) => setOnline((o) => (o ? { ...o, stage: "connected", code } : o)),
+      onPeerJoined: () => {
+        setOnline((o) => (o ? { ...o, stage: "connected" } : o));
+        hostDeal();
+      },
+      onData: handleNetData,
+      onPeerLeft: () => setOnline((o) => (o ? { ...o, peerLeft: true } : o)),
+      onError: (reason) =>
+        setOnline((o) =>
+          o
+            ? {
+                ...o,
+                stage: "menu",
+                error:
+                  reason === "room-not-found"
+                    ? "No game with that code"
+                    : reason === "room-full"
+                      ? "That game already has two players"
+                      : "Connection error",
+              }
+            : o
+        ),
+      onClosed: () =>
+        setOnline((o) =>
+          o && !o.peerLeft ? { ...o, stage: "menu", error: "Can't reach the game server" } : o
+        ),
+    });
+    netRef.current = net;
+    return net;
+  }
+
+  function startHost() {
+    setOnline({ role: "host", stage: "connecting", code: "", error: null, peerLeft: false });
+    makeNet().host();
+  }
+
+  function startJoin() {
+    setOnline({ role: "guest", stage: "connecting", code: "", error: null, peerLeft: false });
+    makeNet().join(joinCode);
+  }
+
+  function leaveOnline(nextOpponent: OpponentType = "ai") {
+    netRef.current?.close();
+    netRef.current = null;
+    setOnline(null);
+    setJoinCode("");
+    setOpponentType(nextOpponent);
+    startGame(undefined, rules, false); // fresh local board
+  }
+
+  function handleOpponentChange(value: OpponentType) {
+    if (value === "online") {
+      setOpponentType("online");
+      setDeckOpen(false);
+      setOnline({ role: null, stage: "menu", code: "", error: null, peerLeft: false });
+    } else if (online) {
+      leaveOnline(value);
+    } else {
+      setOpponentType(value);
+    }
   }
 
   // Select mode: draft your 5 from a spread of 10 pyramid-weighted cards.
@@ -203,9 +372,11 @@ function App() {
   }
 
   function toggleRule(key: keyof RuleSet) {
+    if (online?.role === "guest") return; // the host owns the rules online
     const nextRules = { ...rules, [key]: !rules[key] };
     setRules(nextRules);
-    startGame(undefined, nextRules, false); // rule tweaks re-deal without the coin ceremony
+    if (online) hostDeal(nextRules);
+    else startGame(undefined, nextRules, false); // rule tweaks re-deal without the coin ceremony
   }
 
   function togglePick(card: Card) {
@@ -255,9 +426,14 @@ function App() {
     else startGame();
   }
 
-  const player2Label = opponentType === "ai" ? "Computer" : "Player 2";
-  const winnerLabel =
-    state.winner === "A"
+  const player2Label = online ? "Friend" : opponentType === "ai" ? "Computer" : "Player 2";
+  const winnerLabel = online
+    ? state.winner === myPlayer
+      ? "You win!"
+      : state.winner === "draw"
+        ? "Draw!"
+        : "Friend wins!"
+    : state.winner === "A"
       ? "Player 1 wins!"
       : state.winner === "B"
         ? `${player2Label} wins!`
@@ -269,15 +445,20 @@ function App() {
     ? winnerLabel
     : aiThinking
       ? `${player2Label} is thinking…`
-      : `${state.turn === "A" ? "Player 1" : player2Label}'s turn`;
+      : online
+        ? state.turn === myPlayer
+          ? "Your turn"
+          : "Friend's turn"
+        : `${state.turn === "A" ? "Player 1" : player2Label}'s turn`;
 
+  const meForBanner: PlayerId = online ? myPlayer : "A";
   const bannerKind =
-    state.winner === "A" ? "win" : state.winner === "B" ? "lose" : "draw";
+    state.winner === "draw" ? "draw" : state.winner === meForBanner ? "win" : "lose";
   const bannerTitle =
     state.winner === "draw"
       ? "Draw"
-      : opponentType === "ai"
-        ? state.winner === "A"
+      : opponentType === "ai" || online
+        ? state.winner === meForBanner
           ? "You Won!"
           : "You Lost…"
         : state.winner === "A"
@@ -286,14 +467,22 @@ function App() {
   const showBanner = !!state.winner && !bannerDismissed;
 
   const coinStarter = coin?.pending.turn ?? "A";
-  const coinResult =
-    coinStarter === "A"
+  const coinResult = online
+    ? coinStarter === myPlayer
+      ? "You go first!"
+      : "Friend goes first!"
+    : coinStarter === "A"
       ? opponentType === "ai"
         ? "You go first!"
         : "Player 1 goes first!"
       : opponentType === "ai"
         ? "Computer goes first!"
         : "Player 2 goes first!";
+
+  // Online, each device shows its own hand at the bottom (host = blue A,
+  // guest = red B); locally the layout stays A-bottom as always.
+  const bottomPlayer: PlayerId = online ? myPlayer : "A";
+  const topPlayer: PlayerId = bottomPlayer === "A" ? "B" : "A";
 
   return (
     <>
@@ -317,12 +506,12 @@ function App() {
       <div className="tt-game">
         <section className="tt-hand-shell">
           <Hand
-            player="B"
-            cards={state.hands.B}
-            isActive={state.turn === "B" && !state.winner && opponentType === "human"}
+            player={topPlayer}
+            cards={state.hands[topPlayer]}
+            isActive={!online && state.turn === "B" && !state.winner && opponentType === "human"}
             selectedCardId={selectedCard?.id ?? null}
             onSelect={handleSelect}
-            onInspect={(card) => setInspecting({ card, owner: "B" })}
+            onInspect={(card) => setInspecting({ card, owner: topPlayer })}
             label={player2Label}
           />
         </section>
@@ -341,28 +530,34 @@ function App() {
 
         <section className="tt-hand-shell">
           <Hand
-            player="A"
-            cards={state.hands.A}
-            isActive={state.turn === "A" && !state.winner}
+            player={bottomPlayer}
+            cards={state.hands[bottomPlayer]}
+            isActive={state.turn === bottomPlayer && !state.winner}
             selectedCardId={selectedCard?.id ?? null}
             onSelect={handleSelect}
-            onInspect={(card) => setInspecting({ card, owner: "A" })}
-            label="Player 1"
+            onInspect={(card) => setInspecting({ card, owner: bottomPlayer })}
+            label={online ? "You" : "Player 1"}
           />
         </section>
       </div>
 
       <div className="tt-panel">
       <div className="tt-topbar">
-        <button type="button" className="tt-new-game" onClick={() => handleNewGame()}>
+        <button
+          type="button"
+          className="tt-new-game"
+          onClick={() => (online ? online.role === "host" && hostDeal() : handleNewGame())}
+          disabled={online?.role === "guest"}
+          title={online?.role === "guest" ? "The host deals" : undefined}
+        >
           New Game
         </button>
         <div className={`tt-status ${!state.winner ? `turn-${state.turn}` : ""}`}>
           <span className="tt-status-text">{status}</span>
           <span className="tt-score">
-            <span className="score-a">P1: {counts.a}</span>
+            <span className="score-a">{online ? (myPlayer === "A" ? "You" : "Friend") : "P1"}: {counts.a}</span>
             <span className="score-b">
-              {opponentType === "ai" ? "CPU" : "P2"}: {counts.b}
+              {online ? (myPlayer === "B" ? "You" : "Friend") : opponentType === "ai" ? "CPU" : "P2"}: {counts.b}
             </span>
           </span>
         </div>
@@ -376,9 +571,10 @@ function App() {
 
           <label className="tt-field">
             Opponent
-            <select value={opponentType} onChange={(e) => setOpponentType(e.target.value as OpponentType)}>
+            <select value={opponentType} onChange={(e) => handleOpponentChange(e.target.value as OpponentType)}>
               <option value="ai">Computer</option>
               <option value="human">Human</option>
+              <option value="online">Friend (online)</option>
             </select>
           </label>
 
@@ -395,31 +591,33 @@ function App() {
             </label>
           )}
 
-          <label className="tt-field">
-            Deck
-            <select value={deckMode} onChange={(e) => setDeckMode(e.target.value as "random" | "select")}>
-              <option value="random">Random</option>
-              <option value="select">Select</option>
-            </select>
-          </label>
+          {!online && (
+            <label className="tt-field">
+              Deck
+              <select value={deckMode} onChange={(e) => setDeckMode(e.target.value as "random" | "select")}>
+                <option value="random">Random</option>
+                <option value="select">Select</option>
+              </select>
+            </label>
+          )}
         </div>
 
         <fieldset className="tt-rules">
           <legend>Rules</legend>
           <label>
-            <input type="checkbox" checked={rules.same} onChange={() => toggleRule("same")} />
+            <input type="checkbox" checked={rules.same} disabled={online?.role === "guest"} onChange={() => toggleRule("same")} />
             Same
           </label>
           <label>
-            <input type="checkbox" checked={rules.plus} onChange={() => toggleRule("plus")} />
+            <input type="checkbox" checked={rules.plus} disabled={online?.role === "guest"} onChange={() => toggleRule("plus")} />
             Plus
           </label>
           <label>
-            <input type="checkbox" checked={rules.combo} onChange={() => toggleRule("combo")} />
+            <input type="checkbox" checked={rules.combo} disabled={online?.role === "guest"} onChange={() => toggleRule("combo")} />
             Combo
           </label>
           <label>
-            <input type="checkbox" checked={rules.sameWall} onChange={() => toggleRule("sameWall")} />
+            <input type="checkbox" checked={rules.sameWall} disabled={online?.role === "guest"} onChange={() => toggleRule("sameWall")} />
             Same Wall
           </label>
         </fieldset>
@@ -445,11 +643,21 @@ function App() {
           <div className={`tt-winbanner ${bannerKind}`} onClick={(e) => e.stopPropagation()}>
             <h2 className="tt-winbanner-title">{bannerTitle}</h2>
             <p className="tt-winbanner-score">
-              Player 1 {counts.a} — {counts.b} {opponentType === "ai" ? "Computer" : "Player 2"}
+              {online
+                ? `You ${myPlayer === "A" ? counts.a : counts.b} — ${myPlayer === "A" ? counts.b : counts.a} Friend`
+                : `Player 1 ${counts.a} — ${counts.b} ${opponentType === "ai" ? "Computer" : "Player 2"}`}
             </p>
-            <button type="button" className="tt-new-game tt-winbanner-btn" onClick={() => handleNewGame()}>
-              New Game
-            </button>
+            {online?.role !== "guest" ? (
+              <button
+                type="button"
+                className="tt-new-game tt-winbanner-btn"
+                onClick={() => (online ? hostDeal() : handleNewGame())}
+              >
+                New Game
+              </button>
+            ) : (
+              <p className="tt-winbanner-score">Waiting for the host to deal again…</p>
+            )}
             <button type="button" className="tt-winbanner-dismiss" onClick={() => setBannerDismissed(true)}>
               View board
             </button>
@@ -527,11 +735,75 @@ function App() {
             </button>
             <p className="tt-coin-caption">
               {coin.phase === "ready"
-                ? "Tap the coin to flip"
+                ? online?.role === "guest"
+                  ? "Waiting for the host to flip…"
+                  : "Tap the coin to flip"
                 : coin.phase === "done"
                   ? coinResult
                   : "Flipping…"}
             </p>
+          </div>
+        </div>
+      )}
+
+      {online && (online.stage !== "connected" || online.error) && !online.peerLeft && (
+        <div className="tt-lobby-veil">
+          <div className="tt-lobby">
+            <h2>Play a Friend</h2>
+            {online.error && <p className="tt-lobby-error">{online.error}</p>}
+            {online.stage === "menu" && (
+              <>
+                <button type="button" className="tt-new-game tt-lobby-btn" onClick={startHost}>
+                  Host a game
+                </button>
+                <div className="tt-lobby-divider">or join with a code</div>
+                <div className="tt-lobby-join">
+                  <input
+                    value={joinCode}
+                    maxLength={4}
+                    placeholder="CODE"
+                    autoCapitalize="characters"
+                    autoCorrect="off"
+                    spellCheck={false}
+                    onChange={(e) => setJoinCode(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ""))}
+                    aria-label="Room code"
+                  />
+                  <button
+                    type="button"
+                    className="tt-new-game tt-lobby-btn"
+                    disabled={joinCode.length !== 4}
+                    onClick={startJoin}
+                  >
+                    Join
+                  </button>
+                </div>
+              </>
+            )}
+            {online.stage === "connecting" && <p className="tt-lobby-wait">Connecting…</p>}
+            {online.stage === "hosting" && (
+              <>
+                <p className="tt-lobby-wait">Room code</p>
+                <div className="tt-lobby-code">{online.code}</div>
+                <p className="tt-lobby-hint">
+                  Your friend opens the game, picks Opponent → Friend (online), and enters this code.
+                </p>
+              </>
+            )}
+            <button type="button" className="tt-lobby-leave" onClick={() => leaveOnline()}>
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      {online?.peerLeft && (
+        <div className="tt-lobby-veil">
+          <div className="tt-lobby">
+            <h2>Friend disconnected</h2>
+            <p className="tt-lobby-hint">The connection to your friend was lost.</p>
+            <button type="button" className="tt-new-game tt-lobby-btn" onClick={() => leaveOnline()}>
+              Back to solo play
+            </button>
           </div>
         </div>
       )}

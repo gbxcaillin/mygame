@@ -96,6 +96,11 @@ export function TutorialModal({ onClose }: TutorialModalProps) {
               Pick Human for local pass-and-play, or Computer for an AI opponent with five difficulty levels, from
               Beginner (random moves) to Expert (plans several moves ahead).
             </p>
+            <p>
+              <strong>Friend (online)</strong> plays against a friend on another device: one of you hosts and reads
+              out the 4-letter room code, the other joins with it. The host deals, sets the rules and flips the
+              coin; your own cards always sit at the bottom of your screen.
+            </p>
           </section>
 
           <section>

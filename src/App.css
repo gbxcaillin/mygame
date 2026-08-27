@@ -566,6 +566,105 @@
 
 /* ── Start screen ── */
 
+/* ── Online lobby ── */
+
+.tt-lobby-veil {
+  position: fixed;
+  inset: 0;
+  z-index: 84;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  box-sizing: border-box;
+  background: rgba(4, 3, 8, 0.86);
+  backdrop-filter: blur(4px);
+}
+
+.tt-lobby {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  width: min(86vw, 360px);
+  padding: 26px 24px;
+  border: 2px solid var(--gold);
+  border-radius: 12px;
+  background: rgba(8, 6, 14, 0.92);
+  text-align: center;
+}
+
+.tt-lobby h2 {
+  margin: 0;
+  color: var(--gold-bright);
+  font-size: 22px;
+  letter-spacing: 0.04em;
+}
+
+.tt-lobby-btn {
+  width: 100%;
+}
+
+.tt-lobby-divider {
+  font-size: 13px;
+  color: var(--gold);
+  opacity: 0.75;
+}
+
+.tt-lobby-join {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+.tt-lobby-join input {
+  flex: 1;
+  min-width: 0;
+  padding: 10px;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 0.35em;
+  text-align: center;
+  text-transform: uppercase;
+  color: var(--gold-bright);
+  background: var(--btn-bg);
+  border: 1.5px solid var(--gold);
+  border-radius: 8px;
+}
+
+.tt-lobby-code {
+  font-size: 46px;
+  font-weight: 800;
+  letter-spacing: 0.3em;
+  padding-left: 0.3em; /* visually recenter the tracked text */
+  color: var(--gold-bright);
+  text-shadow: 0 0 14px rgba(232, 198, 90, 0.5);
+}
+
+.tt-lobby-wait,
+.tt-lobby-hint {
+  margin: 0;
+  font-size: 14px;
+  color: var(--gold);
+  opacity: 0.85;
+}
+
+.tt-lobby-error {
+  margin: 0;
+  font-size: 14px;
+  color: #e88;
+}
+
+.tt-lobby-leave {
+  background: none;
+  border: none;
+  color: var(--gold);
+  font-size: 13px;
+  text-decoration: underline;
+  cursor: pointer;
+  opacity: 0.8;
+}
+
 /* ── Intro video (first open) ── */
 
 .tt-intro {
