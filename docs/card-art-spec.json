@@ -1,0 +1,69 @@
+{
+  "$schema_note": "Generation brief for Court of Beasts card art. Two layers, same model as the backdrops: YOU generate the card painting with EMPTY plaques and an EMPTY name banner; Claude Code bakes the rank numbers (and the creature name for new cards) into the plaques afterwards (scripts/bake_card_numbers.py). All coordinates are fractions of the square canvas; px values apply at the game's baked 512x512 resolution.",
+  "canvas": {
+    "shape": "square, 1:1 - the game renders cards square",
+    "generate_at": "1024x1024 or larger",
+    "baked_in_game_at": "512x512 JPG"
+  },
+  "art_direction": [
+    "Dark painterly creature portrait filling the whole card interior: torch-lit, near-black ground, warm gold/amber rim light, in the style of the existing 60-card set (classic JRPG bestiary meets oil painting).",
+    "The creature is the sole subject, centered in the safe area, facing forward or three-quarter, dissolving into shadow at the edges.",
+    "Ornate thin gold double frame with corner bracket flourishes around the card edge (this one IS painted into the art, unlike the backdrops).",
+    "Four EMPTY black rank plaques and one EMPTY name banner at the exact geometry below - flat near-black (#000-#141414) fill inside a thin gold trim, NO digits, NO text; numbers and names are baked in post.",
+    "No text anywhere on the card."
+  ],
+  "frame": {
+    "style": "thin gold double hairline tracing the card edge, ornate corner brackets",
+    "outer_rule_inset_pct": 0.045,
+    "corner_brackets": "reach roughly 0.12 in from each corner",
+    "palette": "gold #d79425 / deep gold #8a6a25 on near-black"
+  },
+  "rank_plaques": {
+    "description": "Rounded near-black boxes with a thin gold trim. Interiors must be flat and empty (< #1e luminance) so the baker's digit lands cleanly.",
+    "positions_center_pct": {
+      "top":    {"x": 0.500, "y": 0.112},
+      "left":   {"x": 0.160, "y": 0.520},
+      "right":  {"x": 0.842, "y": 0.520},
+      "bottom": {"x": 0.500, "y": 0.943}
+    },
+    "size_pct": {
+      "top":    {"w": 0.168, "h": 0.136},
+      "left":   {"w": 0.138, "h": 0.161},
+      "right":  {"w": 0.146, "h": 0.164},
+      "bottom": {"w": 0.168, "h": 0.117}
+    },
+    "size_px_at_512": {"top": "86x70", "left": "70x82", "right": "75x84", "bottom": "86x60"},
+    "notes": [
+      "Top and bottom plaques overlap the frame rule; left/right sit just inside it - matching the existing set.",
+      "Placement tolerance: the baker searches a +/-0.11-canvas window around each canonical center and centers the digit in the card's OWN detected plaque, so a drift of a couple percent is fine.",
+      "Keep the art around each plaque from going pitch black, or the plaque can't be isolated from it."
+    ]
+  },
+  "name_banner": {
+    "description": "Dark horizontal strip with thin gold rules top and bottom, left EMPTY for the baked name.",
+    "span_x_pct": [0.17, 0.83],
+    "center_y_pct": 0.770,
+    "height_pct": 0.062,
+    "baked_text_style": "creature name in gold (#d79425) bold small caps, centered, ~0.045 canvas tall"
+  },
+  "baked_numbers": {
+    "who": "Claude Code (scripts/bake_card_numbers.py), not the art generator",
+    "font": "DejaVu Sans Bold (or equivalent heavy grotesque)",
+    "size": "0.112 x canvas (57px at 512)",
+    "fill": "#f7e9ce warm cream",
+    "stroke": "4px black at 512",
+    "values": "1-9 as digits; 10 renders as 'X'",
+    "layout": "one value centered in each of the four plaques: top, left, right, bottom"
+  },
+  "safe_areas": {
+    "creature_focus": "keep the face/focal point inside x 0.22-0.78, y 0.18-0.70 so plaques and banner never cover it",
+    "corners": "corner brackets own the corners; nothing important there"
+  },
+  "generation_prompt_template": "Dark fantasy trading card art, square 1:1, painterly portrait of a {CREATURE} emerging from shadow, torch-lit with warm gold rim light on near-black ground, ornate thin gold double frame with corner bracket flourishes at the card edge, four empty rounded black plaques with thin gold trim (top-center overlapping the frame, middle-left, middle-right, bottom-center overlapping the frame), one empty dark banner strip with thin gold rules across the lower card at 77% height, plaques and banner completely blank, no text, no letters, no numbers, high detail digital painting matching a classic JRPG bestiary",
+  "reference": "src/assets/cards/*.jpg are the finished look (numbers already baked); scripts/bake_card_numbers.py is the authoritative baking geometry",
+  "delivery": {
+    "format": "PNG or high-quality JPG, opaque, square",
+    "per_card": "one image per creature; file names get slugged from the creature name (e.g. 'Ancient Dragon' -> ancient-dragon.jpg)",
+    "stats": "provide top/right/bottom/left values (1-10) per creature, or let Claude Code assign them to fit the rarity tiers in src/game/cards.ts"
+  }
+}
