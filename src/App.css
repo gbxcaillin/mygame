@@ -617,11 +617,18 @@
   width: 100%;
 }
 
+/* the code input gets the room; Join stays compact beside it */
+.tt-lobby-join .tt-lobby-btn {
+  width: auto;
+  flex: none;
+  padding: 10px 16px;
+}
+
 .tt-lobby-join input {
   flex: 1;
   min-width: 0;
   padding: 10px;
-  font-size: 22px;
+  font-size: 26px;
   font-weight: 800;
   letter-spacing: 0.35em;
   text-align: center;
