@@ -347,6 +347,11 @@ function App() {
   }
 
   function handleOpponentChange(value: OpponentType) {
+    if (!started) {
+      // start screen: just record the choice; Press Start opens the right flow
+      setOpponentType(value);
+      return;
+    }
     if (value === "online") {
       setOpponentType("online");
       setDeckOpen(false);
@@ -375,6 +380,7 @@ function App() {
     if (online?.role === "guest") return; // the host owns the rules online
     const nextRules = { ...rules, [key]: !rules[key] };
     setRules(nextRules);
+    if (!started) return; // start screen: record the choice, Start deals with it
     if (online) hostDeal(nextRules);
     else startGame(undefined, nextRules, false); // rule tweaks re-deal without the coin ceremony
   }
@@ -419,11 +425,17 @@ function App() {
   }
 
   // Press Start: a direct user gesture that reliably kicks off music.
+  // Routes by the opponent chosen on the start screen.
   function handleStart() {
     startMusic();
     setStarted(true);
-    if (deckMode === "select") openDraft();
-    else startGame();
+    if (opponentType === "online") {
+      setOnline({ role: null, stage: "menu", code: "", error: null, peerLeft: false });
+    } else if (deckMode === "select") {
+      openDraft();
+    } else {
+      startGame();
+    }
   }
 
   const player2Label = online ? "Friend" : opponentType === "ai" ? "Computer" : "Player 2";
@@ -691,6 +703,60 @@ function App() {
         <div className="tt-start-veil">
           <div className="tt-start">
             <img className="tt-start-logo" src={titleLogo} alt="Court of Beasts" />
+
+            <div className="tt-start-options">
+              <div className="tt-start-selects">
+                <label className="tt-field">
+                  Opponent
+                  <select value={opponentType} onChange={(e) => handleOpponentChange(e.target.value as OpponentType)}>
+                    <option value="ai">Computer</option>
+                    <option value="human">Human</option>
+                    <option value="online">Friend (online)</option>
+                  </select>
+                </label>
+                {opponentType === "ai" && (
+                  <label className="tt-field">
+                    Difficulty
+                    <select value={difficulty} onChange={(e) => setDifficulty(Number(e.target.value) as Difficulty)}>
+                      {([1, 2, 3, 4, 5] as const).map((d) => (
+                        <option key={d} value={d}>
+                          {DIFFICULTY_LABELS[d]}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                )}
+                {opponentType !== "online" && (
+                  <label className="tt-field">
+                    Deck
+                    <select value={deckMode} onChange={(e) => setDeckMode(e.target.value as "random" | "select")}>
+                      <option value="random">Random</option>
+                      <option value="select">Select</option>
+                    </select>
+                  </label>
+                )}
+              </div>
+              <fieldset className="tt-rules tt-start-rules">
+                <legend>Rules</legend>
+                <label>
+                  <input type="checkbox" checked={rules.same} onChange={() => toggleRule("same")} />
+                  Same
+                </label>
+                <label>
+                  <input type="checkbox" checked={rules.plus} onChange={() => toggleRule("plus")} />
+                  Plus
+                </label>
+                <label>
+                  <input type="checkbox" checked={rules.combo} onChange={() => toggleRule("combo")} />
+                  Combo
+                </label>
+                <label>
+                  <input type="checkbox" checked={rules.sameWall} onChange={() => toggleRule("sameWall")} />
+                  Same Wall
+                </label>
+              </fieldset>
+            </div>
+
             <button type="button" className="tt-start-btn" onClick={handleStart} autoFocus>
               Press Start
             </button>

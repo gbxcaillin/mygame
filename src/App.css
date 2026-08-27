@@ -704,20 +704,69 @@
   box-sizing: border-box;
   background: rgba(4, 3, 8, 0.84);
   backdrop-filter: blur(4px);
+  overflow-y: auto;
 }
 
 .tt-start {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 26px;
+  gap: 20px;
   text-align: center;
   max-width: 92vw;
+  margin: auto; /* stays centered, but scrolls instead of clipping when tall */
 }
 
 .tt-start-logo {
   width: min(82vw, 560px);
   height: auto;
+}
+
+/* Match setup on the start screen */
+.tt-start-options {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: min(86vw, 420px);
+}
+
+.tt-start-selects {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px 18px;
+}
+
+.tt-start-options .tt-field {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 3px;
+  font-size: 13px;
+}
+
+.tt-start-options .tt-field select {
+  min-width: 120px;
+}
+
+.tt-start-rules {
+  justify-content: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.tt-start-rules label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--gold);
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.tt-start-rules input[type="checkbox"] {
+  accent-color: var(--gold);
 }
 
 .tt-start-btn {
