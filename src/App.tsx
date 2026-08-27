@@ -16,6 +16,8 @@ import bg4x3 from "./assets/bg-4x3.jpg";
 import bgPortrait from "./assets/bg-portrait.jpg";
 import coinCrown from "./assets/coin-crown.png";
 import coinShield from "./assets/coin-shield.png";
+import introMp4 from "./assets/intro.mp4";
+import introWebm from "./assets/intro.webm";
 import {
   startMusic,
   getAudioSettings,
@@ -69,6 +71,19 @@ function App() {
   const [picked, setPicked] = useState<Card[]>([]);
   const [coin, setCoin] = useState<{ pending: GameState; phase: "ready" | "flipping" | "done" } | null>(null);
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [intro, setIntro] = useState(true);
+
+  // If the intro can't load or decode (unsupported codec, offline cache
+  // miss), skip it rather than sit on a black screen. Source-element
+  // failures don't bubble to the video's onError, hence the watchdog.
+  useEffect(() => {
+    if (!intro) return;
+    const t = setTimeout(() => {
+      const v = document.querySelector<HTMLVideoElement>(".tt-intro-video");
+      if (!v || v.readyState < 2) setIntro(false);
+    }, 2500);
+    return () => clearTimeout(t);
+  }, [intro]);
 
   // Capture the browser's install prompt so we can offer it from our own button.
   useEffect(() => {
@@ -442,6 +457,27 @@ function App() {
         </div>
       )}
       </div>
+
+      {intro && !started && (
+        <div className="tt-intro" onClick={() => setIntro(false)} role="button" aria-label="Skip intro">
+          {/* no onError here: a rejected <source> fires an error that React's
+              capture-phase listener would treat as a video failure, killing the
+              intro before the next source loads. The readyState watchdog above
+              handles genuine can't-play cases. */}
+          <video
+            className="tt-intro-video"
+            autoPlay
+            muted
+            playsInline
+            onEnded={() => setIntro(false)}
+          >
+            {/* codec-specific types let H.264-less browsers skip straight to the webm */}
+            <source src={introMp4} type='video/mp4; codecs="avc1.640028"' />
+            <source src={introWebm} type='video/webm; codecs="vp9"' />
+          </video>
+          <span className="tt-intro-skip">Tap to skip</span>
+        </div>
+      )}
 
       {!started && (
         <div className="tt-start-veil">

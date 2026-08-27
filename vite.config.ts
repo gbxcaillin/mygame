@@ -31,7 +31,7 @@ export default defineConfig({
       workbox: {
         // Precache everything the game needs so it plays fully offline:
         // card art, backdrops, coins and sounds included.
-        globPatterns: ['**/*.{js,css,html,png,jpg,svg,wav}'],
+        globPatterns: ['**/*.{js,css,html,png,jpg,svg,wav,mp4,webm}'],
         maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
       },
     }),
