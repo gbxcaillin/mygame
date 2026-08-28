@@ -1,6 +1,10 @@
-// Player collection: owned cards, earned rewards and saved decks,
-// persisted to localStorage on this device. (A later stage can move the
-// same shapes behind the relay server for cross-device sync.)
+// Player collection: owned cards, earned rewards and saved decks.
+//
+// The server (server/store.js) is the primary store when a name is claimed;
+// this module keeps a synchronous localStorage cache so the UI stays simple
+// and the installed app still works offline. sync.ts hydrates this cache
+// from the server on launch and pushes every change back up (it listens via
+// subscribe()).
 
 import { CARD_POOL } from "./cards";
 import type { Card } from "./types";
@@ -39,19 +43,43 @@ function starterCollection(): Collection {
 }
 
 let cached: Collection | null = null;
+let currentName: string | null = null;
+const listeners = new Set<() => void>();
+
+/** Local cache key — namespaced per claimed name; the bare key is the
+    pre-claim "guest" collection (and back-compat with older saves). */
+function keyFor(name: string | null): string {
+  return name ? `${STORAGE_KEY}:${name}` : STORAGE_KEY;
+}
+
+/** Subscribe to any collection change (mutation or server hydrate). */
+export function subscribe(fn: () => void): () => void {
+  listeners.add(fn);
+  return () => {
+    listeners.delete(fn);
+  };
+}
+
+function emit() {
+  for (const fn of listeners) fn();
+}
+
+function normalize(parsed: Partial<Collection> | null): Collection {
+  return {
+    owned: parsed && typeof parsed.owned === "object" ? parsed.owned : {},
+    decks: parsed && Array.isArray(parsed.decks) ? parsed.decks : [],
+    activeDeckId: parsed?.activeDeckId ?? null,
+  };
+}
 
 export function loadCollection(): Collection {
   if (cached) return cached;
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(keyFor(currentName));
     if (raw) {
       const parsed = JSON.parse(raw) as Collection;
       if (parsed && typeof parsed.owned === "object") {
-        cached = {
-          owned: parsed.owned,
-          decks: Array.isArray(parsed.decks) ? parsed.decks : [],
-          activeDeckId: parsed.activeDeckId ?? null,
-        };
+        cached = normalize(parsed);
         return cached;
       }
     }
@@ -65,10 +93,36 @@ export function loadCollection(): Collection {
 
 function persist() {
   try {
-    if (cached) localStorage.setItem(STORAGE_KEY, JSON.stringify(cached));
+    if (cached) localStorage.setItem(keyFor(currentName), JSON.stringify(cached));
   } catch {
     /* storage full/blocked — collection lives for the session only */
   }
+}
+
+/** Persist locally AND notify subscribers (which triggers the server push). */
+function afterMutate() {
+  persist();
+  emit();
+}
+
+export function getName(): string | null {
+  return currentName;
+}
+
+/** Switch the active collection to a named (or guest, null) local slot. */
+export function switchName(name: string | null) {
+  if (name === currentName) return;
+  currentName = name;
+  cached = null;
+  loadCollection();
+  emit();
+}
+
+/** Replace the whole collection (e.g. hydrated from the server). */
+export function hydrate(data: Partial<Collection>) {
+  cached = normalize(data);
+  persist();
+  emit();
 }
 
 /** Test hook / hard reset. */
@@ -118,7 +172,7 @@ export function earnReward(difficulty: Difficulty): { card: Card; isNew: boolean
   const col = loadCollection();
   const isNew = !(card.id in col.owned);
   col.owned[card.id] = (col.owned[card.id] ?? 0) + 1;
-  persist();
+  afterMutate();
   return { card, isNew };
 }
 
@@ -135,7 +189,7 @@ export function saveDeck(name: string, cardIds: string[]): SavedDeck | null {
   };
   col.decks.push(deck);
   col.activeDeckId = deck.id;
-  persist();
+  afterMutate();
   return deck;
 }
 
@@ -143,14 +197,14 @@ export function deleteDeck(deckId: string) {
   const col = loadCollection();
   col.decks = col.decks.filter((d) => d.id !== deckId);
   if (col.activeDeckId === deckId) col.activeDeckId = col.decks[0]?.id ?? null;
-  persist();
+  afterMutate();
 }
 
 export function setActiveDeck(deckId: string) {
   const col = loadCollection();
   if (col.decks.some((d) => d.id === deckId)) {
     col.activeDeckId = deckId;
-    persist();
+    afterMutate();
   }
 }
 

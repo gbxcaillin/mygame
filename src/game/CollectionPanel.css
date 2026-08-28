@@ -42,6 +42,24 @@
   opacity: 0.9;
 }
 
+.tt-col-sync {
+  display: block;
+  font-size: 11.5px;
+  font-weight: 600;
+  opacity: 0.8;
+  margin-top: 2px;
+  color: var(--gold);
+}
+
+.tt-col-sync.synced {
+  color: #8fd39a;
+}
+
+.tt-col-sync.error,
+.tt-col-sync.offline {
+  color: #e0a86a;
+}
+
 .tt-col-close {
   background: none;
   border: none;

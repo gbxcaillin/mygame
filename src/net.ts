@@ -14,6 +14,12 @@ function relayUrl(): string {
   return DEFAULT_RELAY;
 }
 
+/** The HTTP(S) base for the collection API — the same host as the relay,
+    with the ws/wss scheme swapped for http/https. Honors ?relay= too. */
+export function apiBase(): string {
+  return relayUrl().replace(/^ws(s?):\/\//, "http$1://");
+}
+
 export interface NetEvents {
   onHosted: (code: string) => void;
   onJoined: (code: string) => void;

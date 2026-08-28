@@ -1,18 +1,39 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeAll, beforeEach, describe, expect, it } from "vitest";
 import {
   activeDeckCards,
   earnReward,
+  getName,
+  hydrate,
   loadCollection,
   ownedCount,
   resetCollection,
   rollReward,
   saveDeck,
   setActiveDeck,
+  switchName,
   deleteDeck,
 } from "./collection";
 import { CARD_POOL } from "./cards";
 
+// The test runner is node (no DOM); give collection.ts a real localStorage so
+// per-name persistence can be exercised.
+beforeAll(() => {
+  const store = new Map<string, string>();
+  (globalThis as { localStorage?: Storage }).localStorage = {
+    getItem: (k: string) => store.get(k) ?? null,
+    setItem: (k: string, v: string) => void store.set(k, v),
+    removeItem: (k: string) => void store.delete(k),
+    clear: () => store.clear(),
+    key: (i: number) => [...store.keys()][i] ?? null,
+    get length() {
+      return store.size;
+    },
+  } as Storage;
+});
+
 beforeEach(() => {
+  switchName(null);
+  localStorage.clear();
   resetCollection();
 });
 
@@ -62,5 +83,25 @@ describe("collection", () => {
     expect(loadCollection().activeDeckId).toBe(deck2.id);
     deleteDeck(deck2.id);
     expect(activeDeckCards()).toBeNull();
+  });
+
+  it("keeps separate collections per name and hydrates from a server payload", () => {
+    // guest earns some cards
+    earnReward(5);
+    const guestCount = Object.keys(loadCollection().owned).length;
+
+    // switching to a named slot starts fresh (its own local key)
+    switchName("alice");
+    expect(getName()).toBe("alice");
+    expect(Object.keys(loadCollection().owned).length).toBe(15);
+
+    // hydrate replaces the whole collection (as a server pull would)
+    hydrate({ owned: { dragon: 3 }, decks: [], activeDeckId: null });
+    expect(ownedCount("dragon")).toBe(3);
+    expect(Object.keys(loadCollection().owned).length).toBe(1);
+
+    // switching back to guest restores its independent data
+    switchName(null);
+    expect(Object.keys(loadCollection().owned).length).toBe(guestCount);
   });
 });

@@ -9,15 +9,27 @@ import {
 } from "./collection";
 import "./CollectionPanel.css";
 
+type SyncStatus = "offline" | "local" | "synced" | "syncing" | "error";
+
 interface CollectionPanelProps {
   onClose: () => void;
   /** notify the app that owned cards / decks changed (deck dropdown etc.) */
   onChanged: () => void;
+  playerName: string | null;
+  syncStatus: SyncStatus;
 }
 
 const TIER_NAMES = ["Common", "Uncommon", "Rare", "Epic", "Legendary", "Mythic"];
 
-export function CollectionPanel({ onClose, onChanged }: CollectionPanelProps) {
+const SYNC_LABEL: Record<SyncStatus, string> = {
+  synced: "✓ Saved to server",
+  syncing: "Saving…",
+  offline: "Offline — saved on this device",
+  error: "Sync error — saved locally",
+  local: "Local only — set a name to sync",
+};
+
+export function CollectionPanel({ onClose, onChanged, playerName, syncStatus }: CollectionPanelProps) {
   const [, setTick] = useState(0);
   const [picking, setPicking] = useState<string[] | null>(null);
   const [deckName, setDeckName] = useState("");
@@ -53,6 +65,10 @@ export function CollectionPanel({ onClose, onChanged }: CollectionPanelProps) {
         <div className="tt-col-head">
           <h2>
             Collection <span className="tt-col-count">{totalOwnedDistinct()} / {CARD_POOL.length}</span>
+            <span className={`tt-col-sync ${syncStatus}`}>
+              {playerName ? `${playerName} · ` : ""}
+              {SYNC_LABEL[syncStatus]}
+            </span>
           </h2>
           <button type="button" className="tt-col-close" onClick={onClose} aria-label="Close">
             &times;

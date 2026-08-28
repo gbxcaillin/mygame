@@ -7,7 +7,8 @@ import { createInitialState, placeCard } from "./game/engine";
 import { dealHands, cloneHand, dealHandExcluding, dealDraftPool, CARD_POOL } from "./game/cards";
 import { NetSession } from "./net";
 import { CollectionPanel } from "./game/CollectionPanel";
-import { activeDeckCards, earnReward } from "./game/collection";
+import { activeDeckCards, earnReward, getName, subscribe as subscribeCollection } from "./game/collection";
+import { claimName, initSync, onSyncStatus, signOut, type SyncStatus } from "./game/sync";
 import { chooseAiMove, DIFFICULTY_LABELS } from "./game/ai";
 import type { Difficulty } from "./game/ai";
 import { DEFAULT_RULES } from "./game/types";
@@ -94,6 +95,33 @@ function App() {
   const [collectionOpen, setCollectionOpen] = useState(false);
   const [reward, setReward] = useState<{ card: Card; isNew: boolean } | null>(null);
   const [, setColVersion] = useState(0); // bumped when the collection changes
+  const [playerName, setPlayerName] = useState<string | null>(getName());
+  const [syncStatus, setSyncStatus] = useState<SyncStatus>("local");
+  const [nameModal, setNameModal] = useState(false);
+  const [nameInput, setNameInput] = useState("");
+
+  // Load the collection from the server (if a name is remembered), and keep
+  // the UI in step with every collection change / sync-status change.
+  useEffect(() => {
+    const unsubCol = subscribeCollection(() => {
+      setColVersion((v) => v + 1);
+      setPlayerName(getName());
+    });
+    const unsubStatus = onSyncStatus(setSyncStatus);
+    initSync();
+    return () => {
+      unsubCol();
+      unsubStatus();
+    };
+  }, []);
+
+  async function submitName() {
+    const name = nameInput.trim();
+    if (name.length < 2) return;
+    await claimName(name);
+    setNameModal(false);
+    setNameInput("");
+  }
 
   // Net callbacks are registered once and outlive renders, so anything they
   // read must come through refs, and anything they write must use setters.
@@ -803,6 +831,15 @@ function App() {
             <button type="button" className="tt-new-game tt-start-collection" onClick={() => setCollectionOpen(true)}>
               Collection
             </button>
+            <button type="button" className="tt-start-player" onClick={() => setNameModal(true)}>
+              {playerName ? (
+                <>
+                  Player: <strong>{playerName}</strong> · change
+                </>
+              ) : (
+                "Set a name to save your collection across devices"
+              )}
+            </button>
             <div className="tt-start-sound">
               <label>
                 <input type="checkbox" checked={audio.music} onChange={toggleMusic} />
@@ -995,7 +1032,56 @@ function App() {
         <CollectionPanel
           onClose={() => setCollectionOpen(false)}
           onChanged={() => setColVersion((v) => v + 1)}
+          playerName={playerName}
+          syncStatus={syncStatus}
         />
+      )}
+
+      {nameModal && (
+        <div className="tt-lobby-veil" onClick={() => setNameModal(false)}>
+          <div className="tt-lobby" onClick={(e) => e.stopPropagation()}>
+            <h2>{playerName ? "Change name" : "Choose your name"}</h2>
+            <p className="tt-lobby-hint">
+              Your collection is saved on the server under this name — enter the same name on any device to load
+              it. No password; anyone using the name shares the collection.
+            </p>
+            <input
+              className="tt-name-input"
+              value={nameInput}
+              maxLength={40}
+              placeholder={playerName ?? "e.g. Sam"}
+              autoFocus
+              onChange={(e) => setNameInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") submitName();
+              }}
+              aria-label="Player name"
+            />
+            <button
+              type="button"
+              className="tt-new-game tt-lobby-btn"
+              disabled={nameInput.trim().length < 2}
+              onClick={submitName}
+            >
+              {playerName ? "Switch" : "Claim name"}
+            </button>
+            {playerName && (
+              <button
+                type="button"
+                className="tt-lobby-leave"
+                onClick={() => {
+                  signOut();
+                  setNameModal(false);
+                }}
+              >
+                Play without saving
+              </button>
+            )}
+            <button type="button" className="tt-lobby-leave" onClick={() => setNameModal(false)}>
+              Cancel
+            </button>
+          </div>
+        </div>
       )}
 
       {/* Lightbox last so it sits above every overlay. */}
