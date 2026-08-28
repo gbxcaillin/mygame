@@ -94,9 +94,24 @@ export function TutorialModal({ onClose }: TutorialModalProps) {
             <h3>Your collection</h3>
             <p>
               You start with 15 creatures. Beat the Computer to win a new card after every victory &mdash; the
-              harder the difficulty, the rarer the finds. Open <strong>Collection</strong> to see everything
-              you own (and shadows of what you're missing), and build named decks of 5 to play with via the
-              Deck &rarr; <strong>My Deck</strong> option.
+              harder the difficulty, the rarer the finds. Every card you win is added to your collection and saved
+              automatically. Open <strong>Collection</strong> to see everything you own (and shadows of what you're
+              missing), and build named decks of 5 to play with via the Deck &rarr; <strong>My Deck</strong> option.
+            </p>
+          </section>
+
+          <section>
+            <h3>Your name &amp; saving</h3>
+            <p>
+              Your collection is saved under a player name. Tap the <strong>Player</strong> line on the start screen
+              to choose one, then enter the same name on any device &mdash; your phone, a tablet, the installed app
+              or the browser &mdash; to load the same cards and decks. There's no password, so pick a name only you
+              and your friends will use.
+            </p>
+            <p>
+              You can also play without a name; your progress then stays on that one device. Saving happens
+              automatically &mdash; the Collection screen shows <strong>&#10003; Saved to server</strong>, or tells
+              you when it's held offline until you reconnect.
             </p>
           </section>
 
