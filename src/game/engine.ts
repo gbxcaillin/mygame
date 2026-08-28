@@ -87,7 +87,7 @@ export function placeCard(
   };
 
   const boardFull = board.every((c) => c !== null);
-  const winner = boardFull ? determineWinner(board) : null;
+  const winner = boardFull ? determineWinner(board, hands) : null;
 
   return {
     ...state,
@@ -211,23 +211,33 @@ function basicCaptures(
   return results;
 }
 
-function determineWinner(board: Cell[]): PlayerId | "draw" {
-  let a = 0;
-  let b = 0;
+/**
+ * Authoritative ownership total per player: cards owned on the board PLUS
+ * cards still held in hand. This is the single source of truth for both the
+ * final winner and the displayed score, so they can never disagree.
+ */
+function countOwnership(
+  board: Cell[],
+  hands: Record<PlayerId, Card[]>
+): Record<PlayerId, number> {
+  const counts: Record<PlayerId, number> = { A: 0, B: 0 };
   for (const cell of board) {
-    if (cell?.owner === "A") a++;
-    else if (cell?.owner === "B") b++;
+    if (cell) counts[cell.owner]++;
   }
-  if (a === b) return "draw";
-  return a > b ? "A" : "B";
+  counts.A += hands.A.length;
+  counts.B += hands.B.length;
+  return counts;
+}
+
+function determineWinner(
+  board: Cell[],
+  hands: Record<PlayerId, Card[]>
+): PlayerId | "draw" {
+  const { A, B } = countOwnership(board, hands);
+  if (A === B) return "draw";
+  return A > B ? "A" : "B";
 }
 
 export function cardCounts(state: GameState): Record<PlayerId, number> {
-  const counts: Record<PlayerId, number> = { A: 0, B: 0 };
-  for (const cell of state.board) {
-    if (cell) counts[cell.owner]++;
-  }
-  counts.A += state.hands.A.length;
-  counts.B += state.hands.B.length;
-  return counts;
+  return countOwnership(state.board, state.hands);
 }

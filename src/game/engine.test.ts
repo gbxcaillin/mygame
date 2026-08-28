@@ -138,28 +138,105 @@ describe("combo rule", () => {
   });
 });
 
-describe("win detection", () => {
-  it("declares the player with more board cards the winner once the board fills", () => {
-    const filler = (id: string) => card(id, [1, 1, 1, 1]);
-    const owners: ("A" | "B")[] = ["A", "A", "A", "A", "A", "B", "B", "B"];
-    const board: GameState["board"] = owners.map((owner, i) => ({
-      card: filler(`f${i}`),
-      owner,
-    }));
-    board.push(null);
+const filler = (id: string) => card(id, [1, 1, 1, 1]); // never captures (1 > 1 is false)
 
-    const lastCard = filler("last");
+/** Board with the 8 given owners in cells 0..7 and cell 8 left empty. */
+function nearFullBoard(owners: ("A" | "B")[]): GameState["board"] {
+  const board: GameState["board"] = owners.map((owner, i) => ({ card: filler(`f${i}`), owner }));
+  board.push(null);
+  return board;
+}
+
+describe("win detection (10-card scoring: board ownership + remaining hand cards)", () => {
+  it("Player A wins 6-4 with a card still in B's hand", () => {
+    // board fills to A:5 B:4; A also holds one unplayed card -> 6 vs 4
     const state: GameState = {
-      board,
-      hands: { A: [], B: [lastCard] },
+      board: nearFullBoard(["A", "A", "A", "A", "A", "B", "B", "B"]),
+      hands: { A: [filler("aLeft")], B: [filler("last")] },
       turn: "B",
       rules: NO_SPECIAL_RULES,
       winner: null,
       lastMove: null,
     };
-
-    const result = placeCard(state, 8, lastCard);
+    const result = placeCard(state, 8, state.hands.B[0]);
     expect(result.winner).toBe("A");
+    const counts = cardCounts(result);
+    expect([counts.A, counts.B]).toEqual([6, 4]);
+    expect(counts.A + counts.B).toBe(10);
+  });
+
+  it("Player B wins 6-4 with a card still in B's hand", () => {
+    // board fills to A:4 B:5; B also holds one unplayed card -> 4 vs 6
+    const state: GameState = {
+      board: nearFullBoard(["A", "A", "A", "B", "B", "B", "B", "B"]),
+      hands: { A: [filler("last")], B: [filler("bLeft")] },
+      turn: "A",
+      rules: NO_SPECIAL_RULES,
+      winner: null,
+      lastMove: null,
+    };
+    const result = placeCard(state, 8, state.hands.A[0]);
+    expect(result.winner).toBe("B");
+    const counts = cardCounts(result);
+    expect([counts.A, counts.B]).toEqual([4, 6]);
+    expect(counts.A + counts.B).toBe(10);
+  });
+
+  it("is a 5-5 draw when board ownership plus the leftover hand card tie", () => {
+    // board fills to A:4 B:5; A holds one unplayed card -> 5 vs 5
+    const state: GameState = {
+      board: nearFullBoard(["A", "A", "A", "A", "B", "B", "B", "B"]),
+      hands: { A: [filler("aLeft")], B: [filler("last")] },
+      turn: "B",
+      rules: NO_SPECIAL_RULES,
+      winner: null,
+      lastMove: null,
+    };
+    const result = placeCard(state, 8, state.hands.B[0]);
+    expect(result.winner).toBe("draw");
+    const counts = cardCounts(result);
+    expect([counts.A, counts.B]).toEqual([5, 5]);
+  });
+
+  it("includes the remaining hand card: a board-only A lead becomes a draw", () => {
+    // after the last placement the board alone is A:5 B:4 (board-only -> A wins),
+    // but B's one unplayed card makes it 5-5 -> the hand card must be counted.
+    const state: GameState = {
+      board: nearFullBoard(["A", "A", "A", "A", "B", "B", "B", "B"]),
+      hands: { A: [filler("last")], B: [filler("bLeft")] },
+      turn: "A",
+      rules: NO_SPECIAL_RULES,
+      winner: null,
+      lastMove: null,
+    };
+    const result = placeCard(state, 8, state.hands.A[0]);
+
+    // board-only would give A the win (5 vs 4)...
+    let boardA = 0;
+    let boardB = 0;
+    for (const cell of result.board) {
+      if (cell?.owner === "A") boardA++;
+      else if (cell?.owner === "B") boardB++;
+    }
+    expect([boardA, boardB]).toEqual([5, 4]);
+    // ...but counting B's leftover card makes it a genuine draw.
+    expect(result.winner).toBe("draw");
+    expect([cardCounts(result).A, cardCounts(result).B]).toEqual([5, 5]);
+  });
+
+  it("before the final move the displayed totals still sum to 10", () => {
+    // one empty cell remains; 8 on board, one card still in hand -> 5 vs 5, total 10
+    const state: GameState = {
+      board: nearFullBoard(["A", "A", "A", "A", "B", "B", "B", "B"]),
+      hands: { A: [filler("aLeft")], B: [filler("last")] },
+      turn: "B",
+      rules: NO_SPECIAL_RULES,
+      winner: null,
+      lastMove: null,
+    };
+    const counts = cardCounts(state);
+    expect(counts.A + counts.B).toBe(10);
+    expect(state.winner).toBeNull();
   });
 });
 
@@ -172,5 +249,32 @@ describe("cardCounts", () => {
     const counts = cardCounts(state);
     expect(counts.A).toBe(1);
     expect(counts.B).toBe(1);
+  });
+
+  it("sums board ownership and hand cards to the correct per-player totals", () => {
+    // A owns 3 on board + 1 in hand = 4; B owns 2 on board + 4 in hand = 6; total 10
+    const board: GameState["board"] = [
+      { card: filler("f0"), owner: "A" },
+      { card: filler("f1"), owner: "A" },
+      { card: filler("f2"), owner: "A" },
+      { card: filler("f3"), owner: "B" },
+      { card: filler("f4"), owner: "B" },
+      null,
+      null,
+      null,
+      null,
+    ];
+    const state: GameState = {
+      board,
+      hands: { A: [filler("ah0")], B: [filler("bh0"), filler("bh1"), filler("bh2"), filler("bh3")] },
+      turn: "A",
+      rules: NO_SPECIAL_RULES,
+      winner: null,
+      lastMove: null,
+    };
+    const counts = cardCounts(state);
+    expect(counts.A).toBe(4);
+    expect(counts.B).toBe(6);
+    expect(counts.A + counts.B).toBe(10);
   });
 });

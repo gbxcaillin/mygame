@@ -3,7 +3,7 @@ import { Board } from "./game/Board";
 import { Hand } from "./game/Hand";
 import { CardLightbox } from "./game/CardLightbox";
 import { TutorialModal } from "./game/TutorialModal";
-import { createInitialState, placeCard } from "./game/engine";
+import { createInitialState, placeCard, cardCounts } from "./game/engine";
 import { dealHands, cloneHand, dealHandExcluding, dealDraftPool, CARD_POOL } from "./game/cards";
 import { NetSession } from "./net";
 import { CollectionPanel } from "./game/CollectionPanel";
@@ -226,15 +226,12 @@ function App() {
     return () => clearTimeout(timer);
   }, [state, opponentType, difficulty, started, coin]);
 
+  // Displayed score uses the engine's authoritative ownership total (board
+  // cards + remaining hand cards), so it always agrees with the winner.
   const counts = useMemo(() => {
-    let a = 0;
-    let b = 0;
-    for (const cell of state.board) {
-      if (cell?.owner === "A") a++;
-      else if (cell?.owner === "B") b++;
-    }
-    return { a, b };
-  }, [state.board]);
+    const totals = cardCounts(state);
+    return { a: totals.A, b: totals.B };
+  }, [state]);
 
   function handleSelect(card: Card) {
     setSelectedCard((prev) => (prev?.id === card.id ? null : card));
