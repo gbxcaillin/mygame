@@ -566,6 +566,54 @@
 
 /* ── Start screen ── */
 
+/* ── Win reward (card earned from the computer) ── */
+
+.tt-reward {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin: 4px 0;
+}
+
+.tt-reward-label {
+  margin: 0;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gold-bright);
+}
+
+.tt-reward-card {
+  width: min(34vw, 150px);
+  border-radius: 10px;
+  border: 2px solid var(--gold);
+  box-shadow: 0 0 22px rgba(232, 198, 90, 0.55);
+  animation: reward-pop 0.5s cubic-bezier(0.2, 1.4, 0.4, 1);
+}
+
+@keyframes reward-pop {
+  from {
+    transform: scale(0.4) rotate(-6deg);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) rotate(0);
+    opacity: 1;
+  }
+}
+
+.tt-reward-name {
+  margin: 0;
+  font-size: 13px;
+  color: var(--gold);
+}
+
+.tt-start-collection {
+  padding: 8px 22px;
+  font-size: 14px;
+}
+
 /* ── Online lobby ── */
 
 .tt-lobby-veil {

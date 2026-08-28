@@ -6,6 +6,8 @@ import { TutorialModal } from "./game/TutorialModal";
 import { createInitialState, placeCard } from "./game/engine";
 import { dealHands, cloneHand, dealHandExcluding, dealDraftPool, CARD_POOL } from "./game/cards";
 import { NetSession } from "./net";
+import { CollectionPanel } from "./game/CollectionPanel";
+import { activeDeckCards, earnReward } from "./game/collection";
 import { chooseAiMove, DIFFICULTY_LABELS } from "./game/ai";
 import type { Difficulty } from "./game/ai";
 import { DEFAULT_RULES } from "./game/types";
@@ -80,7 +82,7 @@ function App() {
   const [audio, setAudio] = useState(getAudioSettings);
   const [bannerDismissed, setBannerDismissed] = useState(false);
   const [started, setStarted] = useState(false);
-  const [deckMode, setDeckMode] = useState<"random" | "select">("select");
+  const [deckMode, setDeckMode] = useState<"random" | "select" | "deck">("select");
   const [deckOpen, setDeckOpen] = useState(false);
   const [draftPool, setDraftPool] = useState<Card[]>([]);
   const [picked, setPicked] = useState<Card[]>([]);
@@ -89,6 +91,9 @@ function App() {
   const [intro, setIntro] = useState(true);
   const [online, setOnline] = useState<OnlineState | null>(null);
   const [joinCode, setJoinCode] = useState("");
+  const [collectionOpen, setCollectionOpen] = useState(false);
+  const [reward, setReward] = useState<{ card: Card; isNew: boolean } | null>(null);
+  const [, setColVersion] = useState(0); // bumped when the collection changes
 
   // Net callbacks are registered once and outlive renders, so anything they
   // read must come through refs, and anything they write must use setters.
@@ -96,6 +101,8 @@ function App() {
   const coinRef = useRef(coin);
   const rulesRef = useRef(rules);
   const onlineRef = useRef(online);
+  const opponentTypeRef = useRef(opponentType);
+  const difficultyRef = useRef(difficulty);
   useEffect(() => {
     coinRef.current = coin;
   }, [coin]);
@@ -105,6 +112,12 @@ function App() {
   useEffect(() => {
     onlineRef.current = online;
   }, [online]);
+  useEffect(() => {
+    opponentTypeRef.current = opponentType;
+  }, [opponentType]);
+  useEffect(() => {
+    difficultyRef.current = difficulty;
+  }, [difficulty]);
 
   const myPlayer: PlayerId = online?.role === "guest" ? "B" : "A";
 
@@ -155,11 +168,18 @@ function App() {
     if (state.winner === mine) {
       playWin();
       vibrate([50, 40, 70]);
+      if (opponentTypeRef.current === "ai" && !onlineRef.current) {
+        setReward(earnReward(difficultyRef.current));
+        setColVersion((v) => v + 1);
+      }
     } else if (state.winner) {
       playLose();
       vibrate(160);
     }
-    if (!state.winner) setBannerDismissed(false);
+    if (!state.winner) {
+      setBannerDismissed(false);
+      setReward(null);
+    }
   }, [state.winner]);
 
   useEffect(() => {
@@ -370,9 +390,10 @@ function App() {
     setDeckOpen(true);
   }
 
-  // "New Game": draft in Select mode, else deal a fresh random game.
+  // "New Game": draft in Select mode, saved deck in My Deck mode, else random.
   function handleNewGame() {
     if (deckMode === "select") openDraft();
+    else if (deckMode === "deck") startGame(activeDeckCards() ?? undefined);
     else startGame();
   }
 
@@ -433,10 +454,14 @@ function App() {
       setOnline({ role: null, stage: "menu", code: "", error: null, peerLeft: false });
     } else if (deckMode === "select") {
       openDraft();
+    } else if (deckMode === "deck") {
+      startGame(activeDeckCards() ?? undefined);
     } else {
       startGame();
     }
   }
+
+  const myDeck = activeDeckCards();
 
   const player2Label = online ? "Friend" : opponentType === "ai" ? "Computer" : "Player 2";
   const winnerLabel = online
@@ -580,6 +605,9 @@ function App() {
           <button type="button" className="tt-help-btn" onClick={() => setTutorialOpen(true)}>
             How to play
           </button>
+          <button type="button" className="tt-help-btn" onClick={() => setCollectionOpen(true)}>
+            Collection
+          </button>
 
           <label className="tt-field">
             Opponent
@@ -606,9 +634,10 @@ function App() {
           {!online && (
             <label className="tt-field">
               Deck
-              <select value={deckMode} onChange={(e) => setDeckMode(e.target.value as "random" | "select")}>
+              <select value={deckMode} onChange={(e) => setDeckMode(e.target.value as "random" | "select" | "deck")}>
                 <option value="random">Random</option>
                 <option value="select">Select</option>
+                {myDeck && <option value="deck">My Deck</option>}
               </select>
             </label>
           )}
@@ -654,6 +683,16 @@ function App() {
         <div className="tt-winbanner-veil" onClick={() => setBannerDismissed(true)}>
           <div className={`tt-winbanner ${bannerKind}`} onClick={(e) => e.stopPropagation()}>
             <h2 className="tt-winbanner-title">{bannerTitle}</h2>
+            {reward && bannerKind === "win" && (
+              <div className="tt-reward">
+                <p className="tt-reward-label">{reward.isNew ? "New card won!" : "Card won!"}</p>
+                {reward.card.image && <img className="tt-reward-card" src={reward.card.image} alt={reward.card.name} />}
+                <p className="tt-reward-name">
+                  {reward.card.name}
+                  {reward.isNew ? " — added to your collection" : " — another copy"}
+                </p>
+              </div>
+            )}
             <p className="tt-winbanner-score">
               {online
                 ? `You ${myPlayer === "A" ? counts.a : counts.b} — ${myPlayer === "A" ? counts.b : counts.a} Friend`
@@ -729,9 +768,10 @@ function App() {
                 {opponentType !== "online" && (
                   <label className="tt-field">
                     Deck
-                    <select value={deckMode} onChange={(e) => setDeckMode(e.target.value as "random" | "select")}>
+                    <select value={deckMode} onChange={(e) => setDeckMode(e.target.value as "random" | "select" | "deck")}>
                       <option value="random">Random</option>
                       <option value="select">Select</option>
+                      {myDeck && <option value="deck">My Deck</option>}
                     </select>
                   </label>
                 )}
@@ -759,6 +799,9 @@ function App() {
 
             <button type="button" className="tt-start-btn" onClick={handleStart} autoFocus>
               Press Start
+            </button>
+            <button type="button" className="tt-new-game tt-start-collection" onClick={() => setCollectionOpen(true)}>
+              Collection
             </button>
             <div className="tt-start-sound">
               <label>
@@ -946,8 +989,16 @@ function App() {
         </div>
       )}
 
-      {/* Lightbox last, at root level, so it sits above every overlay
-          (the deck picker, etc.) — it must not be trapped inside .tt-app. */}
+      {/* Root-level overlays: rendered outside .tt-app so their z-index isn't
+          trapped inside its stacking context. */}
+      {collectionOpen && (
+        <CollectionPanel
+          onClose={() => setCollectionOpen(false)}
+          onChanged={() => setColVersion((v) => v + 1)}
+        />
+      )}
+
+      {/* Lightbox last so it sits above every overlay. */}
       {inspecting && (
         <CardLightbox card={inspecting.card} owner={inspecting.owner} onClose={() => setInspecting(null)} />
       )}

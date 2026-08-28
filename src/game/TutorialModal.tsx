@@ -91,6 +91,16 @@ export function TutorialModal({ onClose }: TutorialModalProps) {
           </section>
 
           <section>
+            <h3>Your collection</h3>
+            <p>
+              You start with 15 creatures. Beat the Computer to win a new card after every victory &mdash; the
+              harder the difficulty, the rarer the finds. Open <strong>Collection</strong> to see everything
+              you own (and shadows of what you're missing), and build named decks of 5 to play with via the
+              Deck &rarr; <strong>My Deck</strong> option.
+            </p>
+          </section>
+
+          <section>
             <h3>Opponent &amp; difficulty</h3>
             <p>
               Pick Human for local pass-and-play, or Computer for an AI opponent with five difficulty levels, from
