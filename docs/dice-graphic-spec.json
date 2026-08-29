@@ -1,0 +1,58 @@
+{
+  "$schema_note": "Spec for a Court of Beasts wager dice graphic. Today the die is only an emoji (🎲) plus the rolled number in the wager-result banner; this describes a real graphic you could drop in to replace it. Two-layer convention: supply the art, Claude Code wires it in.",
+  "where_it_appears": {
+    "context": "The wager-result banner shown when an online friend match ends and both players wagered.",
+    "current_markup": "<span class=\"tt-ante-die\">🎲 {roll}</span> inside the banner's label line, above the forfeited/won card image.",
+    "line_reads": "🎲 {1-6}  ·  WAGER WON!  /  WAGER LOST!",
+    "sits_above": "the card image (min(34vw, 150px) wide, gold-bordered), which shows which creature changed hands"
+  },
+  "what_the_graphic_represents": "The result of the loser's six-sided roll (1-6) that decides which card is forfeited: 1-5 = the fielded card at that position (left to right), 6 = a random drafted-but-unpicked card.",
+  "canvas": {
+    "shape": "square 1:1 per face",
+    "generate_at": "512x512 per face (or a single 1536x1024 sheet of all six)",
+    "displayed_at": "48-72px in the banner (so keep pips/numerals bold and readable when small)"
+  },
+  "two_approaches": {
+    "A_static_faces": {
+      "desc": "Six face images (values 1-6). Claude Code shows the one matching the roll, with a quick pop/settle animation via CSS.",
+      "deliver": "6 square PNGs (die-1.png … die-6.png) with transparent background, OR one horizontal sheet of 6 faces evenly spaced.",
+      "simplest": true
+    },
+    "B_animated_roll": {
+      "desc": "A short tumble that settles on the rolled value. More drama, more work to wire.",
+      "deliver": "either a 6-frame-per-value sprite, a looping-then-settling MP4/WebM (~1s, transparent or on the banner's dark ground), or a CSS/SVG 3D cube Claude Code builds from six face images.",
+      "note": "If you want this, the six faces from approach A are still the raw material."
+    }
+  },
+  "face_design": {
+    "style": "Matches the coins and title plaque: a carved/cast object, top-lit, gold + dark stone, not a flat cartoon die.",
+    "options": [
+      "Pips (classic 1-6 dot layout) carved as gem insets or gold studs on a dark stone/bone die",
+      "Roman numerals (I-VI) stamped like the coin emblems",
+      "Arabic numerals (1-6) in the same beveled cast-gold as the title lettering"
+    ],
+    "recommendation": "Pips as gems/studs read fastest at 48-72px and feel the most 'die'; numerals also fine and more legible.",
+    "body": "aged bone-white or dark arcane stone cube face with a subtle bevel and worn edges; a thin gold rim optional"
+  },
+  "palette": {
+    "reference": "docs/title-art-style.json",
+    "gold_bright": "#f5e9c0",
+    "gold": "#d79425",
+    "gold_deep": "#8a6a25",
+    "stone_dark": "#131017",
+    "bone": "#e8e0cf",
+    "gem_sapphire": "#0753ba",
+    "gem_emerald": "#39835d",
+    "pip_or_numeral": "gold #d79425 or gem-inset (sapphire for the player, but a neutral gold is safest since either side can roll)"
+  },
+  "lighting": "single warm light from above; specular glints on pips/edges; soft occlusion where pips meet the face — same treatment as the coin emblems.",
+  "delivery": {
+    "background": "transparent PNG (the banner ground is dark #08060e); a plain-black background also works since it's masked/dropped like the coins were",
+    "safe_area": "keep pips/numerals inside the central ~80% so a rounded-corner or circular crop never clips them",
+    "naming": "die-1.png … die-6.png (approach A), or dice-sheet.png (6 faces left-to-right), or dice-roll.webm (approach B)"
+  },
+  "notes_for_wiring": [
+    "The roll value is already computed in App.tsx; wiring the graphic means swapping the <span>🎲 {roll}</span> for an <img> of the matching face (approach A) or a short clip (approach B).",
+    "The die shows on BOTH players' screens (winner and loser) with the same value, so a single neutral-colored die is correct — don't tint it per player."
+  ]
+}
