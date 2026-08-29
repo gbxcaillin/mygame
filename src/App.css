@@ -906,6 +906,15 @@
   gap: 22px;
 }
 
+.tt-build-id {
+  margin: 2px 0 0;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--muted, #7a6f5c);
+  opacity: 0.6;
+  font-variant-numeric: tabular-nums;
+}
+
 .tt-start-sound label {
   display: flex;
   align-items: center;

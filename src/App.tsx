@@ -161,6 +161,9 @@ function App() {
   const opponentTypeRef = useRef(opponentType);
   const difficultyRef = useRef(difficulty);
   useEffect(() => {
+    console.info(`Court of Beasts — build ${__BUILD_ID__}`);
+  }, []);
+  useEffect(() => {
     coinRef.current = coin;
   }, [coin]);
   useEffect(() => {
@@ -1015,6 +1018,7 @@ function App() {
                 Install App
               </button>
             )}
+            <p className="tt-build-id">build {__BUILD_ID__}</p>
           </div>
         </div>
       )}

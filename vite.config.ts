@@ -1,9 +1,23 @@
+import { execSync } from 'node:child_process'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
+// A short, human-readable build id (git short SHA) so a running device can
+// report exactly which build it is on — invaluable for telling a fresh deploy
+// apart from a stale PWA cache.
+let buildId = 'dev'
+try {
+  buildId = execSync('git rev-parse --short HEAD').toString().trim()
+} catch {
+  // no git (e.g. a tarball build) — leave the default
+}
+
 // https://vite.dev/config/
 export default defineConfig({
+  define: {
+    __BUILD_ID__: JSON.stringify(buildId),
+  },
   base: '/mygame/',
   plugins: [
     react(),
