@@ -7,6 +7,7 @@ import { createInitialState, placeCard, cardCounts } from "./game/engine";
 import { dealHands, cloneHand, dealHandExcluding, dealDraftPool, CARD_POOL } from "./game/cards";
 import { NetSession } from "./net";
 import { CollectionPanel } from "./game/CollectionPanel";
+import { Die } from "./game/Die";
 import {
   activeDeckCards,
   addCard,
@@ -848,10 +849,8 @@ function App() {
             )}
             {ante && ante.card && (
               <div className="tt-reward">
-                <p className="tt-reward-label">
-                  <span className="tt-ante-die" aria-hidden="true">🎲 {ante.roll}</span>{" "}
-                  {ante.won ? "Wager won!" : "Wager lost!"}
-                </p>
+                <Die value={ante.roll} size={72} />
+                <p className="tt-reward-label">{ante.won ? "Wager won!" : "Wager lost!"}</p>
                 {ante.card.image && (
                   <img className="tt-reward-card" src={ante.card.image} alt={ante.card.name} />
                 )}

@@ -1,0 +1,40 @@
+.tt-die {
+  display: inline-block;
+  position: relative;
+  line-height: 0;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.6));
+}
+
+.tt-die img {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Tumble while the faces cycle, then a quick settle when it lands. */
+.tt-die.spinning {
+  animation: die-tumble 0.66s cubic-bezier(0.25, 0.7, 0.25, 1);
+}
+
+.tt-die.landed {
+  animation: die-settle 0.28s cubic-bezier(0.2, 1.5, 0.35, 1);
+}
+
+@keyframes die-tumble {
+  0% { transform: rotate(0deg) scale(1); }
+  30% { transform: rotate(200deg) scale(0.82); }
+  60% { transform: rotate(410deg) scale(1.08); }
+  100% { transform: rotate(540deg) scale(1); }
+}
+
+@keyframes die-settle {
+  0% { transform: scale(1.14); }
+  100% { transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tt-die.spinning,
+  .tt-die.landed {
+    animation: none;
+  }
+}

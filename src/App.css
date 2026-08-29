@@ -586,11 +586,6 @@
   flex: none;
 }
 
-.tt-ante-die {
-  font-weight: 800;
-  color: var(--gold-bright);
-}
-
 /* ── Win reward (card earned from the computer) ── */
 
 .tt-reward {
