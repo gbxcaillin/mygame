@@ -14,7 +14,7 @@ type NetData =
   | { t: "setup"; a: string[]; b: string[]; starter: PlayerId; rules: RuleSet; wager: boolean }
   | { t: "flip" }
   | { t: "move"; cell: number; cardId: string }
-  | { t: "ante"; roll: number; cardId: string }
+  | { t: "ante"; roll: number; cardId: string; picks: string[] }
   | { t: "rematch" };
 
 const byId = new Map(CARD_POOL.map((c) => [c.id, c]));
@@ -85,7 +85,7 @@ function checkEnd() {
     const roll = 1 + Math.floor(Math.random() * 6);
     const lost = roll <= 5 ? fielded[roll - 1] : discarded[Math.floor(Math.random() * discarded.length)];
     if (lost) {
-      send({ t: "ante", roll, cardId: lost.id });
+      send({ t: "ante", roll, cardId: lost.id, picks: fielded.map((c) => c.id) });
       log(`Wager: rolled ${roll} — bot forfeits ${lost.name} to you`, "end");
     }
   }

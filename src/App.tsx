@@ -7,7 +7,7 @@ import { createInitialState, placeCard, cardCounts } from "./game/engine";
 import { dealHands, cloneHand, dealHandExcluding, dealDraftPool, CARD_POOL } from "./game/cards";
 import { NetSession } from "./net";
 import { CollectionPanel } from "./game/CollectionPanel";
-import { Die } from "./game/Die";
+import { WagerRoll } from "./game/WagerRoll";
 import {
   activeDeckCards,
   addCard,
@@ -60,13 +60,14 @@ type NetData =
   | { t: "setup"; a: string[]; b: string[]; starter: PlayerId; rules: RuleSet; wager: boolean }
   | { t: "flip" }
   | { t: "move"; cell: number; cardId: string }
-  | { t: "ante"; roll: number; cardId: string }
+  | { t: "ante"; roll: number; cardId: string; picks: string[] }
   | { t: "rematch" };
 
 interface AnteResult {
   won: boolean; // true = you took a card, false = you lost one
   roll: number;
-  card: Card | null;
+  card: Card | null; // the card that changed hands
+  field: Card[]; // the loser's five fielded cards (slots 1-5 on the roll screen)
 }
 
 // Chrome/Android fires this before showing its install banner; not yet in TS's DOM lib.
@@ -121,6 +122,7 @@ function App() {
   const [onlineWager, setOnlineWager] = useState(false);
   const [matchWagered, setMatchWagered] = useState(false);
   const [ante, setAnte] = useState<AnteResult | null>(null);
+  const [anteDone, setAnteDone] = useState(false); // dismissed the wager-roll screen
 
   // Online draft/hand exchange lives in refs (read from net callbacks).
   const myHandRef = useRef<{ picked: Card[]; discarded: Card[]; wager: boolean } | null>(null);
@@ -251,8 +253,10 @@ function App() {
         if (lost) {
           removeCard(lost.id);
           setColVersion((v) => v + 1);
-          netRef.current?.send({ t: "ante", roll, cardId: lost.id } satisfies NetData);
-          setAnte({ won: false, roll, card: lost });
+          const picks = hand.picked.map((c) => c.id);
+          netRef.current?.send({ t: "ante", roll, cardId: lost.id, picks } satisfies NetData);
+          setAnte({ won: false, roll, card: lost, field: [...hand.picked] });
+          setAnteDone(false);
         }
       }
     }
@@ -260,6 +264,7 @@ function App() {
       setBannerDismissed(false);
       setReward(null);
       setAnte(null);
+      setAnteDone(false);
     }
   }, [state.winner]);
 
@@ -441,7 +446,9 @@ function App() {
     } else if (msg.t === "ante") {
       // I won: the loser forfeits this card into my collection.
       addCard(msg.cardId);
-      setAnte({ won: true, roll: msg.roll, card: cardById.get(msg.cardId) ?? null });
+      const field = cardsFromIds(msg.picks ?? []);
+      setAnte({ won: true, roll: msg.roll, card: cardById.get(msg.cardId) ?? null, field });
+      setAnteDone(false);
     } else if (msg.t === "rematch") {
       startOnlineDraft();
     }
@@ -505,6 +512,7 @@ function App() {
     setMatchWagered(false);
     matchWageredRef.current = false;
     setAnte(null);
+    setAnteDone(false);
     setOpponentType(nextOpponent);
     startGame(undefined, rules, false); // fresh local board
   }
@@ -849,7 +857,6 @@ function App() {
             )}
             {ante && ante.card && (
               <div className="tt-reward">
-                <Die value={ante.roll} size={72} />
                 <p className="tt-reward-label">{ante.won ? "Wager won!" : "Wager lost!"}</p>
                 {ante.card.image && (
                   <img className="tt-reward-card" src={ante.card.image} alt={ante.card.name} />
@@ -883,6 +890,16 @@ function App() {
         </div>
       )}
       </div>
+
+      {ante && ante.card && ante.field.length > 0 && !anteDone && (
+        <WagerRoll
+          field={ante.field}
+          roll={ante.roll}
+          taken={ante.card}
+          won={ante.won}
+          onContinue={() => setAnteDone(true)}
+        />
+      )}
 
       {intro && !started && (
         <div className="tt-intro" onClick={() => setIntro(false)} role="button" aria-label="Skip intro">

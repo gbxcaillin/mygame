@@ -1,0 +1,204 @@
+.tt-wr {
+  position: fixed;
+  inset: 0;
+  z-index: 98;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: radial-gradient(120% 80% at 50% 0%, #1a1226 0%, #06040c 70%);
+  backdrop-filter: blur(4px);
+  animation: tt-wr-fade 0.3s ease both;
+}
+
+@keyframes tt-wr-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.tt-wr-inner {
+  width: min(94vw, 460px);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.tt-wr-heading {
+  margin: 0;
+  font-family: "Cinzel", Georgia, serif;
+  font-weight: 800;
+  font-size: 22px;
+  letter-spacing: 0.03em;
+  color: var(--gold-bright, #f5e9c0);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
+  min-height: 1.4em;
+}
+
+.tt-wr-heading.won {
+  color: #8fe0a0;
+  text-shadow: 0 0 16px rgba(120, 224, 150, 0.5), 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.tt-wr-heading.lost {
+  color: #ff8a7a;
+  text-shadow: 0 0 16px rgba(224, 74, 58, 0.5), 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.tt-wr-die {
+  width: 88px;
+  height: 88px;
+  line-height: 0;
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.7));
+}
+
+.tt-wr-die img {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.tt-wr-die.spinning {
+  animation: tt-wr-tumble 0.28s linear infinite;
+}
+
+.tt-wr-die.landed {
+  animation: tt-wr-settle 0.3s cubic-bezier(0.2, 1.5, 0.35, 1);
+}
+
+@keyframes tt-wr-tumble {
+  0% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(180deg) scale(0.9); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
+@keyframes tt-wr-settle {
+  0% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+.tt-wr-line {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.tt-wr-slot {
+  position: relative;
+  width: 84px;
+  border-radius: 9px;
+  padding: 4px;
+  border: 1.5px solid var(--line, #2c2436);
+  background: linear-gradient(180deg, #16111f, #0c0912);
+  transition: transform 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease, opacity 0.25s ease;
+}
+
+.tt-wr-slot.active {
+  border-color: var(--gold-bright, #f5e9c0);
+  box-shadow: 0 0 14px rgba(245, 233, 192, 0.45);
+  transform: translateY(-3px) scale(1.04);
+}
+
+.tt-wr-slot.taken {
+  border-color: var(--gold, #d79425);
+  box-shadow: 0 0 22px rgba(215, 148, 37, 0.7);
+  transform: translateY(-4px) scale(1.08);
+  opacity: 1;
+}
+
+.tt-wr-slot.dim {
+  opacity: 0.32;
+  filter: saturate(0.5);
+}
+
+.tt-wr-num {
+  position: absolute;
+  top: -8px;
+  left: -8px;
+  z-index: 2;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Cinzel", Georgia, serif;
+  font-weight: 800;
+  font-size: 14px;
+  color: #1a1206;
+  background: radial-gradient(circle at 35% 30%, #f7e9be, var(--gold, #d79425));
+  border: 1.5px solid #7a5a1e;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+.tt-wr-card {
+  width: 100%;
+  display: block;
+  border-radius: 6px;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+}
+
+.tt-wr-back {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 4px;
+  font-family: "Cinzel", Georgia, serif;
+  font-size: 13px;
+  color: var(--gold, #d79425);
+  background: repeating-linear-gradient(45deg, #1c1626, #1c1626 6px, #221a2e 6px, #221a2e 12px);
+  border: 1px solid var(--gold-deep, #8a6a25);
+}
+
+.tt-wr-back span {
+  font-size: 26px;
+  font-weight: 800;
+  opacity: 0.8;
+}
+
+.tt-wr-caption {
+  margin: 2px 0 0;
+  font-size: 16px;
+  color: var(--text, #d9cfb9);
+  animation: tt-wr-fade 0.3s ease both;
+}
+
+.tt-wr-caption b {
+  color: var(--gold-bright, #f5e9c0);
+}
+
+.tt-wr-continue {
+  margin-top: 6px;
+  font-family: "Cinzel", Georgia, serif;
+  font-weight: 800;
+  font-size: 15px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold-bright, #f5e9c0);
+  background: linear-gradient(180deg, #241a10, #140f08);
+  border: 1.5px solid var(--gold, #d79425);
+  border-radius: 9px;
+  padding: 13px 30px;
+  cursor: pointer;
+  animation: tt-wr-fade 0.3s ease both;
+}
+
+.tt-wr-continue:hover {
+  border-color: var(--gold-bright, #f5e9c0);
+  box-shadow: 0 0 18px rgba(215, 148, 37, 0.4);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tt-wr-die.spinning,
+  .tt-wr-die.landed {
+    animation: none;
+  }
+}
