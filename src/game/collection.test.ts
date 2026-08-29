@@ -1,11 +1,14 @@
 import { beforeAll, beforeEach, describe, expect, it } from "vitest";
 import {
   activeDeckCards,
+  addCard,
+  draftFromCollection,
   earnReward,
   getName,
   hydrate,
   loadCollection,
   ownedCount,
+  removeCard,
   resetCollection,
   rollReward,
   saveDeck,
@@ -103,5 +106,32 @@ describe("collection", () => {
     // switching back to guest restores its independent data
     switchName(null);
     expect(Object.keys(loadCollection().owned).length).toBe(guestCount);
+  });
+
+  it("drafts distinct owned cards for online play", () => {
+    for (let i = 0; i < 30; i++) {
+      const draft = draftFromCollection(10);
+      expect(draft.length).toBe(10); // starter owns 15 distinct
+      expect(new Set(draft.map((c) => c.id)).size).toBe(10);
+      for (const c of draft) expect(ownedCount(c.id)).toBeGreaterThan(0);
+    }
+  });
+
+  it("adds and removes single copies, dropping decks that lose a card", () => {
+    const id = Object.keys(loadCollection().owned)[0];
+    addCard(id);
+    expect(ownedCount(id)).toBe(2);
+    expect(removeCard(id)).toBe(true);
+    expect(ownedCount(id)).toBe(1);
+    expect(removeCard(id)).toBe(true);
+    expect(ownedCount(id)).toBe(0);
+    expect(removeCard(id)).toBe(false); // none left
+
+    const owned = Object.keys(loadCollection().owned).slice(0, 5);
+    saveDeck("Squad", owned);
+    expect(loadCollection().decks.length).toBe(1);
+    removeCard(owned[2]);
+    expect(loadCollection().decks.length).toBe(0);
+    expect(activeDeckCards()).toBeNull();
   });
 });

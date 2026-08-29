@@ -123,8 +123,14 @@ export function TutorialModal({ onClose }: TutorialModalProps) {
             </p>
             <p>
               <strong>Friend (online)</strong> plays against a friend on another device: one of you hosts and reads
-              out the 4-letter room code, the other joins with it. The host deals, sets the rules and flips the
-              coin; your own cards always sit at the bottom of your screen.
+              out the 4-letter room code, the other joins with it. You each draft 5 cards from 10 drawn from your
+              own collection, then the host flips the coin; your own cards always sit at the bottom of your screen.
+            </p>
+            <p>
+              Before a friend match you can tick <strong>Wager</strong>. If both of you wager, the loser rolls a
+              die and forfeits one card to the winner &mdash; 1&ndash;5 gives up the card at that position in their
+              hand (left to right), and a 6 gives up one of the cards they drafted but didn't pick. If either of
+              you declines, the match is played for fun with no cards at stake.
             </p>
           </section>
 

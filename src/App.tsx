@@ -7,7 +7,15 @@ import { createInitialState, placeCard, cardCounts } from "./game/engine";
 import { dealHands, cloneHand, dealHandExcluding, dealDraftPool, CARD_POOL } from "./game/cards";
 import { NetSession } from "./net";
 import { CollectionPanel } from "./game/CollectionPanel";
-import { activeDeckCards, earnReward, getName, subscribe as subscribeCollection } from "./game/collection";
+import {
+  activeDeckCards,
+  addCard,
+  draftFromCollection,
+  earnReward,
+  getName,
+  removeCard,
+  subscribe as subscribeCollection,
+} from "./game/collection";
 import { claimName, initSync, onSyncStatus, signOut, type SyncStatus } from "./game/sync";
 import { chooseAiMove, DIFFICULTY_LABELS } from "./game/ai";
 import type { Difficulty } from "./game/ai";
@@ -39,7 +47,7 @@ const AI_THINK_DELAY_MS = 1400;
 
 interface OnlineState {
   role: "host" | "guest" | null;
-  stage: "menu" | "connecting" | "hosting" | "connected";
+  stage: "menu" | "connecting" | "hosting" | "connected" | "waiting";
   code: string;
   error: string | null;
   peerLeft: boolean;
@@ -47,9 +55,18 @@ interface OnlineState {
 
 /** Messages exchanged between the two game clients (via the relay). */
 type NetData =
-  | { t: "setup"; a: string[]; b: string[]; starter: PlayerId; rules: RuleSet }
+  | { t: "hand"; cards: string[]; wager: boolean }
+  | { t: "setup"; a: string[]; b: string[]; starter: PlayerId; rules: RuleSet; wager: boolean }
   | { t: "flip" }
-  | { t: "move"; cell: number; cardId: string };
+  | { t: "move"; cell: number; cardId: string }
+  | { t: "ante"; roll: number; cardId: string }
+  | { t: "rematch" };
+
+interface AnteResult {
+  won: boolean; // true = you took a card, false = you lost one
+  roll: number;
+  card: Card | null;
+}
 
 // Chrome/Android fires this before showing its install banner; not yet in TS's DOM lib.
 interface BeforeInstallPromptEvent extends Event {
@@ -99,6 +116,15 @@ function App() {
   const [syncStatus, setSyncStatus] = useState<SyncStatus>("local");
   const [nameModal, setNameModal] = useState(false);
   const [nameInput, setNameInput] = useState("");
+  const [draftMode, setDraftMode] = useState<"solo" | "online">("solo");
+  const [onlineWager, setOnlineWager] = useState(false);
+  const [matchWagered, setMatchWagered] = useState(false);
+  const [ante, setAnte] = useState<AnteResult | null>(null);
+
+  // Online draft/hand exchange lives in refs (read from net callbacks).
+  const myHandRef = useRef<{ picked: Card[]; discarded: Card[]; wager: boolean } | null>(null);
+  const peerHandRef = useRef<{ ids: string[]; wager: boolean } | null>(null);
+  const matchWageredRef = useRef(false);
 
   // Load the collection from the server (if a name is remembered), and keep
   // the UI in step with every collection change / sync-status change.
@@ -204,9 +230,35 @@ function App() {
       playLose();
       vibrate(160);
     }
+    // Online wager: the loser rolls a d6 and forfeits a card to the winner
+    // (1-5 = the fielded card at that position, 6 = a drafted-but-unpicked
+    // card). The winner receives it via the {t:"ante"} message.
+    if (
+      state.winner &&
+      state.winner !== "draw" &&
+      onlineRef.current &&
+      matchWageredRef.current &&
+      state.winner !== mine
+    ) {
+      const hand = myHandRef.current;
+      if (hand) {
+        const roll = 1 + Math.floor(Math.random() * 6);
+        const lost =
+          roll <= 5
+            ? hand.picked[roll - 1]
+            : hand.discarded[Math.floor(Math.random() * hand.discarded.length)];
+        if (lost) {
+          removeCard(lost.id);
+          setColVersion((v) => v + 1);
+          netRef.current?.send({ t: "ante", roll, cardId: lost.id } satisfies NetData);
+          setAnte({ won: false, roll, card: lost });
+        }
+      }
+    }
     if (!state.winner) {
       setBannerDismissed(false);
       setReward(null);
+      setAnte(null);
     }
   }, [state.winner]);
 
@@ -291,38 +343,89 @@ function App() {
   }
 
   // ── Online play (see server/relay.js and src/net.ts) ──
+  // Each player drafts 5 from 10 of their own collection, exchanges the
+  // chosen hand, and the host assembles the match. Wager is on only if
+  // both players opt in; the loser then forfeits a card to the winner.
 
-  // Host deals both hands, picks the starter, and mirrors it to the guest.
-  function hostDeal(nextRules?: RuleSet) {
-    const r = nextRules ?? rulesRef.current;
-    const pending = newGame(r);
+  const cardById = useMemo(() => new Map(CARD_POOL.map((c) => [c.id, c])), []);
+  const cloneCard = (c: Card): Card => ({ ...c, ranks: { ...c.ranks } });
+  const cardsFromIds = (ids: string[]): Card[] =>
+    ids.flatMap((id) => {
+      const c = cardById.get(id);
+      return c ? [cloneCard(c)] : [];
+    });
+
+  function startOnlineDraft() {
+    myHandRef.current = null;
+    peerHandRef.current = null;
+    const pool = draftFromCollection(10);
+    if (pool.length < 5) {
+      setOnline((o) => (o ? { ...o, stage: "menu", error: "You need at least 5 cards to play online" } : o));
+      return;
+    }
+    setDraftPool(pool);
+    setPicked([]);
+    setOnlineWager(false);
+    setDraftMode("online");
+    setDeckOpen(true);
+  }
+
+  // Host: once both hands are in, pick the starter and start the match.
+  function maybeFinalize() {
+    if (onlineRef.current?.role !== "host") return;
+    const mine = myHandRef.current;
+    const peer = peerHandRef.current;
+    if (!mine || !peer) return;
+    const handA = mine.picked.map(cloneCard);
+    const handB = cardsFromIds(peer.ids);
+    if (handB.length !== 5) return;
+    const starter: PlayerId = Math.random() < 0.5 ? "A" : "B";
+    const wager = mine.wager && peer.wager;
+    matchWageredRef.current = wager;
+    setMatchWagered(wager);
     netRef.current?.send({
       t: "setup",
-      a: pending.hands.A.map((c) => c.id),
-      b: pending.hands.B.map((c) => c.id),
-      starter: pending.turn,
-      rules: r,
+      a: mine.picked.map((c) => c.id),
+      b: peer.ids,
+      starter,
+      rules: rulesRef.current,
+      wager,
     } satisfies NetData);
     setSelectedCard(null);
-    setCoin({ pending, phase: "ready" });
+    setOnline((o) => (o ? { ...o, stage: "connected" } : o));
+    setCoin({ pending: createInitialState(handA, handB, starter, rulesRef.current), phase: "ready" });
+  }
+
+  function confirmOnlineDraft() {
+    if (picked.length !== 5) return;
+    const pickedIds = new Set(picked.map((c) => c.id));
+    const discarded = draftPool.filter((c) => !pickedIds.has(c.id));
+    myHandRef.current = { picked: [...picked], discarded, wager: onlineWager };
+    netRef.current?.send({ t: "hand", cards: picked.map((c) => c.id), wager: onlineWager } satisfies NetData);
+    setDeckOpen(false);
+    setDraftMode("solo");
+    // Both wait on the "waiting" screen; the host's maybeFinalize (or the
+    // guest's setup handler) moves to "connected" + coin once both hands are in.
+    setOnline((o) => (o ? { ...o, stage: "waiting" } : o));
+    if (onlineRef.current?.role === "host") maybeFinalize();
   }
 
   function handleNetData(d: unknown) {
     const msg = d as NetData;
     if (!msg || typeof msg !== "object") return;
-    if (msg.t === "setup") {
-      const byId = new Map(CARD_POOL.map((c) => [c.id, c]));
-      const pick = (ids: string[]) =>
-        ids.flatMap((id) => {
-          const c = byId.get(id);
-          return c ? [{ ...c, ranks: { ...c.ranks } }] : [];
-        });
-      const handA = pick(msg.a);
-      const handB = pick(msg.b);
+    if (msg.t === "hand") {
+      peerHandRef.current = { ids: msg.cards, wager: msg.wager };
+      if (onlineRef.current?.role === "host") maybeFinalize();
+    } else if (msg.t === "setup") {
+      const handA = cardsFromIds(msg.a);
+      const handB = cardsFromIds(msg.b);
       if (handA.length !== 5 || handB.length !== 5) return; // version mismatch
+      matchWageredRef.current = msg.wager;
+      setMatchWagered(msg.wager);
       setRules(msg.rules);
       setDeckOpen(false);
       setSelectedCard(null);
+      setOnline((o) => (o ? { ...o, stage: "connected" } : o));
       setCoin({ pending: createInitialState(handA, handB, msg.starter, msg.rules), phase: "ready" });
     } else if (msg.t === "flip") {
       performFlip();
@@ -334,6 +437,12 @@ function App() {
         return placeCard(prev, msg.cell, card);
       });
       setSelectedCard(null);
+    } else if (msg.t === "ante") {
+      // I won: the loser forfeits this card into my collection.
+      addCard(msg.cardId);
+      setAnte({ won: true, roll: msg.roll, card: cardById.get(msg.cardId) ?? null });
+    } else if (msg.t === "rematch") {
+      startOnlineDraft();
     }
   }
 
@@ -341,10 +450,13 @@ function App() {
     netRef.current?.close();
     const net = new NetSession({
       onHosted: (code) => setOnline((o) => (o ? { ...o, stage: "hosting", code } : o)),
-      onJoined: (code) => setOnline((o) => (o ? { ...o, stage: "connected", code } : o)),
+      onJoined: (code) => {
+        setOnline((o) => (o ? { ...o, stage: "connected", code } : o));
+        startOnlineDraft(); // guest drafts its hand
+      },
       onPeerJoined: () => {
         setOnline((o) => (o ? { ...o, stage: "connected" } : o));
-        hostDeal();
+        startOnlineDraft(); // host drafts its hand; both hands assemble the match
       },
       onData: handleNetData,
       onPeerLeft: () => setOnline((o) => (o ? { ...o, peerLeft: true } : o)),
@@ -387,8 +499,20 @@ function App() {
     netRef.current = null;
     setOnline(null);
     setJoinCode("");
+    setDeckOpen(false);
+    setDraftMode("solo");
+    setMatchWagered(false);
+    matchWageredRef.current = false;
+    setAnte(null);
     setOpponentType(nextOpponent);
     startGame(undefined, rules, false); // fresh local board
+  }
+
+  // Host restarts the match: both players redraft.
+  function hostRematch() {
+    if (onlineRef.current?.role !== "host") return;
+    netRef.current?.send({ t: "rematch" } satisfies NetData);
+    startOnlineDraft();
   }
 
   function handleOpponentChange(value: OpponentType) {
@@ -410,6 +534,7 @@ function App() {
 
   // Select mode: draft your 5 from a spread of 10 pyramid-weighted cards.
   function openDraft() {
+    setDraftMode("solo");
     setDraftPool(dealDraftPool(10));
     setPicked([]);
     setDeckOpen(true);
@@ -427,7 +552,7 @@ function App() {
     const nextRules = { ...rules, [key]: !rules[key] };
     setRules(nextRules);
     if (!started) return; // start screen: record the choice, Start deals with it
-    if (online) hostDeal(nextRules);
+    if (online) hostRematch(); // rule change online = fresh draft for both
     else startGame(undefined, nextRules, false); // rule tweaks re-deal without the coin ceremony
   }
 
@@ -608,14 +733,17 @@ function App() {
         <button
           type="button"
           className="tt-new-game"
-          onClick={() => (online ? online.role === "host" && hostDeal() : handleNewGame())}
+          onClick={() => (online ? online.role === "host" && hostRematch() : handleNewGame())}
           disabled={online?.role === "guest"}
           title={online?.role === "guest" ? "The host deals" : undefined}
         >
           New Game
         </button>
         <div className={`tt-status ${!state.winner ? `turn-${state.turn}` : ""}`}>
-          <span className="tt-status-text">{status}</span>
+          <span className="tt-status-text">
+            {status}
+            {online && matchWagered && !state.winner && <span className="tt-wager-tag"> · ⚔ Wager</span>}
+          </span>
           <span className="tt-score">
             <span className="score-a">{online ? (myPlayer === "A" ? "You" : "Friend") : "P1"}: {counts.a}</span>
             <span className="score-b">
@@ -718,6 +846,21 @@ function App() {
                 </p>
               </div>
             )}
+            {ante && ante.card && (
+              <div className="tt-reward">
+                <p className="tt-reward-label">
+                  <span className="tt-ante-die" aria-hidden="true">🎲 {ante.roll}</span>{" "}
+                  {ante.won ? "Wager won!" : "Wager lost!"}
+                </p>
+                {ante.card.image && (
+                  <img className="tt-reward-card" src={ante.card.image} alt={ante.card.name} />
+                )}
+                <p className="tt-reward-name">
+                  {ante.card.name}
+                  {ante.won ? " — taken into your collection" : " — forfeited to your friend"}
+                </p>
+              </div>
+            )}
             <p className="tt-winbanner-score">
               {online
                 ? `You ${myPlayer === "A" ? counts.a : counts.b} — ${myPlayer === "A" ? counts.b : counts.a} Friend`
@@ -727,7 +870,7 @@ function App() {
               <button
                 type="button"
                 className="tt-new-game tt-winbanner-btn"
-                onClick={() => (online ? hostDeal() : handleNewGame())}
+                onClick={() => (online ? hostRematch() : handleNewGame())}
               >
                 New Game
               </button>
@@ -923,6 +1066,9 @@ function App() {
               </>
             )}
             {online.stage === "connecting" && <p className="tt-lobby-wait">Connecting…</p>}
+            {online.stage === "waiting" && (
+              <p className="tt-lobby-wait">Waiting for your friend to pick their hand…</p>
+            )}
             {online.stage === "hosting" && (
               <>
                 <p className="tt-lobby-wait">Room code</p>
@@ -956,7 +1102,7 @@ function App() {
           <div className="tt-deck">
             <div className="tt-deck-head">
               <h2>
-                Pick 5 of these 10
+                {draftMode === "online" ? "Pick 5 from your collection" : "Pick 5 of these 10"}
                 <span className="tt-deck-hint"> · tap the 🔍 to enlarge</span>
               </h2>
               <span className="tt-deck-count">{picked.length} / 5</span>
@@ -1006,6 +1152,12 @@ function App() {
                 );
               })}
             </div>
+            {draftMode === "online" && (
+              <label className="tt-deck-wager">
+                <input type="checkbox" checked={onlineWager} onChange={(e) => setOnlineWager(e.target.checked)} />
+                Wager &mdash; if you lose, you forfeit one card to your friend (and win one if you beat them)
+              </label>
+            )}
             <div className="tt-deck-actions">
               <button type="button" className="tt-new-game" onClick={randomFill}>
                 Random
@@ -1013,10 +1165,10 @@ function App() {
               <button
                 type="button"
                 className="tt-new-game tt-deck-start"
-                onClick={confirmDeck}
+                onClick={draftMode === "online" ? confirmOnlineDraft : confirmDeck}
                 disabled={picked.length !== 5}
               >
-                Start Battle
+                {draftMode === "online" ? "Ready" : "Start Battle"}
               </button>
             </div>
           </div>

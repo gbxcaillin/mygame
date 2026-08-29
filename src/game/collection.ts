@@ -140,6 +140,60 @@ export function totalOwnedDistinct(): number {
   return Object.keys(loadCollection().owned).length;
 }
 
+const byId = new Map(CARD_POOL.map((c) => [c.id, c]));
+const clone = (c: Card): Card => ({ ...c, ranks: { ...c.ranks } });
+
+/** All distinct owned cards as Card objects (order not guaranteed). */
+export function ownedCards(): Card[] {
+  return Object.keys(loadCollection().owned).flatMap((id) => {
+    const c = byId.get(id);
+    return c ? [clone(c)] : [];
+  });
+}
+
+/**
+ * Draws up to `size` distinct random cards from the player's collection
+ * (for the online 10 -> pick 5 draft). Returns fewer only if the player
+ * owns fewer than `size` distinct cards.
+ */
+export function draftFromCollection(size = 10): Card[] {
+  const pool = ownedCards();
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+  return pool.slice(0, size);
+}
+
+/** Adds one copy of a card to the collection (e.g. won from a wager). */
+export function addCard(cardId: string): void {
+  if (!byId.has(cardId)) return;
+  const col = loadCollection();
+  col.owned[cardId] = (col.owned[cardId] ?? 0) + 1;
+  afterMutate();
+}
+
+/** Removes one copy of a card (e.g. lost in a wager). Returns true if a
+    copy was removed. Any deck referencing a now-unowned card is dropped. */
+export function removeCard(cardId: string): boolean {
+  const col = loadCollection();
+  const have = col.owned[cardId] ?? 0;
+  if (have <= 0) return false;
+  if (have === 1) {
+    delete col.owned[cardId];
+    // a saved deck can no longer field a card you don't own
+    const before = col.decks.length;
+    col.decks = col.decks.filter((d) => !d.cardIds.includes(cardId));
+    if (col.decks.length !== before && !col.decks.some((d) => d.id === col.activeDeckId)) {
+      col.activeDeckId = col.decks[0]?.id ?? null;
+    }
+  } else {
+    col.owned[cardId] = have - 1;
+  }
+  afterMutate();
+  return true;
+}
+
 /* ── earning ──────────────────────────────────────────────────────────
    Drop odds follow the rarity pyramid, but harder difficulties shift
    weight toward the high tiers. Weight per tier = base ** (per-tier
