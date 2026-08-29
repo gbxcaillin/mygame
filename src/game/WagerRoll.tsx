@@ -57,9 +57,6 @@ export function WagerRoll({ field, roll, taken, won, onContinue }: WagerRollProp
   // Idle on face 1 before the roll so nothing is given away.
   const activeSlot = result ? roll : rolling ? cursor : 1;
   const dieFace = DIE_FACES[activeSlot - 1];
-  // The winner only knows the loser's candidates if they were sent along; when
-  // they weren't, the line still rolls and the taken card is revealed on landing.
-  const haveField = field.length > 0;
 
   return (
     <div className="tt-wr" role="dialog" aria-label="Wager roll">
