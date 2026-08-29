@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Court of Beasts — Friend Bot</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=EB+Garamond&display=swap" />
+<style>
+  :root {
+    --ground:#0a0711; --panel:#16111f; --panel2:#1c1626; --line:#2c2436;
+    --gold-bright:#f5e9c0; --gold:#d79425; --gold-deep:#8a6a25;
+    --text:#d9cfb9; --muted:#998d78; --btn:#140f08;
+    --ok:#8fd39a; --warn:#e0a86a; --me:#7fb4e6; --you:#e69ea0;
+  }
+  * { box-sizing:border-box; }
+  body {
+    margin:0; min-height:100vh;
+    background:radial-gradient(900px 600px at 50% -10%, #1a1226, transparent 60%), var(--ground);
+    color:var(--text); font-family:"EB Garamond",Georgia,serif; font-size:17px;
+  }
+  .wrap { max-width:640px; margin:0 auto; padding:36px 20px 60px; }
+  h1 { font-family:"Cinzel",serif; font-weight:800; font-size:30px; margin:0; color:var(--gold-bright);
+    letter-spacing:.02em; text-shadow:0 0 24px rgba(215,148,37,.2); }
+  .sub { color:var(--muted); margin:8px 0 0; max-width:56ch; }
+  .card { margin-top:22px; border:1px solid var(--line); border-radius:14px; padding:20px;
+    background:linear-gradient(180deg,var(--panel2),var(--panel)); display:grid; gap:14px; }
+  label { font-family:"Cinzel",serif; font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--gold); display:block; margin-bottom:5px; }
+  input, select { width:100%; padding:11px 12px; font-size:16px; color:var(--gold-bright);
+    background:var(--btn); border:1.5px solid var(--gold-deep); border-radius:8px; font-family:inherit; }
+  input#code { font-family:"Cinzel",serif; font-weight:800; font-size:26px; letter-spacing:.3em; text-align:center; }
+  .row { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .check { display:flex; align-items:center; gap:9px; color:var(--text); font-size:16px; cursor:pointer; }
+  .check input { width:auto; }
+  button {
+    font-family:"Cinzel",serif; font-weight:800; font-size:15px; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--gold-bright); background:linear-gradient(180deg,#241a10,var(--btn)); border:1.5px solid var(--gold);
+    border-radius:9px; padding:14px; cursor:pointer; transition:border-color .15s, box-shadow .15s;
+  }
+  button:hover { border-color:var(--gold-bright); box-shadow:0 0 18px rgba(215,148,37,.3); }
+  .status { margin-top:14px; font-size:15px; color:var(--muted); min-height:1.3em; }
+  .status.connecting { color:var(--warn); }
+  .status.connected { color:var(--ok); }
+  .steps { margin:18px 0 0; padding-left:20px; color:var(--text); }
+  .steps li { margin:4px 0; }
+  .steps b { color:var(--gold-bright); }
+  .logwrap { margin-top:22px; }
+  .log { margin-top:8px; border:1px solid var(--line); border-radius:12px; background:#0c0912; padding:12px;
+    height:260px; overflow-y:auto; font-size:14px; line-height:1.5; }
+  .line { padding:2px 0; border-bottom:1px solid rgba(255,255,255,.03); }
+  .line .t { color:#5c5468; font-variant-numeric:tabular-nums; font-size:12px; margin-right:8px; }
+  .line.me { color:var(--me); }
+  .line.you { color:var(--you); }
+  .line.sys { color:var(--muted); }
+  .line.end { color:var(--gold-bright); }
+  footer { margin-top:22px; color:var(--muted); font-size:14px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Friend Bot</h1>
+  <p class="sub">A stand-in opponent for testing online play on your own. It joins a game you host and plays with the real AI — so you can try the collection draft, the wager, the dice and the card transfer without a second device.</p>
+
+  <ol class="steps">
+    <li>In the game: <b>Opponent → Friend (online) → Host a game</b>. Note the 4-letter code.</li>
+    <li>Enter that code below, pick a difficulty, choose whether the bot wagers, and <b>Connect</b>.</li>
+    <li>Back in the game, finish your own draft (pick 5) — the match starts and the bot plays.</li>
+  </ol>
+
+  <div class="card">
+    <div>
+      <label for="relay">Relay</label>
+      <input id="relay" spellcheck="false" autocomplete="off" />
+    </div>
+    <div>
+      <label for="code">Room code</label>
+      <input id="code" placeholder="CODE" autocomplete="off" autocapitalize="characters" />
+    </div>
+    <div class="row">
+      <div>
+        <label for="difficulty">Bot difficulty</label>
+        <select id="difficulty">
+          <option value="1">Beginner</option>
+          <option value="2">Easy</option>
+          <option value="3" selected>Medium</option>
+          <option value="4">Hard</option>
+          <option value="5">Expert</option>
+        </select>
+      </div>
+      <div>
+        <label>Bot wager</label>
+        <label class="check"><input type="checkbox" id="wager" checked /> Bot agrees to wager</label>
+      </div>
+    </div>
+    <button id="connect" type="button">Connect as friend</button>
+    <div class="status idle" id="status">Host a game, then enter the code.</div>
+  </div>
+
+  <div class="logwrap">
+    <label>Match log</label>
+    <div class="log" id="log"></div>
+  </div>
+
+  <footer>Note: the bot only wagers if you also tick Wager on your side — both must agree. If the bot loses a wager it forfeits one of its cards to you; if it wins, it takes one of yours. It has no collection of its own, so its losses just feed your collection for testing.</footer>
+</div>
+<script src="./bot.js"></script>
+</body>
+</html>
