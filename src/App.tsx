@@ -891,7 +891,7 @@ function App() {
       )}
       </div>
 
-      {ante && ante.card && ante.field.length > 0 && !anteDone && (
+      {ante && ante.card && !anteDone && (
         <WagerRoll
           field={ante.field}
           roll={ante.roll}

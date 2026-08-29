@@ -57,9 +57,9 @@ export function WagerRoll({ field, roll, taken, won, onContinue }: WagerRollProp
   // Idle on face 1 before the roll so nothing is given away.
   const activeSlot = result ? roll : rolling ? cursor : 1;
   const dieFace = DIE_FACES[activeSlot - 1];
-
-  // Slot 6 is the reserve card: face-down until the roll actually lands on it.
-  const reserveRevealed = result && roll === 6 ? taken : null;
+  // The winner only knows the loser's candidates if they were sent along; when
+  // they weren't, the line still rolls and the taken card is revealed on landing.
+  const haveField = field.length > 0;
 
   return (
     <div className="tt-wr" role="dialog" aria-label="Wager roll">
@@ -90,26 +90,23 @@ export function WagerRoll({ field, roll, taken, won, onContinue }: WagerRollProp
           <div className="tt-wr-line">
             {[0, 1, 2, 3, 4, 5].map((i) => {
               const slot = i + 1;
-              const card = slot === 6 ? reserveRevealed : field[i] ?? null;
-              const isReserve = slot === 6;
               const active = (rolling || result) && activeSlot === slot;
               const isTaken = result && roll === slot;
               const dim = result && !isTaken;
+              // The taken card is always revealed in its slot on landing, even
+              // when the candidate list wasn't supplied (slot 6 is the reserve).
+              const card = isTaken ? taken : slot === 6 ? null : field[i] ?? null;
               return (
                 <div
                   key={slot}
                   className={`tt-wr-slot${active ? " active" : ""}${isTaken ? " taken" : ""}${dim ? " dim" : ""}`}
                 >
                   <span className="tt-wr-num">{slot}</span>
-                  {isReserve && !reserveRevealed ? (
-                    <div className="tt-wr-back" aria-label="Reserve card">
-                      <span>?</span>
-                    </div>
-                  ) : card && card.image ? (
+                  {card && card.image ? (
                     <img className="tt-wr-card" src={card.image} alt={card.name} draggable={false} />
                   ) : (
-                    <div className="tt-wr-back">
-                      <span>{card?.name ?? "?"}</span>
+                    <div className="tt-wr-back" aria-label={slot === 6 ? "Reserve card" : "Card"}>
+                      <span>?</span>
                     </div>
                   )}
                 </div>
