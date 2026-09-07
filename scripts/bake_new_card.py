@@ -21,6 +21,7 @@ import sys
 
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
+from scipy import ndimage
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from bake_card_numbers import (  # noqa: E402
@@ -42,9 +43,14 @@ def find_banner(gray):
     plausible height, so dark ground touching the banner can't merge into it.
     """
     size = gray.shape[0]
-    band = gray[:, int(0.25 * size):int(0.75 * size)].astype(np.float32)
+    # A light blur first: a mottled (textured) banner fill averages into a
+    # flat dark band, while textured dark artwork keeps larger-scale structure
+    # and still fails the flatness test. Verified on a clean banner (Kraken),
+    # a banner over dark ground (Fafnir) and the mottled Common template.
+    blurred = ndimage.gaussian_filter(gray.astype(np.float32), sigma=size / 250)
+    band = blurred[:, int(0.25 * size):int(0.75 * size)]
     lo, hi = int(0.62 * size), int(0.90 * size)
-    flat_dark = [y for y in range(lo, hi) if band[y].mean() < 30 and band[y].std() < 12]
+    flat_dark = [y for y in range(lo, hi) if band[y].mean() < 45 and band[y].std() < 20]
     runs = []
     for y in flat_dark:
         if runs and y == runs[-1][-1] + 1:
@@ -64,7 +70,20 @@ def draw_centered(draw, text, font, cx, cy, stroke):
               text, font=font, fill=FILL, stroke_width=stroke, stroke_fill=(0, 0, 0))
 
 
-def main(src, name):
+BOXES = os.path.join(BASE, "scripts", "card_boxes.json")
+
+
+def record_boxes(slug, boxes):
+    """Pin this card's measured plaque centres so a full re-bake
+    (bake_card_numbers.py) reproduces it exactly, whatever the detector does."""
+    pinned = json.load(open(BOXES)) if os.path.exists(BOXES) else {}
+    pinned[slug] = {side: [float(x), float(y)] for side, (x, y) in boxes.items()}
+    with open(BOXES, "w") as f:
+        json.dump(dict(sorted(pinned.items())), f, indent=1)
+        f.write("\n")
+
+
+def main(src, name, detect_from=None):
     creatures = json.load(open(CREATURES))["creatures"]
     idx, creature = next(((i, c) for i, c in enumerate(creatures, 1)
                           if c["name"].lower() == name.lower()), (None, None))
@@ -83,8 +102,17 @@ def main(src, name):
     if im.size[0] != im.size[1]:
         sys.exit(f"Source must be square, got {im.size}")
     size = im.size[0]
-    gray = np.array(im.convert("L"))
-    by, bh = find_banner(gray)
+    # Plaques and banner are measured on the card itself, or on a reference
+    # image of the same template (e.g. the per-pixel median of a batch, where
+    # the identical frame stays crisp and the differing paintings average
+    # away) when per-card detection is unreliable, as on a mottled fill.
+    if detect_from:
+        ref_gray = np.array(Image.open(detect_from).convert("L"))
+        if ref_gray.shape[0] != size:
+            sys.exit(f"Reference must match the source size {size}, got {ref_gray.shape[0]}")
+    else:
+        ref_gray = np.array(im.convert("L"))
+    by, bh = find_banner(ref_gray)
     draw = ImageDraw.Draw(im)
     name_font = ImageFont.truetype(FONT, int(size * bh * NAME_FILL))
     draw_centered(draw, creature["name"].upper(), name_font, 0.5 * size, by * size,
@@ -93,8 +121,8 @@ def main(src, name):
     im.save(placeholder)
 
     # 2) game JPG: ranks baked into the detected plaques, as bake_card_numbers.py does
-    gray = np.array(im.convert("L"))
-    boxes = detect_boxes(gray, size)
+    boxes = detect_boxes(ref_gray if detect_from else np.array(im.convert("L")), size)
+    record_boxes(hyslug(creature["name"]), boxes)
     img = im.resize((OUT, OUT), Image.LANCZOS)
     d = ImageDraw.Draw(img)
     font = ImageFont.truetype(FONT, FONT_PX)
@@ -112,6 +140,13 @@ def main(src, name):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
+    # usage: bake_new_card.py <source.png> "<Creature Name>" [--detect-from ref.png]
+    args = sys.argv[1:]
+    ref = None
+    if "--detect-from" in args:
+        i = args.index("--detect-from")
+        ref = args[i + 1]
+        del args[i:i + 2]
+    if len(args) != 2:
         sys.exit(__doc__)
-    main(sys.argv[1], sys.argv[2])
+    main(args[0], args[1], ref)

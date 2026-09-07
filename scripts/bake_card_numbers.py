@@ -105,10 +105,20 @@ def main():
     files = sorted(glob.glob(os.path.join(PLACEHOLDERS, "*.png")))
     assert len(files) == len(creatures), (len(files), len(creatures))
 
+    # Positions pinned at bake time (scripts/card_boxes.json) take precedence
+    # over live detection, so a re-bake reproduces each card exactly even on
+    # templates the detector reads poorly; cards without an entry are detected.
+    boxes_path = os.path.join(BASE, "scripts", "card_boxes.json")
+    pinned = json.load(open(boxes_path)) if os.path.exists(boxes_path) else {}
+
     font = ImageFont.truetype(FONT, FONT_PX)
     for creature, path in zip(creatures, files):
-        gray = np.array(Image.open(path).convert("L"))
-        boxes = detect_boxes(gray, gray.shape[0])
+        slug = hyslug(creature["name"])
+        if slug in pinned:
+            boxes = {side: tuple(xy) for side, xy in pinned[slug].items()}
+        else:
+            gray = np.array(Image.open(path).convert("L"))
+            boxes = detect_boxes(gray, gray.shape[0])
         img = Image.open(path).convert("RGB").resize((OUT, OUT), Image.LANCZOS)
         draw = ImageDraw.Draw(img)
         vals = {"top": creature["top"], "left": creature["left"],
