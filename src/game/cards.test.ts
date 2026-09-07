@@ -29,7 +29,7 @@ describe("pyramid-weighted dealing", () => {
   });
 
   it("low tiers appear far more often than high tiers", () => {
-    const tierCounts: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 };
+    const tierCounts: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0 };
     const deals = 2000;
     for (let i = 0; i < deals; i++) {
       const { handA, handB } = dealHands();
@@ -41,6 +41,8 @@ describe("pyramid-weighted dealing", () => {
     expect(tierCounts[2]).toBeGreaterThan(tierCounts[4]);
     expect(tierCounts[3]).toBeGreaterThan(tierCounts[5]);
     expect(tierCounts[4]).toBeGreaterThan(tierCounts[6]);
+    // Primordial (tier 7) is rarer than Mythic.
+    expect(tierCounts[6]).toBeGreaterThan(tierCounts[7]);
     // Commons should be several times more frequent than Mythics.
     expect(tierCounts[1]).toBeGreaterThan(tierCounts[6] * 4);
   });

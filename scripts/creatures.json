@@ -616,6 +616,26 @@
       "bottom": 9,
       "left": 8,
       "total_power": 34
+    },
+    {
+      "name": "Ent King",
+      "rarity": "Primordial",
+      "tier": 7,
+      "top": 10,
+      "right": 9,
+      "bottom": 9,
+      "left": 9,
+      "total_power": 37
+    },
+    {
+      "name": "Cthulhu",
+      "rarity": "Primordial",
+      "tier": 7,
+      "top": 10,
+      "right": 10,
+      "bottom": 9,
+      "left": 9,
+      "total_power": 38
     }
   ]
 }

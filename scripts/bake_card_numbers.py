@@ -95,7 +95,7 @@ def main():
     os.makedirs(OUT_DIR, exist_ok=True)
     creatures = json.load(open(CREATURES))["creatures"]
     files = sorted(glob.glob(os.path.join(PLACEHOLDERS, "*.png")))
-    assert len(files) == len(creatures) == 60, (len(files), len(creatures))
+    assert len(files) == len(creatures), (len(files), len(creatures))
 
     font = ImageFont.truetype(FONT, FONT_PX)
     for creature, path in zip(creatures, files):

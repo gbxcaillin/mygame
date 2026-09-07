@@ -201,12 +201,12 @@ export function removeCard(cardId: string): boolean {
    always pays commons while Expert pays Epic+ roughly half the time. */
 
 const DROP_WEIGHTS: Record<Difficulty, number[]> = {
-  // index 0 = tier 1 … index 5 = tier 6
-  1: [50, 28, 14, 6, 1.6, 0.4],
-  2: [38, 28, 18, 10, 4.5, 1.5],
-  3: [24, 24, 21, 10, 12, 4],
-  4: [12, 18, 22, 24, 16, 8],
-  5: [6, 12, 18, 26, 24, 14],
+  // index 0 = tier 1 … index 6 = tier 7 (Primordial: rarest at every level)
+  1: [50, 28, 14, 6, 1.6, 0.4, 0.05],
+  2: [38, 28, 18, 10, 4.5, 1.5, 0.2],
+  3: [24, 24, 21, 10, 12, 4, 0.8],
+  4: [12, 18, 22, 24, 16, 8, 2],
+  5: [6, 12, 18, 26, 24, 14, 5],
 };
 
 export function rollReward(difficulty: Difficulty, rng: () => number = Math.random): Card {

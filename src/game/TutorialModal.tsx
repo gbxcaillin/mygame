@@ -86,7 +86,8 @@ export function TutorialModal({ onClose }: TutorialModalProps) {
             </p>
             <p>
               Creatures follow a rarity pyramid &mdash; Commons and Uncommons appear often, while Legendary and
-              Mythic beasts like the Dragon or Kraken are rare finds.
+              Mythic beasts like the Dragon or Kraken are rare finds. Rarest of all are the two Primordials,
+              the Ent King and Cthulhu, the strongest cards in the game.
             </p>
           </section>
 

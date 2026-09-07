@@ -15,7 +15,8 @@ export type Rarity =
   | "Rare"
   | "Epic"
   | "Legendary"
-  | "Mythic";
+  | "Mythic"
+  | "Primordial";
 
 export interface Card {
   id: string;

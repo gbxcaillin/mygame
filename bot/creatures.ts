@@ -69,6 +69,8 @@ const CREATURES: CreatureData[] = [
   { name: "Typhon", rarity: "Mythic", tier: 6, top: 8, right: 9, bottom: 9, left: 7 },
   { name: "Nidhoggr", rarity: "Mythic", tier: 6, top: 9, right: 10, bottom: 8, left: 7 },
   { name: "Jormungandr", rarity: "Mythic", tier: 6, top: 8, right: 9, bottom: 9, left: 8 },
+  { name: "Ent King", rarity: "Primordial", tier: 7, top: 10, right: 9, bottom: 9, left: 9 },
+  { name: "Cthulhu", rarity: "Primordial", tier: 7, top: 10, right: 10, bottom: 9, left: 9 },
 ];
 
 function slugify(name: string): string {

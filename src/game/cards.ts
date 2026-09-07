@@ -81,6 +81,9 @@ const CREATURES: CreatureData[] = [
   { name: "Typhon", rarity: "Mythic", tier: 6, top: 8, right: 9, bottom: 9, left: 7 },
   { name: "Nidhoggr", rarity: "Mythic", tier: 6, top: 9, right: 10, bottom: 8, left: 7 },
   { name: "Jormungandr", rarity: "Mythic", tier: 6, top: 8, right: 9, bottom: 9, left: 8 },
+  // Primordial: a tier above Mythic, the two strongest cards in the game.
+  { name: "Ent King", rarity: "Primordial", tier: 7, top: 10, right: 9, bottom: 9, left: 9 },
+  { name: "Cthulhu", rarity: "Primordial", tier: 7, top: 10, right: 10, bottom: 9, left: 9 },
 ];
 
 function slugify(name: string): string {
@@ -104,8 +107,9 @@ const clone = (c: Card): Card => ({ ...c, ranks: { ...c.ranks } });
 /* Pyramid rarity: relative deal weight per tier. Low tiers dominate the
    draw and the strongest creatures are genuinely rare. With 10 cards per
    tier these are effectively percentages of each dealt card:
-   Common 35%, Uncommon 25%, Rare 18%, Epic 12%, Legendary 7%, Mythic 3%. */
-const TIER_WEIGHTS: Record<number, number> = { 1: 35, 2: 25, 3: 18, 4: 12, 5: 7, 6: 3 };
+   Common 35%, Uncommon 25%, Rare 18%, Epic 12%, Legendary 7%, Mythic 3%.
+   Primordial (only two cards) is rarer still. */
+const TIER_WEIGHTS: Record<number, number> = { 1: 35, 2: 25, 3: 18, 4: 12, 5: 7, 6: 3, 7: 1 };
 
 function cardWeight(card: Card): number {
   return TIER_WEIGHTS[card.tier] ?? 1;

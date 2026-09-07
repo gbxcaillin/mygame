@@ -19,7 +19,7 @@ interface CollectionPanelProps {
   syncStatus: SyncStatus;
 }
 
-const TIER_NAMES = ["Common", "Uncommon", "Rare", "Epic", "Legendary", "Mythic"];
+const TIER_NAMES = ["Common", "Uncommon", "Rare", "Epic", "Legendary", "Mythic", "Primordial"];
 
 const SYNC_LABEL: Record<SyncStatus, string> = {
   synced: "✓ Saved to server",
@@ -130,7 +130,7 @@ export function CollectionPanel({ onClose, onChanged, playerName, syncStatus }: 
         )}
 
         <div className="tt-col-grid">
-          {[1, 2, 3, 4, 5, 6].map((tier) => (
+          {[1, 2, 3, 4, 5, 6, 7].map((tier) => (
             <section key={tier} className="tt-col-tier">
               <h3>{TIER_NAMES[tier - 1]}</h3>
               <div className="tt-col-cards">
