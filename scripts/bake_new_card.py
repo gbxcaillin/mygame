@@ -72,7 +72,10 @@ def main(src, name):
         sys.exit(f"No creature named {name!r} in {CREATURES}")
 
     us_slug = re.sub(r"[^a-z0-9]+", "_", creature["name"].lower()).strip("_")
-    matches = glob.glob(os.path.join(PLACEHOLDERS, f"*_{us_slug}.png"))
+    # Match the exact NN_slug.png name. A looser "*_slug.png" would also match
+    # names this one is a suffix of ("Dragon" -> "Ancient Dragon"), and then
+    # baking one card could silently overwrite another's placeholder.
+    matches = glob.glob(os.path.join(PLACEHOLDERS, f"[0-9][0-9]_{us_slug}.png"))
     placeholder = matches[0] if matches else os.path.join(PLACEHOLDERS, f"{idx:02d}_{us_slug}.png")
 
     # 1) placeholder: source art + name baked into the banner at full resolution

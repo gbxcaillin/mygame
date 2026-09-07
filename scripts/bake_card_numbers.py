@@ -73,16 +73,24 @@ def detect_boxes(gray, size):
     """Centre of each of the four number boxes as canvas fractions.
 
     Top/bottom are found independently. Left and right share one vertical
-    centre taken from whichever of the two is a clean (unmerged) box, so a
-    left/right box that blends into dark artwork still gets the right Y while
-    keeping its own reliable X. Falls back to canonical positions if needed.
+    centre (the mean of both plausible boxes) so the two side numbers sit at
+    exactly the same height, while each keeps its own reliable X. A box is
+    plausible when its blob is a lone plaque (height < 0.19 canvas); one
+    that has merged into dark artwork is excluded, so the other side's Y is
+    used, falling back to the canonical position only if neither is usable.
+
+    Fill ratio is deliberately NOT a criterion. The newer card template
+    paints a soft shadow halo around each plaque, which enlarges the blob's
+    bounding box (lowering fill) without moving its centre; judging by fill
+    wrongly rejected those plaques and dropped the number to the canonical
+    Y, leaving the side numbers visibly low.
     """
     t = _blob(gray, size, *CANON["top"])
     b = _blob(gray, size, *CANON["bottom"])
     lft = _blob(gray, size, *CANON["left"])
     rgt = _blob(gray, size, *CANON["right"])
-    clean = [c[1] for c in (lft, rgt) if c and c[3] > 0.82 and c[2] < 0.19]
-    fy = float(np.mean(clean)) if clean else CANON["left"][1]
+    plausible = [c[1] for c in (lft, rgt) if c and c[2] < 0.19]
+    fy = float(np.mean(plausible)) if plausible else CANON["left"][1]
     return {
         "top": (t[0], t[1]) if t else CANON["top"],
         "bottom": (b[0], b[1]) if b else CANON["bottom"],
